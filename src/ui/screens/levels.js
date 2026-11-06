@@ -51,7 +51,7 @@ export function levels(root, app) {
   );
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
-  speaker.say('Où est-ce qu’on va aujourd’hui ?', { silent: true });
+  speaker.say('Où est-ce qu’on va aujourd’hui ?', { once: 'carte' });
 
   cards.forEach((card) => card.addEventListener('click', () => {
     const lv = LEVELS.find((l) => l.id === +card.dataset.level);

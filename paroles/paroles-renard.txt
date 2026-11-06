@@ -1,0 +1,890 @@
+PAROLES DU RENARD — 869 phrases à enregistrer
+Chaque ligne : identifiant | phrase. Le fichier audio de chaque phrase doit porter son identifiant : <identifiant>.mp3
+
+=== CONSIGNE (210) ===
+b3b2065d | Barre, biais, ventre, enroulé
+65819cf7 | Boucle en haut, boucle en bas
+4190d906 | Comme deux v collés l’un à l’autre.
+41b761c1 | Comme le l, petite boucle, jambe
+4bd6aa0e | Comme le l, puis un pont
+6910ce1e | Comme le n, mais avec deux ponts.
+22279e44 | Comme un i qui descend sous la ligne, avec son point.
+db947097 | Comme un u qui descend plus bas
+c9eea5c1 | Comme un u, mais la deuxième jambe descend sous la ligne.
+a302823f | Commence en haut, trace la barre vers la droite, descends en biais, fais le ventre, descends sous la ligne et enroule vers la gauche.
+5512dce4 | D’abord un c à l’envers (qui s’ouvre vers la gauche) ; lève le crayon, puis un c normal à droite, qui touche le premier au milieu.
+6b69e118 | Des ponts pour passer la rivière !
+e14f575b | Descends en rond, remonte, descends en rond, remonte, et finis par un petit trait vers la droite.
+19c0b674 | Descends tout droit
+0011b241 | Descends, arrondis au fond, remonte tout droit, puis tire un petit trait vers la droite.
+640fd032 | Descends, arrondis, remonte
+9dfcd1e2 | Deux creux
+24c7db7b | Deux ponts
+35f22f26 | Écris chaque mot lettre par lettre, puis pose le point final sur la ligne.
+ff84de59 | Écris les lettres l’une après l’autre, de gauche à droite, puis pose le point.
+4bf74ba6 | Écris les lettres l’une après l’autre, de gauche à droite.
+ce250d45 | Écris les lettres une par une, de gauche à droite, puis pose le point du i à la fin.
+e63c9bf0 | Écris les lettres une par une, de gauche à droite.
+c1cb261c | Elles montent et elles descendent, doucement.
+56da4d04 | Fais comme un u, mais la dernière descente va sous la ligne ; fais la boucle et remonte en croisant ton trait.
+2763bcf9 | Fais la boucle
+e19f9c55 | Fais la grande boucle et descends, remonte sur le trait, fais la petite boucle, puis descends avec la jambe.
+9f653c5f | Fais le rond vers la gauche, remonte, puis descends tout droit avec la queue.
+1847e6e4 | Fais le rond, descends sous la ligne, tourne vers la gauche, puis remonte en croisant ton trait.
+e2ff63b2 | Fais le rond, monte tout droit plus haut que le rond, puis redescends avec la queue.
+0a0dc672 | Fais le rond, puis descends tout droit sous la ligne.
+de1ce341 | Grande boucle, descends, ventre
+9c3b6d81 | J’écris les lettres une par une, et je lève le crayon entre les lettres.
+8d063945 | J’écris les mots l’un après l’autre, et je pose un point à la fin.
+2010b87e | Je commence comme un rond, mais je m’arrête avant de le fermer.
+bd9f40db | Je commence en haut, je trace la barre vers la droite, je descends en biais, puis je fais le ventre et je descends sous la ligne pour enrouler.
+d561315c | Je descends, j’arrondis au fond, je remonte tout droit et je pars vers la droite.
+ddb9763a | Je dessine des gouttes de haut en bas.
+5067fc1c | Je dessine une bulle !
+af952c19 | Je fais comme un l, puis une petite boucle au milieu et la jambe.
+685324ef | Je fais la grande boucle du l, je descends tout droit, puis je fais le ventre et je finis par un petit bec.
+cadf6e99 | Je fais la grande boucle du l, puis je remonte et je fais un pont.
+8c28f75b | Je fais un rond, je descends sous la ligne, je fais une boucle et je remonte.
+6cf285fa | Je fais un rond, puis je descends tout droit sous la ligne.
+56f812f0 | Je fais un rond, puis je monte tout droit et je redescends avec la petite queue.
+4a67cf11 | Je fais un rond, puis je remonte et je descends tout droit le long du rond, avec la petite queue.
+cb4ebd63 | Je les écris l’une après l’autre.
+f22886f1 | Je monte en biais, je redescends tout droit avec la petite queue… et je n’oublie pas son point !
+d4ee53bd | Je monte en pointe, je descends en faisant le ventre bien rond, et je reviens un peu vers la gauche.
+bb13abb0 | Je monte en pointe, je redescends tout droit avec la petite queue, puis je pose la barre en travers.
+6af4d932 | Je monte haut, je fais une grande boucle et je redescends.
+9913d7d3 | Je monte tout droit, je fais un petit toit plat vers la droite, puis je descends jusqu’à la ligne.
+3afc9a78 | Je monte, je descends en rond, je remonte et je redescends avec la petite queue.
+de5a88b9 | Je monte, je descends tout droit sous la ligne, je remonte et je fais un pont.
+5fecab38 | Je monte, je descends, je remonte et je fais un pont rond.
+a984661b | Je monte, je fais une boucle et j’avance.
+fd67fdee | Je monte, je passe au-dessus et je redescends.
+6163e7e1 | Je pars du milieu, je trace la barre vers la droite, puis je fais le tour en rond vers la gauche.
+bf5d9a06 | Je tourne vers la gauche et je ferme le rond.
+955f3aaa | Je tourne vers la gauche, comme une horloge à l’envers.
+00686a76 | La barre, puis le tour
+e69672b3 | La phrase « il a un ami ».
+d0bf67d7 | La phrase « il a un chien ».
+6e3ccb98 | La phrase « il neige ».
+109be9c2 | La phrase « il pleut ».
+ffb8730a | La phrase « la lune brille ».
+d132c773 | La phrase « le bebe dort ».
+30434da9 | La phrase « le chat dort ».
+9c935bc8 | La phrase « le lapin saute ».
+9ccf7b07 | La phrase « le lion rugit ».
+2d84b48c | La phrase « le loup a faim ».
+a13f5c1f | La phrase « mon ami joue ».
+ed7bf8a4 | La phrase « papa lit ».
+0417ee20 | La phrase « tu as un ami ».
+27a02f10 | La phrase « un ours dort ».
+e26b6950 | La rivière fait des vagues.
+c08e5946 | Le a, comme abeille.
+18594df9 | Le b, comme ballon.
+19076266 | Le c, comme chat.
+0516166e | Le d, comme dauphin.
+08991922 | Le e, comme écureuil.
+71c65389 | Le f, comme fleur.
+b92fee78 | Le g, comme grenouille.
+889e7c3c | Le h, comme hibou.
+ced60bab | Le i, comme iris.
+2d31df11 | Le j, comme jardin.
+9e3fabe2 | Le k, comme koala.
+3742da6e | Le l, comme lanterne.
+7c0027d2 | Le m, comme mouton.
+f25ed001 | Le mot « aile ».
+7a1edb97 | Le mot « ami ».
+8acb7832 | Le mot « arbre ».
+5f8024ba | Le mot « blanc ».
+452964be | Le mot « bleu ».
+da42f053 | Le mot « canard ».
+4091e7d0 | Le mot « chat ».
+095d58fd | Le mot « cheval ».
+8f5d2163 | Le mot « chien ».
+10172bea | Le mot « fleur ».
+88036911 | Le mot « gris ».
+b257f025 | Le mot « il ».
+cd86bc1f | Le mot « jaune ».
+90f7b027 | Le mot « la ».
+0780e0a8 | Le mot « lait ».
+7c6adcb6 | Le mot « lapin ».
+bf5d7e63 | Le mot « le ».
+cfe99f44 | Le mot « lion ».
+c64529af | Le mot « lit ».
+bee10dea | Le mot « livre ».
+cac51c24 | Le mot « loi ».
+280a1b32 | Le mot « loup ».
+0ffbee20 | Le mot « lune ».
+400e42d6 | Le mot « maman ».
+43748e69 | Le mot « mamie ».
+a64ed55c | Le mot « neige ».
+006c8742 | Le mot « noir ».
+e084dc4d | Le mot « oie ».
+6464bfc7 | Le mot « ours ».
+eed01256 | Le mot « pain ».
+44f71c4e | Le mot « papa ».
+d636b566 | Le mot « papi ».
+5cbcc48f | Le mot « pluie ».
+5d7a1773 | Le mot « poire ».
+21929e72 | Le mot « pomme ».
+9d3c92ca | Le mot « porte ».
+d6083ea8 | Le mot « robe ».
+545057ff | Le mot « rose ».
+64ade136 | Le mot « rouge ».
+c2b1f84f | Le mot « sable ».
+50ca1e97 | Le mot « sac ».
+a7d3a3fa | Le mot « soleil ».
+246a71d1 | Le mot « souris ».
+120fc024 | Le mot « table ».
+79efd956 | Le mot « tata ».
+481a9ba3 | Le mot « vache ».
+65a7dda7 | Le mot « vent ».
+94e0614b | Le mot « vert ».
+d3d5a66f | Le n, comme nuage.
+3a2b8182 | Le o, comme oiseau.
+a7eba770 | Le p, comme papillon.
+1e74aba6 | Le q, comme quille.
+acf39ac8 | Le r, comme rivière.
+e09651f4 | Le s, comme soleil.
+0f5738bf | Le son « ai » s’écrit avec 2 lettres : a, i.
+42bf5dab | Le son « an » s’écrit avec 2 lettres : a, n.
+905f1c4f | Le son « au » s’écrit avec 2 lettres : a, u.
+71e0273f | Le son « ch » s’écrit avec 2 lettres : c, h.
+1c0f5ac8 | Le son « eau » s’écrit avec 3 lettres : e, a, u.
+5c75d65f | Le son « eu » s’écrit avec 2 lettres : e, u.
+2e9b11d7 | Le son « gn » s’écrit avec 2 lettres : g, n.
+e9f2d16b | Le son « in » s’écrit avec 2 lettres : i, n.
+8b17086f | Le son « oi » s’écrit avec 2 lettres : o, i.
+da0e3f37 | Le son « on » s’écrit avec 2 lettres : o, n.
+bf774507 | Le son « ou » s’écrit avec 2 lettres : o, u.
+3b5f03af | Le son « qu » s’écrit avec 2 lettres : q, u.
+5ad220d4 | Le t, comme tortue.
+a606dbfb | Le u, comme ukulélé.
+0dc0f8a0 | Le v, comme vache.
+a2367088 | Le w, comme wagon.
+c92341ef | Le x, comme xylophone.
+cbc9f92e | Le y, comme yaourt.
+432f8778 | Le z, comme zèbre.
+9ed16b67 | Lettre après lettre
+d7a65aaa | Lettre par lettre
+833133a3 | Monte en arrondi, descends tout droit, remonte sur ton trait, fais un pont et descends.
+17d7f446 | Monte en arrondi, descends, puis fais deux ponts de suite.
+33f9825c | Monte en biais jusqu’en haut, tourne et descends en arrondi, puis reviens un peu vers la gauche.
+01b8f0fa | Monte en biais, descends en arrondi, remonte, puis redescends avec la queue.
+7f848d8f | Monte en biais, descends sous la ligne, fais la boucle en croisant ton trait, puis pose le point en haut.
+edefb321 | Monte en biais, descends tout droit sous la ligne, remonte sur ton trait, puis fais un pont.
+d5769b0e | Monte en biais, descends tout droit, puis pose le point sur la ligne du haut.
+0edb2d81 | Monte en pointe, descends tout droit, tourne avec la queue, puis lève le crayon et trace la barre.
+9db194be | Monte en pointe, descends, la barre
+30faa6a1 | Monte en tournant vers la gauche, fais la boucle et avance.
+cd4cb5b4 | Monte haut, fais la grande boucle, descends sous la ligne, fais la boucle du bas et reviens.
+9609501a | Monte haut, fais la grande boucle, descends tout droit, puis arrondis le ventre vers la droite et finis par un petit bec.
+7e55e9b4 | Monte haut, fais la grande boucle, descends, remonte et fais un pont.
+23a7c8dc | Monte haut, grande boucle, descends
+56148f25 | Monte jusqu’à la ligne du haut, fais la grande boucle, redescends.
+b87d3c7c | Monte tout droit, glisse vers la droite en gardant le trait plat, puis descends jusqu’à la ligne.
+214ff67e | Monte, arrondis, remonte
+7e3edf5d | Monte, descends sous la ligne, un pont
+12e781b3 | Monte, descends, puis le point
+63604baa | Monte, descends, recourbe, point
+c3bfea9d | Monte, descends, un pont
+56d23c93 | Monte, passe au-dessus et redescends.
+0cbb4388 | Monte, passe, redescends
+c7461d78 | Monte, toit plat, descends
+3dd46ff5 | Monte, ventre rond
+8cc32d21 | Mot après mot, puis le point
+8364f665 | Pars du point vert et descends tout droit.
+fce656de | Pars du point vert, tourne vers la gauche et ferme le rond.
+108294db | Pars du point vert, tourne vers la gauche et referme le rond.
+b83dba6c | Pars du point vert, tourne vers la gauche, et arrête-toi : le rond reste ouvert.
+cfd6a93a | Pars du point vert, trace la barre vers la droite, puis fais le tour du e en tournant vers la gauche.
+a4df161e | Puis recommence.
+09d6d049 | Regarde, il pleut !
+81f92ca0 | Suis la vague
+50d61b7a | Suis la vague sans t’arrêter : le haut touche la ligne, le bas touche la ligne.
+291f6954 | Tourne et ferme le rond
+b6118162 | Tourne vers la gauche
+4f8226ce | Un c à l’envers, puis un c
+7158330f | Un c à l’envers, puis un c : ils se touchent au milieu.
+5899e0aa | Un rond ouvert
+f3310c06 | Un rond, descends, boucle, remonte
+c8951d09 | Un rond, monte haut, descends
+ebb1793f | Un rond, puis descends
+66ba8717 | Un rond, puis descends tout droit
+ba210f39 | Un ruban qui danse !
+e43354bf | Une grande boucle en haut, une boucle en bas, et elles se croisent sur la ligne.
+
+=== FÉLICITATION (140) ===
+b70e7308 | Bravo !
+0670fc29 | Encore un essai sans aide pour gagner ton trésor.
+822b2e14 | Encore un essai sans aide pour réussir ce mot.
+3aa3272d | Et 2 nouvelles vignettes !
+8fbbab9e | Et 3 nouvelles vignettes !
+bd8c5fdb | Et 4 nouvelles vignettes !
+cf514c2c | Et 5 nouvelles vignettes !
+6e113cc9 | Et 6 nouvelles vignettes !
+c907b89a | Et une nouvelle vignette : l’abeille !
+621510f8 | Et une nouvelle vignette : l’écureuil !
+24b31c60 | Et une nouvelle vignette : l’escargot !
+c885a657 | Et une nouvelle vignette : l’ours !
+f2e9ac0f | Et une nouvelle vignette : la coccinelle !
+9dd68f92 | Et une nouvelle vignette : la grenouille !
+50b345e2 | Et une nouvelle vignette : la libellule !
+401669fb | Et une nouvelle vignette : la luciole !
+d3d69ecf | Et une nouvelle vignette : la souris !
+89677e1b | Et une nouvelle vignette : la tortue !
+d1c4a955 | Et une nouvelle vignette : la vache !
+96f4cc01 | Et une nouvelle vignette : le canard !
+880361dc | Et une nouvelle vignette : le castor !
+ed0e8f72 | Et une nouvelle vignette : le cerf !
+948b20bc | Et une nouvelle vignette : le chat !
+c66cdaaf | Et une nouvelle vignette : le cheval !
+68c3d571 | Et une nouvelle vignette : le dauphin !
+73ddfa1b | Et une nouvelle vignette : le hérisson !
+6ab373ff | Et une nouvelle vignette : le hibou !
+c9b72bf6 | Et une nouvelle vignette : le lapin !
+de78448e | Et une nouvelle vignette : le mouton !
+6da20e07 | Et une nouvelle vignette : le papillon !
+25abca83 | Et une nouvelle vignette : le poisson !
+b2c76dca | Et une nouvelle vignette : le renard doré !
+cbf7a5c3 | Et une nouvelle vignette : le rouge-gorge !
+a65d02fe | On a bien travaillé !
+68b801b7 | On reprendra une autre fois.
+7ae8f28f | Tu as réussi : la bulle !
+e3c7109e | Tu as réussi : la pluie !
+0f154256 | Tu as réussi : la rivière !
+90fa28aa | Tu as réussi : les ponts !
+1a26177b | Tu as réussi : les rubans !
+1de66269 | Tu sais écrire « ai » !
+4499b52e | Tu sais écrire « aile » !
+5494e45c | Tu sais écrire « ami » !
+0ffa2ecc | Tu sais écrire « an » !
+5c67398f | Tu sais écrire « arbre » !
+9d245a0d | Tu sais écrire « au » !
+800b46cf | Tu sais écrire « blanc » !
+e7c74ae3 | Tu sais écrire « bleu » !
+ee764978 | Tu sais écrire « canard » !
+b18db2ec | Tu sais écrire « ch » !
+3e8aac2d | Tu sais écrire « chat » !
+c5c0ccb2 | Tu sais écrire « cheval » !
+af00e580 | Tu sais écrire « chien » !
+39248018 | Tu sais écrire « eau » !
+02e8ec49 | Tu sais écrire « eu » !
+8a35ebaf | Tu sais écrire « fleur » !
+3cf2c582 | Tu sais écrire « gn » !
+b2fea4f6 | Tu sais écrire « gris » !
+040836ea | Tu sais écrire « il » !
+ee740124 | Tu sais écrire « in » !
+10f18c24 | Tu sais écrire « jaune » !
+def242f4 | Tu sais écrire « la » !
+af21ba5d | Tu sais écrire « lait » !
+64be188b | Tu sais écrire « lapin » !
+71fa3668 | Tu sais écrire « le » !
+1b479411 | Tu sais écrire « lion » !
+0e8c90cc | Tu sais écrire « lit » !
+4fcb88e7 | Tu sais écrire « livre » !
+90165111 | Tu sais écrire « loi » !
+cb8195a7 | Tu sais écrire « loup » !
+9ea5a3b5 | Tu sais écrire « lune » !
+2562ed83 | Tu sais écrire « maman » !
+7c2ca356 | Tu sais écrire « mamie » !
+d91b99f9 | Tu sais écrire « neige » !
+292042df | Tu sais écrire « noir » !
+10b7e26b | Tu sais écrire « oi » !
+b1323602 | Tu sais écrire « oie » !
+401e0e5a | Tu sais écrire « on » !
+dd3b773f | Tu sais écrire « ou » !
+3714ebfc | Tu sais écrire « ours » !
+7a293a9b | Tu sais écrire « pain » !
+533c5d0b | Tu sais écrire « papa » !
+b1686723 | Tu sais écrire « papi » !
+82820484 | Tu sais écrire « pluie » !
+0dd7e6d0 | Tu sais écrire « poire » !
+6cdb0487 | Tu sais écrire « pomme » !
+d59c6277 | Tu sais écrire « porte » !
+06f2871d | Tu sais écrire « qu » !
+1d983e1d | Tu sais écrire « robe » !
+3117a0b4 | Tu sais écrire « rose » !
+d4cf184b | Tu sais écrire « rouge » !
+e404d04c | Tu sais écrire « sable » !
+b1f72534 | Tu sais écrire « sac » !
+15108ea7 | Tu sais écrire « soleil » !
+b741358e | Tu sais écrire « souris » !
+c6735de9 | Tu sais écrire « table » !
+be68b8c3 | Tu sais écrire « tata » !
+8e624d20 | Tu sais écrire « vache » !
+2b81c7ec | Tu sais écrire « vent » !
+02b3edf8 | Tu sais écrire « vert » !
+09f65549 | Tu sais écrire la phrase « il a un ami » !
+0c6edd4d | Tu sais écrire la phrase « il a un chien » !
+131db04e | Tu sais écrire la phrase « il neige » !
+1c646838 | Tu sais écrire la phrase « il pleut » !
+ce0a4860 | Tu sais écrire la phrase « la lune brille » !
+abe9ae3b | Tu sais écrire la phrase « le bebe dort » !
+cc1ffef1 | Tu sais écrire la phrase « le chat dort » !
+74f74f9a | Tu sais écrire la phrase « le lapin saute » !
+af10a3c9 | Tu sais écrire la phrase « le lion rugit » !
+1994c666 | Tu sais écrire la phrase « le loup a faim » !
+7b09e29b | Tu sais écrire la phrase « mon ami joue » !
+dfe07456 | Tu sais écrire la phrase « papa lit » !
+dc31a70e | Tu sais écrire la phrase « tu as un ami » !
+8fa06f42 | Tu sais écrire la phrase « un ours dort » !
+eae9ac2d | Tu sais écrire le a !
+e963f6bc | Tu sais écrire le b !
+ec7dab57 | Tu sais écrire le c !
+ec352a66 | Tu sais écrire le d !
+2eafe001 | Tu sais écrire le e !
+2dc98e50 | Tu sais écrire le f !
+318113ab | Tu sais écrire le g !
+f09a5d3a | Tu sais écrire le h !
+73157795 | Tu sais écrire le i !
+72ccf6a4 | Tu sais écrire le j !
+75e6ab3f | Tu sais écrire le k !
+b4615a8e | Tu sais écrire le l !
+377a45a9 | Tu sais écrire le m !
+b7328e38 | Tu sais écrire le n !
+3a4b7953 | Tu sais écrire le o !
+163b9102 | Tu sais écrire le p !
+18b5e1dd | Tu sais écrire le q !
+17cf902c | Tu sais écrire le r !
+5b877a47 | Tu sais écrire le s !
+daa05f16 | Tu sais écrire le t !
+5d1b7971 | Tu sais écrire le u !
+5cd2f880 | Tu sais écrire le v !
+1fec485b | Tu sais écrire le w !
+9e675c6a | Tu sais écrire le x !
+21804785 | Tu sais écrire le y !
+61382b54 | Tu sais écrire le z !
+
+=== RETOUR (37) ===
+78c8a224 | Bien essayé !
+9629bee5 | Bon départ !
+2b6021e8 | C’est bien !
+0229cfb1 | Continue jusqu’au bout du chemin !
+5949aac9 | Essaie de ne pas lever ton doigt.
+64a62f74 | Essaie de rester sur le chemin.
+3b7658ba | Joli !
+ec537460 | La taille est parfaite !
+0fbba616 | Le point se pose juste au-dessus.
+fb5585ca | Magnifique !
+7d65a4a6 | Monte jusqu’à la ligne du haut.
+11521f1c | Ne dépasse pas la ligne du haut.
+ac8ee07e | On commence au point vert.
+d066e479 | Pas de souci, on réessaie.
+78cdc8b7 | Pose bien sur la ligne du bas.
+94bc80d1 | Pour le point, tape une seule fois.
+54905f26 | Quel beau geste, tout en douceur !
+3b3ce7bc | Quel joli tracé !
+1a9109d1 | Regarde les flèches : on va dans l’autre sens.
+b9eb3cd3 | Regardons ensemble.
+5db69bba | Super travail !
+c112ffc1 | Ta forme est très réussie !
+01bfbfc4 | Ton écriture est bien posée sur la ligne !
+122c64af | Très bien !
+4f97bbeb | Tu as bien commencé au point vert !
+73290b4e | Tu as bien respecté les lignes !
+7feff8aa | Tu as bien suivi le chemin !
+1abaa319 | Tu as pris la bonne place !
+948fa280 | Tu as suivi le bon sens !
+c73a3628 | Tu écris sans t’arrêter, super !
+9d0e8a0c | Tu peux avancer sans t’arrêter.
+6a43963f | Tu peux faire un peu plus grand !
+ad04c7c8 | Tu vas dans le bon sens !
+f81bcdb3 | Tu y es presque !
+9194ff75 | Un peu plus petit, pour rester dans les lignes.
+3051089c | Va jusqu’à la ligne du bas.
+73a9b096 | Va tout doucement, sans trembler.
+
+=== TABLEAU (75) ===
+ea748872 | Écris « ai » : suis la première ligne, puis les pointillés, puis écris tout seul !
+c12279f9 | Écris « aile » : suis la première ligne, puis les pointillés, puis écris tout seul !
+3dfa4029 | Écris « ami » : suis la première ligne, puis les pointillés, puis écris tout seul !
+777701f3 | Écris « an » : suis la première ligne, puis les pointillés, puis écris tout seul !
+c32f24ae | Écris « arbre » : suis la première ligne, puis les pointillés, puis écris tout seul !
+7d486ce6 | Écris « au » : suis la première ligne, puis les pointillés, puis écris tout seul !
+36813eaa | Écris « blanc » : suis la première ligne, puis les pointillés, puis écris tout seul !
+ab3e6184 | Écris « bleu » : suis la première ligne, puis les pointillés, puis écris tout seul !
+5904be53 | Écris « canard » : suis la première ligne, puis les pointillés, puis écris tout seul !
+7e3c069f | Écris « ch » : suis la première ligne, puis les pointillés, puis écris tout seul !
+54983e52 | Écris « chat » : suis la première ligne, puis les pointillés, puis écris tout seul !
+3d30b2a9 | Écris « cheval » : suis la première ligne, puis les pointillés, puis écris tout seul !
+f1a9bbbd | Écris « chien » : suis la première ligne, puis les pointillés, puis écris tout seul !
+6285061d | Écris « eau » : suis la première ligne, puis les pointillés, puis écris tout seul !
+05b4f902 | Écris « eu » : suis la première ligne, puis les pointillés, puis écris tout seul !
+953d29fa | Écris « fleur » : suis la première ligne, puis les pointillés, puis écris tout seul !
+445aba11 | Écris « gn » : suis la première ligne, puis les pointillés, puis écris tout seul !
+0629f5a5 | Écris « gris » : suis la première ligne, puis les pointillés, puis écris tout seul !
+242643a5 | Écris « il » : suis la première ligne, puis les pointillés, puis écris tout seul !
+19f37d54 | Écris « il a un ami » : suis la première ligne, puis les pointillés, puis écris tout seul !
+a2975cd8 | Écris « il a un chien » : suis la première ligne, puis les pointillés, puis écris tout seul !
+e73d5a35 | Écris « il neige » : suis la première ligne, puis les pointillés, puis écris tout seul !
+56c11467 | Écris « il pleut » : suis la première ligne, puis les pointillés, puis écris tout seul !
+dd5c052b | Écris « in » : suis la première ligne, puis les pointillés, puis écris tout seul !
+d22f4e3d | Écris « jaune » : suis la première ligne, puis les pointillés, puis écris tout seul !
+81248ecb | Écris « la » : suis la première ligne, puis les pointillés, puis écris tout seul !
+a5a674fb | Écris « la lune brille » : suis la première ligne, puis les pointillés, puis écris tout seul !
+605fd04e | Écris « lait » : suis la première ligne, puis les pointillés, puis écris tout seul !
+d823e782 | Écris « lapin » : suis la première ligne, puis les pointillés, puis écris tout seul !
+388e49ef | Écris « le » : suis la première ligne, puis les pointillés, puis écris tout seul !
+b564a674 | Écris « le bebe dort » : suis la première ligne, puis les pointillés, puis écris tout seul !
+ff9f8a4e | Écris « le chat dort » : suis la première ligne, puis les pointillés, puis écris tout seul !
+349d8e95 | Écris « le lapin saute » : suis la première ligne, puis les pointillés, puis écris tout seul !
+a43ce854 | Écris « le lion rugit » : suis la première ligne, puis les pointillés, puis écris tout seul !
+b2aab2e1 | Écris « le loup a faim » : suis la première ligne, puis les pointillés, puis écris tout seul !
+772e3fe6 | Écris « lion » : suis la première ligne, puis les pointillés, puis écris tout seul !
+7864e111 | Écris « lit » : suis la première ligne, puis les pointillés, puis écris tout seul !
+30a104ce | Écris « livre » : suis la première ligne, puis les pointillés, puis écris tout seul !
+12a01688 | Écris « loi » : suis la première ligne, puis les pointillés, puis écris tout seul !
+4c3d26cc | Écris « loup » : suis la première ligne, puis les pointillés, puis écris tout seul !
+1867cc6a | Écris « lune » : suis la première ligne, puis les pointillés, puis écris tout seul !
+d86bb852 | Écris « maman » : suis la première ligne, puis les pointillés, puis écris tout seul !
+4a774207 | Écris « mamie » : suis la première ligne, puis les pointillés, puis écris tout seul !
+e2bb18f0 | Écris « mon ami joue » : suis la première ligne, puis les pointillés, puis écris tout seul !
+baf212b4 | Écris « neige » : suis la première ligne, puis les pointillés, puis écris tout seul !
+0a4a9278 | Écris « noir » : suis la première ligne, puis les pointillés, puis écris tout seul !
+9e813fa4 | Écris « oi » : suis la première ligne, puis les pointillés, puis écris tout seul !
+a4ca8e1f | Écris « oie » : suis la première ligne, puis les pointillés, puis écris tout seul !
+81300369 | Écris « on » : suis la première ligne, puis les pointillés, puis écris tout seul !
+133806c0 | Écris « ou » : suis la première ligne, puis les pointillés, puis écris tout seul !
+7998a9fb | Écris « ours » : suis la première ligne, puis les pointillés, puis écris tout seul !
+6216e840 | Écris « pain » : suis la première ligne, puis les pointillés, puis écris tout seul !
+751d2590 | Écris « papa » : suis la première ligne, puis les pointillés, puis écris tout seul !
+1c07dc81 | Écris « papa lit » : suis la première ligne, puis les pointillés, puis écris tout seul !
+90138408 | Écris « papi » : suis la première ligne, puis les pointillés, puis écris tout seul !
+bcd0d381 | Écris « pluie » : suis la première ligne, puis les pointillés, puis écris tout seul !
+2eac224d | Écris « poire » : suis la première ligne, puis les pointillés, puis écris tout seul !
+9e3292d2 | Écris « pomme » : suis la première ligne, puis les pointillés, puis écris tout seul !
+7f46e6a6 | Écris « porte » : suis la première ligne, puis les pointillés, puis écris tout seul !
+c6982ed6 | Écris « qu » : suis la première ligne, puis les pointillés, puis écris tout seul !
+0620ca4e | Écris « renard » : suis la première ligne, puis les pointillés, puis écris tout seul !
+2376b9e6 | Écris « robe » : suis la première ligne, puis les pointillés, puis écris tout seul !
+2a17e37b | Écris « rose » : suis la première ligne, puis les pointillés, puis écris tout seul !
+ab8f56d2 | Écris « rouge » : suis la première ligne, puis les pointillés, puis écris tout seul !
+964e2d81 | Écris « sable » : suis la première ligne, puis les pointillés, puis écris tout seul !
+7f05b049 | Écris « sac » : suis la première ligne, puis les pointillés, puis écris tout seul !
+e4064268 | Écris « soleil » : suis la première ligne, puis les pointillés, puis écris tout seul !
+6722026d | Écris « souris » : suis la première ligne, puis les pointillés, puis écris tout seul !
+5ecc8894 | Écris « table » : suis la première ligne, puis les pointillés, puis écris tout seul !
+9a4cd8f0 | Écris « tata » : suis la première ligne, puis les pointillés, puis écris tout seul !
+2733732d | Écris « tu as un ami » : suis la première ligne, puis les pointillés, puis écris tout seul !
+cbb8847d | Écris « un ours dort » : suis la première ligne, puis les pointillés, puis écris tout seul !
+32253945 | Écris « vache » : suis la première ligne, puis les pointillés, puis écris tout seul !
+882fdf93 | Écris « vent » : suis la première ligne, puis les pointillés, puis écris tout seul !
+4186fe77 | Écris « vert » : suis la première ligne, puis les pointillés, puis écris tout seul !
+
+=== DESSIN (22) ===
+54e83c62 | Dessine ce que tu veux sur la feuille !
+ab2b81b2 | Dessine sa maison !
+4bca6145 | Où habite Renard ?
+1277948d | Renard a besoin de sa voiture.
+5940364c | Renard part en bateau sur la rivière !
+5218d860 | Renard veut jouer avec son cerf-volant.
+ada4de84 | Tu la dessines ?
+f9d56098 | Tu le dessines ?
+f73f34b0 | Une idée : dessine la pluie !
+e38cbad5 | Une idée : dessine le soleil !
+687a165f | Une idée : dessine ta famille !
+9bd9f920 | Une idée : dessine ton animal préféré !
+803deb17 | Une idée : dessine ton jouet préféré !
+b013475f | Une idée : dessine un arbre !
+29876fb1 | Une idée : dessine un ballon !
+29d2ea0b | Une idée : dessine un bonhomme de neige !
+ef51396f | Une idée : dessine un chat !
+379bb9ed | Une idée : dessine un escargot !
+822e3020 | Une idée : dessine un poisson dans l’eau !
+29562c10 | Une idée : dessine une fleur !
+d65ecec7 | Une idée : dessine une maison !
+ec4a7203 | Une idée : dessine une montagne !
+
+=== ANIMAL (214) ===
+185081bd | Apprends à écrire ton premier mot.
+0d9f5ce2 | Apprends à écrire trois mots.
+db011eab | Apprends douze sons, mots ou phrases.
+06c71e35 | Apprends huit lettres.
+30d09bfe | Apprends quatorze lettres.
+18c672d2 | Apprends tous les sons, les mots et les phrases du niveau 3.
+9514c595 | Apprends tous les tracés du niveau 1.
+1ae7b61e | Apprends toutes les lettres : de a à z !
+e284a08c | Apprends trente-cinq sons, mots ou phrases.
+3e337449 | Apprends vingt lettres.
+cfc90a86 | Avance comme une tortue : très, très lentement, en comptant jusqu’à dix.
+a2ab1457 | Avant d’être papillon, il est chenille.
+c8923d9f | Bats des bras comme des ailes de papillon et vole doucement dans la pièce.
+cf6fd21b | Beaucoup de poissons sentent les mouvements de l’eau avec une ligne sur leurs flancs.
+34f1b4c9 | Bourdonne comme une abeille et dessine un grand 8 dans l’air avec ton doigt.
+1b6c2670 | C’est ton ami Renard !
+b5bffc0c | Certaines tortues vivent plus de cent ans.
+db5ca056 | Chacun a son propre sifflement, comme un prénom.
+86df1b7a | Chaque luciole s’allume et s’éteint à son rythme.
+fb001f06 | Chaque réussite te donne une vignette d’animal.
+cd67cccb | Colle toutes les vignettes des niveaux.
+b7495484 | Cours sur place avec de tout petits pas de souris, sans faire de bruit.
+cb45674b | Dans une ruche, une seule reine pond les œufs.
+e4b62048 | Écarte les bras comme des ailes et tourne doucement sur toi-même.
+e1769a3c | Écris le a avec trois étoiles.
+bf29cf08 | Écris le e avec trois étoiles.
+60fa0db4 | Écris le i avec trois étoiles.
+a282f583 | Écris le l avec trois étoiles.
+8926ca96 | Écris le o avec trois étoiles.
+d2a27928 | Écris sur ton cahier, avec ton crayon, puis touche « J’ai essayé ».
+673d5949 | Elle adore quand il pleut !
+27118fa8 | Elle attrape des moucherons en volant.
+0c6114f8 | Elle donne du lait, avec lequel on fait du fromage et du yaourt.
+10aeb771 | Elle est toute petite, mais elle court très vite.
+3b6ae29b | Elle passe l’hiver cachée, souvent avec d’autres coccinelles.
+bf32fed9 | Elle prend son temps, et elle y arrive !
+962b9c66 | Elle saute très loin avec ses grandes pattes arrière.
+ce5856d7 | Elle se faufile dans de minuscules trous.
+aca5b4bd | En hiver, il dort pendant plusieurs mois : on dit qu’il hiberne.
+5cb3d39a | Essaie trois exercices différents sur ton cahier.
+2ca27829 | Étire-toi comme un chat qui se réveille, puis marche sur la pointe des pieds sans faire de bruit.
+ef079106 | Fais la luciole : ouvre et ferme les mains comme une lumière qui clignote.
+1bec0634 | Galope sur place comme un cheval, puis arrête-toi et souffle doucement.
+830bb0de | Glisse comme un escargot, très doucement, en dessinant une spirale par terre.
+38273c67 | Grimpe à un arbre imaginaire, puis saute de branche en branche.
+60f2364e | Il avale ses proies entières, puis recrache ce qu’il ne digère pas.
+86d182ee | Il chante pour dire aux autres : ici, c’est chez moi !
+4457a654 | Il chasse surtout à la tombée de la nuit.
+e1b62748 | Il communique avec ses oreilles, ses yeux et sa queue.
+2f8a3c35 | Il construit son nid près du sol, dans un trou ou dans un buisson.
+a446a425 | Il est très fier : tu as trouvé tous les animaux.
+2cc72c2d | Il les use en grignotant.
+8acc9664 | Il mange de l’herbe et la mâche longtemps.
+52ef7865 | Il mange de l’herbe, du foin et des carottes.
+c8b69f9d | Il mange un peu de tout : des baies, du miel, des poissons, des racines.
+db71a7bf | Il peut descendre le long d’un tronc la tête en bas.
+b024a58f | Il peut tourner la tête presque tout autour de lui.
+ee9c4bc3 | Il retombe presque toujours sur ses pattes quand il saute de haut.
+d0b8e9c6 | Il saute d’arbre en arbre sans tomber.
+fd4a2234 | Il saute hors de l’eau et fait des cabrioles.
+58f7fb50 | Il sort surtout la nuit pour manger des insectes, des vers et des limaces.
+2486acc3 | Ils vivent dans l’eau.
+8ac87c73 | L’abeille fait une petite danse pour dire à ses copines où sont les fleurs.
+fe787ff2 | L’écureuil a une grande queue touffue qui l’aide à garder l’équilibre.
+f770ae75 | L’écureuil cache des noisettes pour l’hiver.
+4f712475 | L’escargot laisse une trace brillante derrière lui, comme ton crayon sur la feuille.
+de95931f | L’escargot porte sa coquille sur son dos : c’est sa maison.
+6a4ad2b9 | L’ours brun est l’un des plus gros animaux de la forêt.
+827e23f6 | L’ours se repose longtemps dans sa tanière pendant l’hiver.
+ef2a86b2 | La carapace de la tortue fait partie de son squelette : elle ne peut pas l’enlever.
+02b840e3 | La chenille se transforme dans une chrysalide.
+a6cf1fcb | La coccinelle mange les pucerons : c’est une amie du jardin.
+3364a7de | La grenouille attrape les insectes avec sa langue collante.
+8a74dde4 | La grenouille respire aussi par la peau.
+6a10188c | La laine du mouton le garde au chaud l’hiver.
+d373bc38 | La libellule a quatre ailes et de très grands yeux.
+1426b7d7 | La libellule peut voler en arrière et rester immobile dans les airs.
+9c392c73 | La luciole fabrique sa propre lumière pour briller dans la nuit.
+e390712e | La plupart des poissons n’ont pas de paupières.
+651b1b54 | La souris a de longues moustaches pour sentir autour d’elle, même dans le noir.
+b54296e4 | La tortue n’a pas de dents : elle coupe sa nourriture avec son bec.
+da621120 | La tortue porte sa maison sur son dos.
+b9f80bc2 | La vache a quatre estomacs pour bien digérer l’herbe.
+31ac589d | La vache passe plusieurs heures par jour à mâcher l’herbe, tranquillement.
+9a549130 | Le bébé de la vache s’appelle un veau.
+152e9d60 | Le bébé du cheval s’appelle un poulain.
+4730e00a | Le bébé du mouton s’appelle un agneau.
+dbbafcff | Le castor a une queue plate, qui lui sert de rame.
+9e89be97 | Le castor coupe des branches avec ses grandes dents pour construire des barrages.
+9e2dcc27 | Le cerf court vite et saute par-dessus les obstacles.
+ec036c64 | Le chat dort beaucoup : souvent plus de douze heures par jour.
+5cf84974 | Le chat ronronne quand il est content, et ses moustaches l’aident à sentir les passages étroits.
+b0c9f52b | Le cheval dort souvent debout : ses jambes se verrouillent pour qu’il ne tombe pas.
+524e900f | Le cheval peut courir très vite : plus de 60 kilomètres à l’heure.
+9ccbc5de | Le dauphin n’est pas un poisson : il respire de l’air par le trou sur sa tête.
+0898eca7 | Le dauphin siffle pour parler à ses amis.
+59bc68f8 | Le hérisson a plus de 5 000 piquants sur le dos.
+7564d247 | Le hérisson se roule en boule quand il a peur : ses piquants le protègent.
+7ea0992f | Le hibou voit très bien la nuit.
+9fd88737 | Le hibou vole presque sans bruit, grâce à ses plumes très douces.
+bafd05a0 | Le lapin a de longues oreilles : il entend très bien.
+a774cc72 | Le mouton vit en troupeau : il aime rester avec ses copains.
+b09d6b8d | Le papillon goûte avec ses pattes !
+2af51297 | Le petit du cerf s’appelle un faon.
+b3822cee | Le poisson nage en bougeant sa queue et ses nageoires.
+9bb99958 | Le poisson respire sous l’eau grâce à ses branchies.
+440436e7 | Le renard a de grandes oreilles : il entend très bien.
+64e7d4df | Le rouge-gorge a la poitrine orange.
+040117d2 | Le rouge-gorge chante même en hiver.
+4c060f13 | Les abeilles fabriquent le miel avec le nectar des fleurs.
+0313bbc2 | Les ailes du papillon sont couvertes de minuscules écailles colorées.
+f3182832 | Les bébés grenouilles s’appellent des têtards.
+9f774d51 | Les bois du cerf tombent chaque année, et de nouveaux repoussent.
+6613a37f | Les canetons savent nager peu de temps après leur naissance.
+dadb39bd | Les dauphins vivent en groupe et s’entraident.
+b1db9acd | Les dents de devant de la souris ne s’arrêtent jamais de pousser : elle grignote pour les user.
+9fcd7d38 | Les dents du lapin poussent toute sa vie.
+3730ac3e | Les lucioles s’allument surtout les soirs d’été.
+e36df72c | Les oursons restent près de leur maman pendant longtemps.
+60800555 | Les pattes du canard sont palmées, comme des palmes pour nager.
+d630325a | Les petits canetons suivent leur maman en file.
+3cc1799a | Les plumes du canard sont huilées : l’eau glisse dessus sans les mouiller.
+996b1565 | Leur lumière est froide : elle ne brûle pas.
+62ed0c65 | Marche à quatre pattes comme une coccinelle, puis ouvre tes bras en ailes.
+b861508b | Marche comme un canard : petits pas, et un joli « coin-coin » !
+417da33f | Marche la tête haute, les mains au-dessus de la tête comme des bois.
+e847a5f5 | Marche lentement à quatre pattes comme une vache, puis fais « meuh » tout doucement.
+da7a444c | Marche lourdement comme un gros ours, puis fais-toi un grand câlin.
+a2f6ca80 | Marche sur la pointe des pieds comme un renard, sans faire un seul bruit.
+52d3c1d8 | Nage comme un dauphin : fais de grandes vagues avec tout ton corps, puis un petit saut.
+70614e4e | Nage comme un poisson : fais des vagues avec tes bras.
+acaa8dfb | On la tond au printemps pour faire des pulls.
+a69ab4d1 | On les colle ici !
+0474a420 | On ne peut pas deviner l’âge d’une coccinelle avec ses points.
+d534ef8c | Parfois il les oublie, et un arbre pousse !
+7eb56353 | Porte une grosse bûche imaginaire jusqu’à ton barrage, comme un castor.
+7c8d70ba | Quand il fait trop sec, il rentre dans sa coquille.
+4540f4f8 | Quand il y a un danger, il frappe l’eau avec sa queue pour prévenir ses amis.
+77789201 | Quand un essai est difficile, recommence : tu vas y arriver !
+fd51e320 | Quelle belle collection !
+c16eee50 | Roule-toi en boule comme un hérisson, puis déroule-toi tout doucement.
+ae08a914 | Sa larve vit dans l’eau avant de devenir libellule.
+c2f922c9 | Sa maison s’appelle un terrier.
+7abdedca | Sa maison, la hutte, a une entrée cachée sous l’eau.
+aa0faf4f | Saute comme un lapin, les mains près des oreilles.
+d876571e | Saute comme une grenouille, cinq fois de suite !
+3c68889d | Saute par-dessus un mouton imaginaire, puis compte jusqu’à dix en sautant.
+9bdb7d4b | Sautille sur place comme un petit oiseau.
+84d3e899 | Ses ailes rouges et dures protègent ses vraies ailes, fines et transparentes.
+808524b7 | Ses grands yeux sont tournés vers l’avant.
+d390e8f7 | Ses yeux brillent dans le noir parce qu’ils renvoient la lumière.
+d7a5e767 | Ses yeux sont au bout de ses grandes antennes.
+958089eb | Seul le cerf mâle a des bois.
+b88cc671 | Son terrier s’appelle une garenne.
+1382fa92 | Termine ton premier exercice.
+a60321b6 | Touche un haut-parleur pour l’écouter, ou « Tout lire ».
+e48d6cee | Touche une vignette pour la regarder.
+e1d91374 | Tourne doucement la tête à gauche, puis à droite, comme un hibou.
+7ef096f2 | Trace la bulle avec trois étoiles.
+7a142ffb | Trace la pluie avec trois étoiles.
+7b47ef37 | Trace la rivière avec trois étoiles.
+11fe0c0d | Trace les ponts avec trois étoiles.
+efe73bc6 | Trace les rubans avec trois étoiles.
+2879a7c2 | Tu as 1 vignette sur 25.
+3a6d1e57 | Tu as 10 vignettes sur 25.
+2d007528 | Tu as 11 vignettes sur 25.
+25efe2fd | Tu as 12 vignettes sur 25.
+dc6740be | Tu as 13 vignettes sur 25.
+ecd6353b | Tu as 14 vignettes sur 25.
+7abb954c | Tu as 15 vignettes sur 25.
+bc5ee3f1 | Tu as 16 vignettes sur 25.
+227c1f42 | Tu as 17 vignettes sur 25.
+db01b7ff | Tu as 18 vignettes sur 25.
+3c28cdd0 | Tu as 19 vignettes sur 25.
+3372f338 | Tu as 2 vignettes sur 25.
+adba9790 | Tu as 20 vignettes sur 25.
+838954bf | Tu as 21 vignettes sur 25.
+ca04c086 | Tu as 22 vignettes sur 25.
+921e9e65 | Tu as 23 vignettes sur 25.
+f1fd3554 | Tu as 24 vignettes sur 25.
+8f727927 | Tu as 3 vignettes sur 25.
+1cabfb12 | Tu as 4 vignettes sur 25.
+a38f1d01 | Tu as 5 vignettes sur 25.
+1fe617dc | Tu as 6 vignettes sur 25.
+625be24b | Tu as 7 vignettes sur 25.
+0208ba56 | Tu as 8 vignettes sur 25.
+12260cb5 | Tu as 9 vignettes sur 25.
+d5149496 | Tu as toutes les vignettes !
+66db657e | Une abeille visite beaucoup de fleurs chaque jour.
+a0b95317 | Voici l’abeille !
+83b7e977 | Voici l’écureuil !
+542d6f1f | Voici l’escargot !
+939490c4 | Voici l’ours !
+c76e4c56 | Voici la coccinelle !
+66561203 | Voici la grenouille !
+0efb2ca9 | Voici la libellule !
+e5fd3594 | Voici la luciole !
+c547186a | Voici la souris !
+a6522356 | Voici la tortue !
+d914bbda | Voici la vache !
+282e2e78 | Voici le canard !
+7f61e29d | Voici le castor !
+e01d5ad3 | Voici le cerf !
+422e6fd5 | Voici le chat !
+78e8d2f2 | Voici le cheval !
+2d1b64fa | Voici le dauphin !
+a378399e | Voici le hérisson !
+36dfa6e4 | Voici le hibou !
+678c8da5 | Voici le lapin !
+3658372b | Voici le mouton !
+0166c01a | Voici le papillon !
+2b81a83c | Voici le poisson !
+85616175 | Voici le renard doré !
+e1e2ad90 | Voici le rouge-gorge !
+
+=== CARTE (105) ===
+ef87b6a7 | a comme abeille
+86343a8a | b comme ballon
+fbd4ff7d | c comme chat
+1792cb81 | d comme dauphin
+b1902109 | e comme écureuil
+94549e7c | f comme fleur
+a4f77d17 | g comme grenouille
+4f1b4d67 | h comme hibou
+9e9ced9a | i comme iris
+faaaa8da | j comme jardin
+8383433b | k comme koala
+c2ed872f | l comme lanterne
+87a2fe4f | La phrase « il a un ami »
+057cfb03 | La phrase « il a un chien »
+6d83a526 | La phrase « il neige »
+14b61058 | La phrase « il pleut »
+ff544f20 | La phrase « la lune brille »
+7fcd4e8f | La phrase « le bebe dort »
+695ce97d | La phrase « le chat dort »
+4779b236 | La phrase « le lapin saute »
+79915913 | La phrase « le lion rugit »
+d09e80ea | La phrase « le loup a faim »
+03b902eb | La phrase « mon ami joue »
+300b1b62 | La phrase « papa lit »
+913dad4e | La phrase « tu as un ami »
+883cbe9e | La phrase « un ours dort »
+e44434b5 | Le mot « aile »
+36071043 | Le mot « ami »
+ad970e68 | Le mot « arbre »
+bfafa4b0 | Le mot « blanc »
+989a7724 | Le mot « bleu »
+8ff18e6f | Le mot « canard »
+2caa9ade | Le mot « chat »
+12541501 | Le mot « cheval »
+619582df | Le mot « chien »
+1a49be80 | Le mot « fleur »
+cd552165 | Le mot « gris »
+56943a49 | Le mot « il »
+487022eb | Le mot « jaune »
+fb8603b3 | Le mot « la »
+7514a596 | Le mot « lait »
+e43bfa1c | Le mot « lapin »
+3681d1df | Le mot « le »
+12317e02 | Le mot « lion »
+0c96b8db | Le mot « lit »
+468d9480 | Le mot « livre »
+bac199e2 | Le mot « loi »
+d9cfbf68 | Le mot « loup »
+5449ad4e | Le mot « lune »
+9acb4fbc | Le mot « maman »
+52621dbd | Le mot « mamie »
+b2779e9a | Le mot « neige »
+2bdb6cd8 | Le mot « noir »
+6ae1d6b1 | Le mot « oie »
+9c34f953 | Le mot « ours »
+d741f23c | Le mot « pain »
+caaadb14 | Le mot « papa »
+e376ecec | Le mot « papi »
+aca4febb | Le mot « pluie »
+203abe8f | Le mot « poire »
+6d543728 | Le mot « pomme »
+8fc28860 | Le mot « porte »
+be028f96 | Le mot « robe »
+ce69034b | Le mot « rose »
+9001b39c | Le mot « rouge »
+d2da53fb | Le mot « sable »
+8184a143 | Le mot « sac »
+830ab070 | Le mot « soleil »
+f30a6da5 | Le mot « souris »
+a882e5e2 | Le mot « table »
+c85b6f3c | Le mot « tata »
+4fc7879f | Le mot « vache »
+c8479033 | Le mot « vent »
+8e66d447 | Le mot « vert »
+ba194ccb | Le rond
+0dbe3c82 | Le son « ai »
+bfa70d8b | Le son « an »
+07c4578e | Le son « au »
+a1ecd323 | Le son « ch »
+48c97557 | Le son « eau »
+1aed7192 | Le son « eu »
+b919cc69 | Le son « gn »
+a529e2d3 | Le son « in »
+bdc1385c | Le son « oi »
+bb71dcd1 | Le son « on »
+1b8d8c88 | Le son « ou »
+5403471e | Le son « qu »
+c1dd70ea | Les boucles
+9fe617f7 | Les ponts
+5c4cc3f8 | Les vagues
+026fc975 | m comme mouton
+e1c1f212 | n comme nuage
+a26372ed | o comme oiseau
+00cfa5e5 | p comme papillon
+59a42835 | q comme quille
+5d373b6f | r comme rivière
+e8cbe977 | s comme soleil
+8408eac1 | t comme tortue
+36b0070b | Traits droits
+30f296dc | u comme ukulélé
+a9af7db3 | v comme vache
+bf0cc8bd | w comme wagon
+e553cb12 | x comme xylophone
+1a0b1165 | y comme yaourt
+e6d97d0f | z comme zèbre
+
+=== ACCUEIL (15) ===
+d29ca526 | Aujourd’hui, on a bien travaillé.
+02ccd5a2 | Aujourd’hui, on écrit ensemble ?
+92652413 | Bonjour !
+a4db2cd7 | Bravo pour tes progrès !
+bca0c42a | Content de te revoir !
+92fb0cf9 | Et si on faisait une pause ?
+2b7f04d6 | J’ai bien travaillé avec toi !
+de5df68d | Je fais une petite sieste…
+710951b7 | Je m’appelle Renard.
+ede5acb0 | Je suis Renard.
+d580c8ae | On refait un exercice que tu aimes ?
+8a2c9b1b | On se retrouve demain !
+ec40a893 | On se retrouve tout à l’heure !
+455c7511 | Salut !
+09135c52 | Tu veux apprendre à écrire avec moi ?
+
+=== INTERFACE (51) ===
+80decf28 | À demain !
+3068c24f | Allez, on y va ?
+dfbea7e2 | Apprends une nouvelle chose pour le gagner !
+ca8225ee | Avec ces lettres, le texte est trop long pour la page.
+c329dce9 | Bouge comme cet animal !
+a9851dd2 | Bravo, quelle belle pause !
+74efd676 | C’est fait !
+88688e08 | C’est retiré.
+46736f00 | Ce niveau arrive bientôt.
+6fb7f50b | Ce trésor t’attend.
+bfe80983 | Chaque nouvelle chose apprise te donne un trésor.
+bd9d32f9 | Choisis ton prochain jeu !
+ef5d3221 | Choisis un mot plus court.
+d8ced0b4 | Coucou !
+a73bf90d | Dessine, puis accroche ton dessin dans la forêt !
+f6c1f369 | Écris de mémoire, tu sais le faire.
+dbc47243 | Essaie d’abord l’exercice d’avant, et celui-ci s’ouvrira !
+e4c9a6c1 | Essaie encore ce trait, doucement.
+6329499c | Hihi, ça chatouille !
+fb0d1b32 | Il dort encore !
+0238102b | J’adore écrire avec toi !
+d62b89f5 | Je fais une petite sieste.
+e246a882 | La place est libre pour un autre dessin !
+68970947 | Maintenant, le chemin est en pointillés.
+72a2f716 | On a bien travaillé aujourd’hui.
+0be2ee3b | On fait autre chose un petit moment ?
+13f6eea9 | On se retrouve !
+12f59805 | Où est-ce qu’on va aujourd’hui ?
+479a03d3 | Pendant ce temps, tu peux bouger, lire ou écrire sur ton cahier !
+9be0ab27 | Plus de guide !
+062ade36 | Quel beau dessin !
+26d8a843 | Quelle belle écriture !
+69d6c9cd | Regarde le geste une fois, puis écris de mémoire.
+997926aa | Regarde tout ce que tu as gagné en apprenant !
+b26ff757 | Regarde, je te montre encore une fois.
+5f6fdc90 | Regardons encore une fois, je te montre.
+3c367e8b | Ta galerie est vide.
+55504342 | Ta page est accrochée dans la forêt.
+b47a0c68 | Ton dessin est accroché dans la forêt.
+6411772e | Ton dessin va disparaître.
+3197e702 | Touche le chemin qui brille !
+16b45c7e | Touche-en un pour le voir en grand.
+5b18036d | Tu as écrit sur du vrai papier, et tu gagnes une vignette !
+f2d9c8b3 | Tu as écrit sur du vrai papier.
+d40deb75 | Tu écris autre chose, ou on retourne à la carte ?
+731c9322 | Tu en fais un autre, ou on retourne à la carte ?
+04dfd99f | Tu peux quand même bouger, lire ou écrire sur ton cahier.
+70778d0d | Tu t’en vas ?
+8cd0bd1c | Tu viens écrire avec moi ?
+f13ca08a | Voilà !
+c051ce0d | Voilà tes dessins !
+

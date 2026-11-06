@@ -80,7 +80,7 @@ export function dessin(root, app) {
     const pool = [...DESSINS.filter((m) => m.tier <= tier).map((model) => ({ model, phrase: model.phrase })), ...IDEES_LIBRES.map((phrase) => ({ phrase }))].filter((x) => x.phrase !== current?.phrase);
     current = pick(pool);
     showModel();
-    speaker.say(current.model?.ask || `Une idée : dessine ${current.phrase} !`, { silent: true, icon: 'pencil' });
+    speaker.say(current.model?.ask || `Une idée : dessine ${current.phrase} !`, { icon: 'pencil' });
   };
   idea();
   b.addEventListener('dblclick', idea);

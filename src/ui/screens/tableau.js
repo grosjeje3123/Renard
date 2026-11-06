@@ -182,11 +182,11 @@ export function tableau(root, app) {
     syncCasse();
     if (view === 'ecrire') buildPage();
   }
-  const askText = () => speaker.say(`Écris « ${shown()} » : suis la première ligne, puis les pointillés, puis écris tout seul !`, { silent: true, icon: 'pencil' });
+  const askText = () => speaker.say(`Écris « ${shown()} » : suis la première ligne, puis les pointillés, puis écris tout seul !`, { icon: 'pencil', dit: `Écris « ${shown().toLowerCase()} » : suis la première ligne, puis les pointillés, puis écris tout seul !` });
 
   function setCasse(id) {
     if (id === casse) return;
-    if (!fits(text, id)) { sfx('oops'); speaker.say('Avec ces lettres, le texte est trop long pour la page. Choisis un mot plus court.', { silent: true, icon: 'pencil' }); return; }
+    if (!fits(text, id)) { sfx('oops'); speaker.say('Avec ces lettres, le texte est trop long pour la page. Choisis un mot plus court.', { icon: 'pencil' }); return; }
     sfx('tap');
     casse = id; app.tableauCasse = id;
     applyText();
@@ -276,7 +276,7 @@ export function tableau(root, app) {
     if (m) { levelTag.textContent = `${'★'.repeat(m.tier)}${'☆'.repeat(3 - m.tier)} ${NIVEAUX_DESSIN[m.tier]}`; levelTag.setAttribute('aria-label', `Difficulté : ${NIVEAUX_DESSIN[m.tier].toLowerCase()}`); }
     calqueModeBtns.forEach((x) => { const on = x.dataset.mode === calqueMode; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); });
   };
-  const useModel = (m, { silent = true } = {}) => {
+  const useModel = (m, { silent = false } = {}) => {
     current = m ? { model: m, phrase: m.phrase } : { phrase: '' };
     showModel(); drawCalque();
     speaker.say(m ? (m.ask || `Une idée : dessine ${m.phrase} !`) : 'Dessine ce que tu veux sur la feuille !', { silent, icon: 'pencil' });
@@ -287,7 +287,7 @@ export function tableau(root, app) {
     const pool = [...DESSINS.filter((m) => m.tier <= tier).map((model) => ({ model, phrase: model.phrase })), ...IDEES_LIBRES.map((phrase) => ({ phrase }))].filter((x) => x.phrase !== current?.phrase);
     current = pick(pool);
     showModel(); drawCalque();
-    speaker.say(current.model?.ask || `Une idée : dessine ${current.phrase} !`, { silent: true, icon: 'pencil' });
+    speaker.say(current.model?.ask || `Une idée : dessine ${current.phrase} !`, { icon: 'pencil' });
   };
   nextBtn.addEventListener('click', () => { sfx('tap'); idea(); });
   gridBtn.addEventListener('click', () => { sfx('tap'); grid = !grid; gridBtn.classList.toggle('on', grid); gridBtn.setAttribute('aria-pressed', String(grid)); drawCalque(); });
@@ -304,10 +304,11 @@ export function tableau(root, app) {
     textCard.hidden = !writing; calqueBtn.hidden = !writing;
     modelCard.hidden = writing; gridBtn.hidden = writing;
     subtitle.textContent = writing ? 'Écris ce que tu veux, sans note' : 'Dessine ce que tu veux, sans note';
-    if (!writing && !drawReady) { drawReady = true; idea(); }
+    let neuve = false; // l'idée vient d'être annoncée : on ne la répète pas
+    if (!writing && !drawReady) { drawReady = true; idea(); neuve = true; }
     buildPage();
     refresh();
-    if (writing) askText(); else if (current) speaker.say(current.model?.ask || (current.phrase ? `Une idée : dessine ${current.phrase} !` : 'Dessine ce que tu veux sur la feuille !'), { silent: true, icon: 'pencil' });
+    if (writing) askText(); else if (current && !neuve) speaker.say(current.model?.ask || (current.phrase ? `Une idée : dessine ${current.phrase} !` : 'Dessine ce que tu veux sur la feuille !'), { icon: 'pencil' });
   }
 
   // ---- Tracé (mêmes gestes que le dessin libre ; en écriture le trait s'épaissit un peu avec la page, qui se réduit à l'écran)

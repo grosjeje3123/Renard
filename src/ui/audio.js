@@ -2,6 +2,11 @@
 // Tout reste sur l'appareil. Les sons ne démarrent qu'après un geste de l'enfant (règle des navigateurs).
 
 import { chooseVoice, rankVoices, timbres, vitesses } from '../core/voices.js';
+import { decouper, idPhrase } from '../core/voixId.js';
+
+// Voix enregistrées : { identifiant de phrase → extension }, fixé à la fabrication (build.mjs) d'après le dossier voix/.
+/* global __VOIX__ */
+const clips = typeof __VOIX__ !== 'undefined' ? __VOIX__ : {};
 
 let ctx = null;
 const cfg = { sons: true, voix: true, voixNom: '', vitesse: vitesses.normal, timbre: timbres.naturel };
@@ -21,6 +26,8 @@ export function configureAudio(s) {
 }
 
 /** Voix françaises disponibles (meilleure en premier) et voix actuellement retenue. */
+/** Des voix enregistrées sont-elles livrées avec cette version ? */
+export const hasClips = () => Object.keys(clips).length > 0;
 export const frenchVoices = () => rankVoices(allVoices());
 export const currentVoice = () => voice;
 /** Prévient l'écran des parents quand la liste des voix arrive (elle se charge après le démarrage). */
@@ -75,35 +82,75 @@ if ('speechSynthesis' in window) {
 
 export function stopSpeaking() {
   try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch { /* silencieux */ }
-  if (current) { clearTimeout(current.timer); current.finish(); current = null; }
+  if (current) {
+    const c = current; current = null;
+    c.stopped = true; clearTimeout(c.timer);
+    try { c.audio?.pause(); } catch { /* silencieux */ }
+    c.release?.();
+    c.finish();
+  }
 }
 
-/**
- * Fait parler le renard. Retourne une promesse résolue à la fin de la phrase.
- * Sans voix (réglage coupé ou indisponible), la durée est estimée pour animer la bouche quand même.
- */
-export function speak(text, { onStart, onEnd, force = false } = {}) {
-  stopSpeaking();
+/** Joue un fichier enregistré. Résout true s'il a été joué jusqu'au bout (ou interrompu), false s'il faut retomber sur la voix du système. */
+function playClip(file, state) {
   return new Promise((resolve) => {
-    let done = false;
-    const finish = () => { if (done) return; done = true; onEnd?.(); resolve(); };
+    let a;
+    try { a = new Audio(file); } catch { resolve(false); return; }
+    state.audio = a;
+    const end = (ok) => { clearTimeout(guard); a.onended = a.onerror = null; state.release = null; resolve(ok); };
+    const guard = setTimeout(() => end(true), 30000);
+    state.release = () => end(true);
+    a.onended = () => end(true);
+    a.onerror = () => end(false);
+    a.play().catch(() => end(false)); // lecture refusée (pas encore de geste) ou fichier absent : voix du système
+  });
+}
+
+/** Une phrase lue par la synthèse vocale du système (ou, sans synthèse, simplement attendue le temps de la dire). */
+function synth(text, state) {
+  return new Promise((resolve) => {
+    const fin = () => { clearTimeout(state.timer); state.release = null; resolve(); };
+    state.release = fin;
     const est = Math.max(900, text.length * 62);
-    const state = { finish, timer: null };
-    current = state;
-    const useVoice = (cfg.voix || force) && 'speechSynthesis' in window;
-    onStart?.();
-    if (useVoice) {
+    if ('speechSynthesis' in window) {
       try {
         const u = new SpeechSynthesisUtterance(text);
         u.lang = voice?.lang || 'fr-FR'; u.rate = cfg.vitesse; u.pitch = cfg.timbre;
         if (voice) u.voice = voice.voice;
-        u.onend = () => { clearTimeout(state.timer); finish(); };
-        u.onerror = () => { clearTimeout(state.timer); finish(); };
+        u.onend = fin; u.onerror = fin;
         speechSynthesis.speak(u);
-        state.timer = setTimeout(finish, est * 2.2 + 1500);
+        state.timer = setTimeout(fin, est * 2.2 + 1500);
         return;
-      } catch { /* on retombe sur le mode silencieux */ }
+      } catch { /* on retombe sur l'attente silencieuse */ }
     }
-    state.timer = setTimeout(finish, est);
+    state.timer = setTimeout(fin, est);
+  });
+}
+
+/**
+ * Fait parler le renard, phrase après phrase : le fichier enregistré de la phrase s'il existe (dossier voix/),
+ * sinon la voix du système. Retourne une promesse résolue à la fin. `dit` : texte à lire s'il diffère du texte affiché.
+ * Sans voix (réglage coupé), la durée est estimée pour animer la bouche quand même.
+ */
+export function speak(text, { onStart, onEnd, force = false, dit } = {}) {
+  stopSpeaking();
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => { if (done) return; done = true; onEnd?.(); resolve(); };
+    const state = { finish, timer: null, audio: null, release: null, stopped: false };
+    current = state;
+    onStart?.();
+    const parts = cfg.voix || force ? decouper(dit ?? text) : [];
+    if (!parts.length) { state.timer = setTimeout(finish, Math.max(900, text.length * 62)); return; }
+    (async () => {
+      for (const p of parts) {
+        if (state.stopped) return;
+        const id = idPhrase(p);
+        if (clips[id] && (await playClip(`voix/${id}.${clips[id]}`, state))) continue;
+        if (state.stopped) return;
+        await synth(p, state);
+      }
+      if (!state.stopped) { if (current === state) current = null; finish(); }
+    })();
   });
 }

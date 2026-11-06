@@ -6,7 +6,7 @@
   "scripts": {
     "build": "node build.mjs",
     "build:app": "node build.mjs --app",
-    "test": "node --test test/engine.test.js test/core.test.js test/features.test.js test/tableau.test.js",
+    "test": "node --test test/engine.test.js test/core.test.js test/features.test.js test/tableau.test.js test/voix.test.js",
     "apk": "node tools/apk.mjs",
     "icons": "node tools/make-icons.mjs",
     "shots": "node tools/shots.mjs",

@@ -3,7 +3,7 @@ import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { recommend, foxStage, breakDue, blocked, takeBreak } from '../../core/progress.js';
 import { SKILLS } from '../../content/skills.js';
-import { sfx } from '../audio.js';
+import { sfx, frenchVoices, onVoicesChanged } from '../audio.js';
 import { galleryOn } from '../../core/galerie.js';
 
 export function home(root, app) {
@@ -27,6 +27,19 @@ export function home(root, app) {
   const lockBtn = h('button', { class: 'round nav', type: 'button', 'aria-label': 'Espace parents : maintenir appuyé 2 secondes', html: `<span class="ring"></span>${icon('lock', 30)}<span class="lbl">Parents</span>` });
   const navBtn = (ic, label, route) => h('button', { class: 'round nav', type: 'button', onClick: () => { sfx('tap'); app.go(route); }, html: `${icon(ic, 32)}<span class="lbl">${label}</span>` });
 
+  // Sans voix française, le renard reste muet et un enfant qui ne lit pas est perdu : on prévient les adultes (une seule fois).
+  const voiceNotice = h('div', { class: 'voice-notice', role: 'note', hidden: true },
+    h('span', {}, 'Le renard n’a pas trouvé de voix française sur cette tablette. S’il reste muet, un adulte peut en installer une en une minute.'),
+    h('div', { class: 'vn-btns' },
+      h('button', { class: 'btn-sec sm', type: 'button', onClick: () => app.go('parents') }, 'Comment faire ?'),
+      h('button', { class: 'btn-sec sm', type: 'button', onClick: () => { st.settings.avisVoix = true; app.save(); voiceNotice.hidden = true; } }, 'Compris')));
+  const checkVoice = () => {
+    if (!voiceNotice.isConnected) { off(); return; }
+    voiceNotice.hidden = !(st.settings.voix && !st.settings.avisVoix && frenchVoices().length === 0);
+  };
+  const off = onVoicesChanged(checkVoice);
+  setTimeout(checkVoice, 2500); // la liste des voix arrive après le démarrage
+
   root.classList.add('home');
   root.append(
     h('div', { class: 'scene-wrap', html: forestScene() }),
@@ -40,6 +53,7 @@ export function home(root, app) {
         playBtn,
         stayBtn,
         h('p', { class: 'stage' }, stage.name),
+        voiceNotice,
       ),
     ),
     h('nav', { class: 'home-nav', 'aria-label': 'Menu' }, navBtn('map', 'Niveaux', 'niveaux'), navBtn('chest', 'Trésors', 'tresors'), navBtn('album', 'Album', 'album'), navBtn('tableau', 'Tableau', 'tableau'), galleryOn(st) ? navBtn('frame', 'Galerie', 'galerie') : null, lockBtn),

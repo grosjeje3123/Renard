@@ -59,7 +59,7 @@ export function album(root, app) {
   const intro = n === 0 ? 'Chaque réussite te donne une vignette d’animal. On les colle ici !'
     : n === STICKERS.length ? 'Tu as toutes les vignettes ! Quelle belle collection !'
     : `Tu as ${n} vignette${n > 1 ? 's' : ''} sur ${STICKERS.length}. Touche une vignette pour la regarder.`;
-  speaker.say(intro, { silent: true, icon: 'star' });
+  speaker.say(intro, { once: 'album', icon: 'star' });
 
   let overlay = null;
   const close = () => { if (!overlay) return; overlay.remove(); overlay = null; stopSpeaking(); };

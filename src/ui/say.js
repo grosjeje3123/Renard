@@ -12,20 +12,24 @@ export function bubble({ big = false } = {}) {
   return h('div', { class: 'bubble' + (big ? ' big' : '') }, ico, p, btn);
 }
 
+/** Consignes d'arrivée déjà lues dans cette session (pour ne pas les répéter à chaque retour sur l'écran). */
+const dejaLues = new Set();
+
 export function makeSpeaker(fox, bubbleEl) {
   const p = bubbleEl.querySelector('.b-text');
   const ico = bubbleEl.querySelector('.b-ico');
   let last = '';
   const api = {
-    async say(text, { mood, icon: ic, ms, silent = false } = {}) {
+    async say(text, { mood, icon: ic, ms, silent = false, once = null, dit } = {}) {
       last = text;
+      if (once) { if (dejaLues.has(once)) silent = true; else dejaLues.add(once); } // `once` : lu à voix haute la première fois seulement
       p.textContent = fr(text);
       ico.innerHTML = ic ? icon(ic, 30) : '';
       ico.hidden = !ic;
       bubbleEl.classList.remove('pop'); void bubbleEl.offsetWidth; bubbleEl.classList.add('pop');
       if (mood) fox.setMood(mood, ms ?? 2800);
       if (silent) return;
-      await speak(text, { onStart: () => fox.talk(true), onEnd: () => fox.talk(false) });
+      await speak(text, { dit, onStart: () => fox.talk(true), onEnd: () => fox.talk(false) });
     },
     repeat() { return last ? api.say(last) : Promise.resolve(); },
     get last() { return last; },

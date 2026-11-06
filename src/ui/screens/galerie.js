@@ -67,7 +67,7 @@ export function galerie(root, app) {
     if (!list.length) {
       wall.append(h('div', { class: 'mur-vide' }, h('p', {}, 'Ta galerie est vide.'), h('p', { class: 'muted' }, 'Fais un dessin, puis accroche-le ici avec le bouton « Accrocher dans la forêt ».'),
         h('button', { class: 'btn-big sm', type: 'button', onClick: () => { sfx('pop'); app.go('dessin'); }, html: `${icon('pencil', 28)}<span>Dessiner</span>` })));
-      speaker.say('Ta galerie est vide. Dessine, puis accroche ton dessin dans la forêt !', { silent: true, icon: 'frame' });
+      speaker.say('Ta galerie est vide. Dessine, puis accroche ton dessin dans la forêt !', { once: 'galerie', icon: 'frame' });
       return;
     }
     list.forEach((e, i) => {
@@ -78,7 +78,7 @@ export function galerie(root, app) {
         h('span', { class: 'cadre-date' }, dateFr(e.t)));
       wall.append(card);
     });
-    speaker.say('Voilà tes dessins ! Touche-en un pour le voir en grand.', { silent: true, icon: 'frame' });
+    speaker.say('Voilà tes dessins ! Touche-en un pour le voir en grand.', { once: 'galerie', icon: 'frame' });
   }
   draw();
 

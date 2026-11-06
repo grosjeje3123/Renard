@@ -2,7 +2,7 @@
 // Ordre des conseils : sens et départ (ce qu'on ne corrige plus une fois pris l'habitude),
 // puis forme, proportions, lignes, enfin fluidité.
 
-const PRAISE = {
+export const PRAISE = {
   start: ['Tu as bien commencé au point vert !', 'Bon départ !'],
   direction: ['Tu as suivi le bon sens !', 'Tu vas dans le bon sens !'],
   shape: ['Quel joli tracé !', 'Tu as bien suivi le chemin !', 'Ta forme est très réussie !'],
@@ -11,7 +11,7 @@ const PRAISE = {
   flow: ['Quel beau geste, tout en douceur !', 'Tu écris sans t’arrêter, super !'],
 };
 
-const TIPS = [
+export const TIPS = [
   ['sens-inverse', 'Regarde les flèches : on va dans l’autre sens.'],
   ['depart-loin', 'On commence au point vert.'],
   ['point-loin', 'Le point se pose juste au-dessus.'],
@@ -29,7 +29,7 @@ const TIPS = [
   ['pause', 'Tu peux avancer sans t’arrêter.'],
 ];
 
-const LEAD = {
+export const LEAD = {
   3: ['Bravo !', 'Magnifique !', 'Super travail !'],
   2: ['Très bien !', 'Joli !', 'C’est bien !'],
   1: ['Bien essayé !', 'Tu y es presque !'],

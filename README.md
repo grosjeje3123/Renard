@@ -6,7 +6,7 @@ Prototype jouable pour enfants de 4 à 8 ans : un renard accompagne l'enfant dan
 
 ```
 npm install
-npm test            # 76 tests : reconnaissance des tracés, progression, pauses, sauvegarde, PDF, tableau libre (reconnaissance d'un mot, majuscules)
+npm test            # 79 tests : reconnaissance des tracés, progression, pauses, sauvegarde, PDF, tableau libre (reconnaissance d'un mot, majuscules)
 npm run build       # produit dist/index.html (un seul fichier, polices incluses)
 npm run build:app   # produit www/index.html (page complète pour l'application Android)
 node build.mjs --pwa  # produit pwa/ : la version installable en plein écran (voir ci-dessous)
@@ -25,6 +25,16 @@ Ouvrir `dist/index.html` dans un navigateur (tablette, ou ordinateur avec souris
 À savoir : la progression est liée à l'adresse (changer d'adresse repart de zéro : utiliser le code de sauvegarde) ; sur iPad, l'icône de l'écran d'accueil a son propre stockage, distinct de celui de Safari ; la page garde `connect-src 'none'` (elle ne peut rien envoyer), seul le service worker relit les fichiers de l'application sur son hébergement ; une mise à jour arrive à la deuxième ouverture suivante avec connexion.
 Dans l'espace parents, la carte « Affichage » propose aussi « Passer en plein écran » quand la page est ouverte dans un navigateur, et sur tablette tactile les PDF et images passent par la feuille de partage du système (Enregistrer dans Fichiers, Imprimer).
 Contrôle : `node build.mjs --pwa && node tools/pwa-check.mjs` (installable selon Chrome, démarrage hors connexion, icônes, aucune requête hors de l'hébergement, plein écran).
+
+## Voix enregistrées du renard (plus naturelles que la voix du système)
+
+Par défaut le renard parle avec la synthèse vocale de la tablette. Pour une voix enregistrée (générée par IA, une seule fois) :
+
+1. `node tools/paroles.mjs` liste toutes les phrases (869, environ 37 minutes) dans `paroles/` : `paroles-renard.txt` (lisible), `paroles-renard.csv` (pour le script), avec un identifiant par phrase (`src/core/voixId.js` : FNV-1a du texte).
+2. `paroles/generer-voix.py` (API OpenAI, consigne de voix dans `paroles/prompt-voix.txt`) écrit `voix/<identifiant>.mp3`. Mode d'emploi : `paroles/LISEZMOI.txt`.
+3. `node build.mjs --app` / `--pwa` embarque le dossier `voix/` (la version « lien d'essai » n'en contient pas) : `media-src 'self'` est ajouté à la politique de sécurité, rien d'autre ne change (`connect-src 'none'`). L'APK recompilé par GitHub Actions les contient.
+
+À la lecture, chaque texte est découpé en phrases ; chaque phrase est jouée depuis son fichier s'il existe, sinon lue par la voix du système (prénom, mot tapé librement, phrases non listées) : rien ne casse si un fichier manque. Les consignes d'arrivée (Tableau, dessin, cartes) sont lues d'elles-mêmes ; l'accueil et les retours après un essai suivent les réglages de voix. Sans voix française trouvée, un avis discret prévient les adultes sur l'écran d'accueil. Contrôles : `tools/voix-auto.mjs` (lecture automatique, avis), `tools/voix-clips.mjs` (fichiers joués, repli), `tools/voice-check.mjs` (réglages de voix).
 
 ## Obtenir l'APK (tablette Android)
 

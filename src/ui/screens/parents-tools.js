@@ -6,7 +6,7 @@ import { STICKERS } from '../../content/stickers.js';
 import { levelSkills, masteredCount, stickerCount } from '../../core/progress.js';
 import { encodeBackup, decodeBackup } from '../../core/backup.js';
 import { toSVG } from '../../core/pdf.js';
-import { speak, frenchVoices, currentVoice, onVoicesChanged, unlockAudio } from '../audio.js';
+import { speak, frenchVoices, currentVoice, onVoicesChanged, unlockAudio, hasClips } from '../audio.js';
 import { voiceLabel } from '../../core/voices.js';
 import { drawings, drawingSVG, clearGallery, MAX_DESSINS } from '../../core/galerie.js';
 import { writingSheet, animalSheet, sheetPDF, deliverPDF, shareText, isNative, partageFichiers, REGLURES } from '../sheets.js';
@@ -168,6 +168,7 @@ function voiceCard(app) {
 
   return card('Voix du renard',
     toggle(app, 'set-voice', 'Voix du renard', 'Lit les consignes à voix haute.', 'voix'),
+    hasClips() ? h('p', { class: 'muted' }, 'Les phrases du renard sont enregistrées avec une voix générée par intelligence artificielle (ce n’est pas une voix humaine). Ce que le renard ne peut pas connaître à l’avance, comme le prénom ou un mot tapé librement, est lu par la voix du système choisie ci-dessous.') : null,
     row('Voix', 'Choisissez la voix qui vous semble la plus agréable. Les voix « sur l’appareil » ne sortent jamais de la tablette.',
       h('div', { class: 'stackc' }, sel, now, warn, listen)),
     row('Vitesse', null, seg('Vitesse de la voix', [['lent', 'Lente'], ['normal', 'Normale'], ['vif', 'Vive']], set.voixVitesse || 'normal', (v) => { set.voixVitesse = v; save(); })),

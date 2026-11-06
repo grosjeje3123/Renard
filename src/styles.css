@@ -93,6 +93,7 @@ button:focus-visible,input:focus-visible,.home-fox:focus-visible{outline:4px sol
 .home-fox{height:min(70vh,640px);justify-self:center;aspect-ratio:400/460;cursor:pointer;margin-top:4vh}
 .home-panel{display:flex;flex-direction:column;align-items:flex-start;gap:18px}
 .logo{font-size:clamp(52px,8vw,96px);line-height:.9;color:var(--accent);letter-spacing:-1px;text-shadow:0 4px 0 var(--card-solid)}
+.voice-notice{display:flex;flex-direction:column;gap:8px;align-items:flex-start;max-width:30em;margin-top:6px;padding:12px 16px;border-radius:16px;background:var(--card-solid);border:2px solid var(--line);font-weight:600;font-size:15px;line-height:1.3;color:var(--text)}.voice-notice .vn-btns{display:flex;flex-wrap:wrap;gap:8px}
 .tagline{font-family:var(--f-display);font-weight:500;font-size:clamp(20px,2.4vw,28px);margin-top:-8px;color:var(--text)}
 .stage{font-family:var(--f-display);font-size:18px;color:var(--text);background:var(--card);padding:6px 16px;border-radius:999px}
 .home-nav{display:flex;justify-content:center;gap:24px;padding:10px 0 calc(20px + env(safe-area-inset-bottom,0px))}

@@ -18,6 +18,7 @@ export function newState() {
       voixNom: '', // voix choisie par les parents ('' = la plus naturelle disponible sur l'appareil)
       voixVitesse: 'normal', // 'lent' | 'normal' | 'vif'
       voixTimbre: 'naturel', // 'naturel' | 'renard' (un peu plus aigu)
+      avisVoix: false, // l'avis « pas de voix française sur cette tablette » a été lu par un adulte
       reps: 1, // réussites demandées à chaque étape d'un exercice (1 ou 2)
       main: 'droite', // main d'écriture : 'droite' | 'gauche' (miroir de l'écran, tolérance de pente élargie)
       plateau: 0, // inclinaison du cahier à l'écran, en degrés (positif = vers la droite)

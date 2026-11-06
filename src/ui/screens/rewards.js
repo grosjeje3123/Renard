@@ -46,7 +46,7 @@ export function rewards(root, app) {
 
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
-  speaker.say(have.size ? 'Regarde tout ce que tu as gagné en apprenant !' : 'Chaque nouvelle chose apprise te donne un trésor.', { silent: true, icon: 'star' });
+  speaker.say(have.size ? 'Regarde tout ce que tu as gagné en apprenant !' : 'Chaque nouvelle chose apprise te donne un trésor.', { once: 'tresors', icon: 'star' });
 
   cards.forEach((c) => {
     if (!c.classList.contains('toggle')) {
