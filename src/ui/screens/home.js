@@ -42,7 +42,7 @@ export function home(root, app) {
         h('p', { class: 'stage' }, stage.name),
       ),
     ),
-    h('nav', { class: 'home-nav', 'aria-label': 'Menu' }, navBtn('map', 'Niveaux', 'niveaux'), navBtn('chest', 'Trésors', 'tresors'), navBtn('album', 'Album', 'album'), st.skills.i?.sessions > 0 || (st.settings.depart || 1) >= 2 ? navBtn('tableau', 'Tableau', 'tableau') : null, galleryOn(st) ? navBtn('frame', 'Galerie', 'galerie') : null, lockBtn),
+    h('nav', { class: 'home-nav', 'aria-label': 'Menu' }, navBtn('map', 'Niveaux', 'niveaux'), navBtn('chest', 'Trésors', 'tresors'), navBtn('album', 'Album', 'album'), navBtn('tableau', 'Tableau', 'tableau'), galleryOn(st) ? navBtn('frame', 'Galerie', 'galerie') : null, lockBtn),
   );
 
   const fox = app.makeFox(foxHost);

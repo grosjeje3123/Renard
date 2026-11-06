@@ -414,6 +414,15 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     check('tableau : aucune erreur', s.errs.length === 0, s.errs.join(' | '));
     await s.ctx.close();
   }
+  // première ouverture : le Tableau (écrire et dessiner avec calques) est dans le menu dès le départ, sans rien à débloquer
+  {
+    const s = await open((st) => { st.skills = {}; st.settings.depart = 1; });
+    check('première ouverture : le menu propose le Tableau', (await buttons(s.page, '.home-nav button')).some((t) => /Tableau/.test(t)));
+    await s.page.click('.home-nav button:has-text("Tableau")'); await s.page.waitForTimeout(800);
+    check('première ouverture : le Tableau s’ouvre', (await s.hash()) === '#tableau' && !!(await s.page.$('.tableau-board')));
+    check('première ouverture : aucune erreur', s.errs.length === 0, s.errs.join(' | '));
+    await s.ctx.close();
+  }
   // classe de l'enfant : niveau de départ
   {
     const s = await open((st) => { st.settings.depart = 3; }, 'carte-3-0');
