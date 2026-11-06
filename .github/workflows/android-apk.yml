@@ -21,11 +21,14 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-      - uses: android-actions/setup-android@v3
+      - name: SDK Android (déjà installé sur le serveur GitHub : on accepte les licences et on s'assure de la bonne plateforme)
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - run: npm ci
       - run: npm test
       - run: npm run build:app
