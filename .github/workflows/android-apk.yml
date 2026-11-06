@@ -1,0 +1,47 @@
+# Construit l'APK Android de Renard dans le cloud GitHub (aucune installation locale).
+# Utilisation : déposer ce dossier dans un dépôt GitHub, puis onglet « Actions » > « APK Android » > « Run workflow ».
+# Au bout de 5 à 10 minutes, l'APK est publié dans l'onglet « Releases » du dépôt (téléchargeable depuis un téléphone)
+# et aussi joint à l'exécution sous le nom renard-apk.
+name: APK Android
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:app
+      - run: npx cap sync android
+      - run: chmod +x android/gradlew
+      - name: Compiler l'APK (signé avec la clé de débogage, installable directement)
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: renard-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Publier l'APK dans les Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk renard.apk
+          gh release create "apk-${{ github.run_number }}" renard.apk --target "${{ github.sha }}" --title "Renard, APK de test n°${{ github.run_number }}" --notes "APK signé avec la clé de débogage : à installer pour les essais, pas pour Google Play."

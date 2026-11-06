@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Renard</string>
+    <string name="title_activity_main">Renard</string>
+    <string name="package_name">fr.renard.ecriture</string>
+    <string name="custom_url_scheme">fr.renard.ecriture</string>
+</resources>

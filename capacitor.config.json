@@ -1,0 +1,10 @@
+{
+  "appId": "fr.renard.ecriture",
+  "appName": "Renard",
+  "webDir": "www",
+  "backgroundColor": "#FFF3DC",
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

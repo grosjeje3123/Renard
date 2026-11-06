@@ -1,0 +1,20 @@
+RENARD — version installable (plein écran, fonctionne sans connexion)
+
+1. Déposez CE DOSSIER (tel quel, sans le renommer ni le modifier) sur un hébergement HTTPS gratuit :
+   - Netlify Drop : glissez le dossier sur la page « Deploy manually » de Netlify.
+   - ou Cloudflare Pages (« Upload assets »), ou GitHub Pages (dépôt public, branche principale).
+   Vous obtenez une adresse en https://… : c'est l'adresse de Renard.
+
+2. Sur la tablette, ouvrez cette adresse UNE fois, avec une connexion.
+   - iPad (Safari) : touchez le bouton Partager, puis « Sur l'écran d'accueil », puis « Ajouter ».
+   - Android (Chrome) : menu ⋮, puis « Installer l'application » (ou « Ajouter à l'écran d'accueil »).
+
+3. Ouvrez Renard depuis son icône : plus de barre de navigateur, et ça marche même sans réseau.
+
+À savoir
+- La progression est enregistrée sur la tablette, pour cette adresse précise. Si vous changez d'adresse ou
+  supprimez l'icône, utilisez d'abord « Code de sauvegarde » dans l'espace parents.
+- Pour mettre à jour : remplacez les fichiers sur l'hébergement. La nouvelle version arrive à la 2e ouverture
+  suivante avec une connexion.
+- Ni compte, ni publicité, ni suivi. Les pages de Renard ne peuvent envoyer aucune donnée : seule la copie des
+  fichiers de l'application est relue sur l'hébergement.

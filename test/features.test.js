@@ -1,0 +1,697 @@
+// Tests des fonctions ajoutées après le premier prototype : mots, consolidation, cahier papier, pauses,
+// ordre des lettres, gaucher, sauvegarde et fiches PDF.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { Session } from '../src/core/session.js';
+import { SKILLS, LEVELS, isWriting } from '../src/content/skills.js';
+import { STICKERS } from '../src/content/stickers.js';
+import { FICHES, factsOf } from '../src/content/fiches.js';
+import { buildTemplate } from '../src/core/template.js';
+import { BOARD } from '../src/core/board.js';
+import { HAUTEUR } from '../src/content/skills.js';
+import { recognizer } from '../src/engine/recognizer.js';
+import { recognizerContext } from '../src/core/tolerance.js';
+import { encodeBackup, decodeBackup } from '../src/core/backup.js';
+import { Page, A4, toPDF, toSVG, wrapText, textWidth } from '../src/core/pdf.js';
+import * as P from '../src/core/progress.js';
+import { simulate } from './sim.js';
+import { writingSheet, animalSheet } from '../src/ui/sheets.js';
+import { DESSINS, IDEES_LIBRES, TRAITS, NIVEAUX_DESSIN, tierFor, bounds, partPath, modelGroup } from '../src/content/dessins.js';
+import { rankVoices, chooseVoice, voiceLabel, timbres, vitesses } from '../src/core/voices.js';
+import * as G from '../src/core/galerie.js';
+
+const ev = (stars) => ({ stars, score: stars / 3, criteria: { start: 1, direction: 1, shape: 1, size: 1, lines: 1, flow: 1 }, tags: [] });
+const DAY = 86400000;
+const T0 = new Date(2026, 2, 3, 10, 0, 0).getTime(); // 3 mars 2026, 10 h
+const mastered = (st, id, now, opts = { demo: true }) => {
+  const s = new Session(id, opts);
+  for (let i = 0; i < 3; i++) s.submit(ev(3));
+  return P.recordSession(st, id, s, now);
+};
+const tried = (st, id, now = T0) => { const s = new Session(id); s.submit(ev(1)); P.recordSession(st, id, s, now); };
+
+// ---------- Alphabet ----------
+test('alphabet : les 26 lettres existent, chacune avec un seul rôle, des phrases d\'aide et un gabarit qui tient sur le cahier', () => {
+  const ABC = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  assert.deepEqual([...LEVELS[1].skills].sort(), ABC);
+  assert.equal(LEVELS[1].sections.flatMap((x) => x.skills).length, 26);
+  for (const id of ABC) {
+    const sk = SKILLS[id];
+    assert.equal(sk.kind, 'letter');
+    assert.ok(sk.say.intro && sk.say.how && sk.say.bubble && sk.word, id);
+    const t = buildTemplate(sk);
+    assert.ok(t.bbox.x0 >= 0.3 && t.bbox.x1 <= t.board.W - 0.3, `${id} : déborde`);
+    assert.ok(t.bbox.y0 >= 0.2 && t.bbox.y1 <= t.board.H - 0.2, `${id} : hors du cahier`);
+  }
+  assert.equal(SKILLS.i.strokes.filter((x) => x.dot).length, 1);
+  assert.equal(SKILLS.j.strokes.filter((x) => x.dot).length, 1, 'le j a son point');
+  assert.equal(SKILLS.t.strokes.length, 2, 'le t a sa barre');
+  assert.equal(SKILLS.x.strokes.length, 2, 'le x : deux traits');
+  assert.equal(SKILLS.k.strokes.length, 1, 'le k cursif s\'écrit d\'un seul trait, comme au cahier (hampe, petit enroulé, pont)');
+});
+
+// ---------- Niveau 3 : sons, mots, phrases ----------
+test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tiennent sur le cahier et finissent par leurs points', () => {
+  const all = LEVELS[2].skills;
+  assert.ok(all.length >= 60, 'beaucoup de contenu');
+  assert.ok(LEVELS[2].available);
+  assert.equal(new Set(all).size, all.length, 'pas de doublon');
+  assert.equal(LEVELS[2].sections.flatMap((x) => x.skills).length, all.length);
+  const kinds = { groupe: 0, phrase: 0, mot: 0 };
+  for (const id of all) {
+    const sk = SKILLS[id];
+    assert.equal(sk.kind, 'word');
+    assert.ok(isWriting(sk));
+    assert.ok(/^[a-z ]+$/.test(sk.glyph), `${id} : lettres sans accent`);
+    assert.ok(sk.needs.every((l) => LEVELS[1].skills.includes(l)), `${id} : lettres connues`);
+    kinds[sk.phrase ? 'phrase' : sk.groupe ? 'groupe' : 'mot']++;
+    const t = buildTemplate(sk);
+    assert.ok(t.bbox.x0 >= 0.3 && t.bbox.x1 <= t.board.W - 0.3, `${id} : déborde (${t.bbox.x0.toFixed(2)}–${t.bbox.x1.toFixed(2)})`);
+    assert.ok(t.bbox.y0 >= 0.2 && t.bbox.y1 <= t.board.H - 0.2, `${id} : hors du cahier en hauteur`);
+    assert.ok(t.board.W <= 40, `${id} : cahier trop large (${t.board.W})`);
+    const dots = t.strokes.filter((s) => s.kind === 'dot');
+    const expected = sk.glyph.split('').filter((c) => c === 'i' || c === 'j').length + (sk.phrase ? 1 : 0);
+    assert.equal(dots.length, expected, `${id} : points du i, du j et point final`);
+    if (!sk.phrase && dots.length) assert.equal(t.strokes.at(-1).kind, 'dot', `${id} : les points viennent à la fin`);
+    if (sk.phrase) {
+      const last = dots.at(-1), body = t.strokes.filter((s) => s.kind !== 'dot');
+      assert.ok(Math.abs(last.start.y - t.frame.baseline) < 0.01, `${id} : le point final repose sur la ligne`);
+      assert.ok(last.start.x > Math.max(...body.map((s) => s.bbox.x1)) - 0.5, `${id} : le point final est à la fin`);
+    }
+  }
+  assert.ok(kinds.groupe >= 12 && kinds.phrase >= 12 && kinds.mot >= 40, JSON.stringify(kinds));
+});
+
+test('cahier : un mot long agrandit la page en gardant l\'interligne, la ligne d\'écriture reste sur une ligne', () => {
+  const small = buildTemplate(SKILLS.mot_il), big = buildTemplate(SKILLS.phr_le_chat_dort);
+  assert.equal(small.board.W, 10);
+  assert.ok(big.board.W > 25);
+  assert.equal(big.board.baseline % 1, 0);
+  assert.ok(big.board.H >= big.board.W * 0.7 - 1e-9, 'la page couvre l\'écran (rapport 10:7)');
+  assert.equal(big.frame.baseline, big.board.baseline);
+  assert.ok(Math.abs(big.bbox.y1 - big.board.baseline) < 0.01, 'le point final est sur la ligne');
+});
+
+test('ouverture : une lettre s\'ouvre après la précédente, un mot dès que ses lettres ont été essayées', () => {
+  const st = newState();
+  assert.equal(P.isSkillOpen(st, 'mot_il'), false);
+  tried(st, 'i');
+  assert.equal(P.isSkillOpen(st, 'mot_il'), false, 'il manque le l');
+  assert.equal(P.lockReason(st, 'mot_il'), 'letters');
+  assert.deepEqual(P.missingLetters(st, 'mot_il'), ['l']);
+  assert.equal(P.isSkillOpen(st, 'u'), false, 'le u attend les lettres d\'avant');
+  assert.equal(P.lockReason(st, 'u'), 'before');
+  tried(st, 'o'); tried(st, 'a'); tried(st, 'l'); tried(st, 'e');
+  assert.equal(P.isSkillOpen(st, 'mot_il'), true);
+  assert.equal(P.isSkillOpen(st, 'mot_aile'), true, 'pas de file d\'attente : tous les mots possibles sont ouverts');
+  assert.equal(P.isSkillOpen(st, 'mot_oie'), true);
+  assert.equal(P.isSkillOpen(st, 'son_ou'), false, 'le u manque');
+  assert.equal(P.isSkillOpen(st, 'u'), true);
+  tried(st, 'u');
+  assert.equal(P.isSkillOpen(st, 'son_ou'), true);
+  assert.equal(P.isSkillOpen(st, 'mot_chat'), false);
+  st.settings.demo = true;
+  assert.equal(P.isSkillOpen(st, 'phr_le_loup_a_faim'), true, 'mode démonstration');
+});
+
+test('parcours conseillé : les mots arrivent dès que leurs lettres sont connues', () => {
+  const st = newState();
+  const order = P.learningOrder(st);
+  assert.equal(new Set(order).size, order.length);
+  assert.equal(order.length, LEVELS[0].skills.length + 26 + LEVELS[2].skills.length);
+  const pos = (id) => order.indexOf(id);
+  assert.ok(pos('mot_il') > pos('l') && pos('mot_il') < pos('u'), '« il » juste après le l et le i, avant les lettres suivantes');
+  assert.ok(pos('mot_aile') < pos('t'), 'les premiers mots avant le reste de l\'alphabet');
+  for (const id of LEVELS[2].skills) for (const l of SKILLS[id].needs) assert.ok(pos(l) < pos(id), `${id} : après la lettre ${l}`);
+  // le conseil suit ce parcours, pas à pas
+  const st2 = newState();
+  for (let k = 0; k < 24; k++) {
+    const rec = P.recommend(st2, T0 + k * 10);
+    assert.equal(rec.skillId, P.learningOrder(st2).find((id) => P.skillStatus(st2, id) === 'new'), `étape ${k}`);
+    assert.ok(P.isSkillOpen(st2, rec.skillId), `${rec.skillId} est ouvert`);
+    mastered(st2, rec.skillId, T0 + k * 10);
+  }
+  const done = P.learningOrder(st2).slice(0, 24);
+  assert.ok(done.some((id) => SKILLS[id].kind === 'word'), 'des sons ou des mots apparaissent avant la fin de l\'alphabet');
+  assert.ok(done.indexOf('son_oi') < done.indexOf('e'), 'le son « oi » dès que le o et le i sont connus');
+});
+
+test('classe de l\'enfant : un niveau de départ ouvre les niveaux d\'avant et ne conseille que la suite', () => {
+  const st = newState();
+  assert.equal(P.departLevel(st), 1);
+  assert.equal(P.isSkillOpen(st, 'z'), false);
+  st.settings.depart = 2;
+  assert.equal(P.isSkillOpen(st, 'boucles'), true, 'niveau 1 déjà ouvert');
+  assert.equal(P.isSkillOpen(st, 'i'), true);
+  assert.equal(P.isSkillOpen(st, 'z'), false, 'au niveau de départ, on avance lettre à lettre');
+  assert.equal(P.recommend(st).skillId, 'i', 'le conseil commence au niveau 2');
+  st.settings.depart = 3;
+  assert.equal(P.isSkillOpen(st, 'z'), true, 'les lettres sont ouvertes');
+  assert.equal(P.isSkillOpen(st, 'mot_chat'), true, 'et les mots dont les lettres sont ouvertes aussi');
+  assert.equal(P.isSkillOpen(st, 'phr_le_chat_dort'), true);
+  assert.equal(P.recommend(st).skillId, P.learningOrder(st)[0]);
+  assert.ok(SKILLS[P.recommend(st).skillId].level === 3, 'on propose un son ou un mot');
+  st.settings.depart = 9;
+  assert.equal(P.departLevel(st), 3, 'valeur bornée');
+  assert.equal(P.hydrate({ v: 1, settings: {}, skills: {} }).settings.depart, 1, 'anciennes sauvegardes');
+});
+
+test('étapes de la carte : les étapes couvrent le niveau, et un ordre de classe est découpé par paquets', () => {
+  const st = newState();
+  for (const lv of [LEVELS[1], LEVELS[2]]) {
+    const secs = P.levelSections(st, lv);
+    assert.deepEqual(secs.flatMap((x) => x.skills), lv.skills);
+    assert.ok(secs.every((x) => x.title && x.skills.length >= 5 && x.skills.length <= 14), lv.name);
+  }
+  assert.equal(P.levelSections(st, LEVELS[0]).length, 1, 'niveau 1 : une seule liste');
+  st.settings.order2 = ['z', 'y', ...LEVELS[1].skills.filter((x) => x !== 'z' && x !== 'y').reverse()];
+  const secs = P.levelSections(st, LEVELS[1]);
+  assert.deepEqual(secs.flatMap((x) => x.skills), P.levelSkills(st, LEVELS[1]));
+  assert.deepEqual(secs[0].skills.slice(0, 2), ['z', 'y']);
+});
+
+function newState() { return P.newState(); }
+
+// ---------- Gaucher : tolérance de pente ----------
+test('gaucher : une pente ordinaire passe pour les deux profils, une pente extrême seulement pour le profil gaucher', () => {
+  const seeds = Array.from({ length: 20 }, (_, i) => i + 1);
+  const rate = (id, k, main) => {
+    const tpl = buildTemplate(SKILLS[id]).strokes[0];
+    return seeds.filter((s) => {
+      const sim = simulate(tpl, { seed: s, noise: 0.06, drift: 0.12 });
+      sim.points = sim.points.map((p) => ({ ...p, x: p.x + k * (p.y - 5) }));
+      return recognizer.evaluateStroke(tpl, sim, recognizerContext(SKILLS[id], 2, { main })).stars >= 2;
+    }).length / seeds.length;
+  };
+  for (const main of ['droite', 'gauche']) for (const k of [0, 0.3, -0.3]) assert.ok(rate('l', k, main) >= 0.95, `l, pente ${k}, ${main}`);
+  assert.ok(rate('l', 0.8, 'gauche') >= 0.9, 'profil gaucher : écriture très penchée en arrière acceptée');
+  assert.ok(rate('l', 0.8, 'droite') <= 0.4, 'profil droitier : pas aussi large');
+  // Le réglage n'est jamais appliqué sans modèle ni alignement (phase 0 : on suit le guide)
+  assert.equal(recognizerContext(SKILLS.l, 0, { main: 'gauche' }).slant, null);
+});
+
+// ---------- Consolidation (révision espacée) ----------
+test('consolidation : acquis, puis réussi de mémoire à des jours espacés, devient « consolidé »', () => {
+  const st = newState();
+  assert.ok(mastered(st, 'o', T0).newlyMastered);
+  assert.equal(P.isConsolidated(st, 'o'), false);
+  assert.equal(P.reviewDue(st, 'o', T0 + DAY), false, 'le lendemain : trop tôt');
+  assert.equal(P.reviewDue(st, 'o', T0 + 3 * DAY), true, 'après deux jours : rappel conseillé');
+  assert.equal(P.startPhaseFor(st, 'o', T0 + 3600e3), 0, 'le jour même : on recommence normalement');
+  assert.equal(P.startPhaseFor(st, 'o', T0 + DAY), 2, 'un autre jour : rappel express, directement « tout seul »');
+  assert.equal(P.startPhaseFor(st, 'i', T0 + DAY), 0, 'un exercice non acquis ne saute rien');
+
+  assert.equal(mastered(st, 'o', T0 + 5000).consolidated, false);
+  assert.equal(st.skills.o.reviews, undefined, 'le même jour ne compte pas');
+  assert.equal(mastered(st, 'o', T0 + 2 * DAY).consolidated, false);
+  assert.equal(st.skills.o.reviews.length, 1);
+  assert.equal(mastered(st, 'o', T0 + 3 * DAY).consolidated, false, 'un seul jour d\'écart avec le rappel précédent : pas compté');
+  const r = mastered(st, 'o', T0 + 4 * DAY);
+  assert.equal(r.consolidated, true);
+  assert.ok(P.isConsolidated(st, 'o'));
+  assert.equal(P.reviewDue(st, 'o', T0 + 20 * DAY), false);
+  assert.equal(mastered(st, 'o', T0 + 9 * DAY).consolidated, false, 'ne se déclare qu\'une fois');
+});
+
+test('consolidation : le rappel express (départ en phase 3) suffit à confirmer l\'acquis, une aide l\'annule', () => {
+  const st = newState();
+  mastered(st, 'a', T0);
+  const s = new Session('a', { demo: true, startPhase: 2 });
+  assert.equal(s.phase, 2);
+  s.submit(ev(3));
+  assert.ok(s.done && s.mastered);
+  assert.equal(P.recordSession(st, 'a', s, T0 + 2 * DAY).newlyMastered, false);
+  assert.equal(st.skills.a.reviews.length, 1);
+  const helped = new Session('a', { demo: true, startPhase: 2 });
+  helped.rewatch(); helped.submit(ev(3));
+  assert.equal(helped.mastered, false, 'modèle revu : pas de confirmation');
+  P.recordSession(st, 'a', helped, T0 + 5 * DAY);
+  assert.equal(st.skills.a.reviews.length, 1);
+});
+
+test('recommandation : un rappel espacé passe avant la nouveauté', () => {
+  const st = newState();
+  LEVELS[0].skills.forEach((id, i) => mastered(st, id, T0 + i));
+  assert.equal(P.recommend(st, T0 + 1000).reason, 'next', 'le jour même : on avance');
+  const r = P.recommend(st, T0 + 3 * DAY);
+  assert.equal(r.reason, 'revise');
+  assert.equal(r.skillId, 'lignes');
+});
+
+// ---------- Cahier (papier) ----------
+test('cahier : « J\'ai essayé » est compté, jamais vérifié ; l\'adulte peut confirmer ; deux vignettes bonus', () => {
+  const st = newState();
+  assert.equal(P.paperCount(st), 0);
+  P.markPaper(st, 'i', T0);
+  P.markPaper(st, 'i', T0 + 1);
+  assert.equal(P.paperState(st, 'i').n, 2);
+  assert.equal(P.paperCount(st), 1, 'on compte les exercices essayés, pas les répétitions');
+  assert.equal(st.skills.i.sessions, 0, 'le papier ne compte pas comme une séance à l\'écran');
+  assert.equal(P.skillStatus(st, 'i'), 'new', 'ni comme une maîtrise');
+  assert.deepEqual(P.awardStickers(st, T0), ['escargot']);
+  P.markPaper(st, 'o'); P.markPaper(st, 'a');
+  assert.deepEqual(P.awardStickers(st, T0), ['coccinelle']);
+  assert.equal(P.confirmPaper(st, 'i', T0), true);
+  assert.equal(P.paperState(st, 'i').seen, T0);
+  assert.equal(P.confirmPaper(st, 'e', T0), false, 'rien à confirmer');
+});
+
+// ---------- Pauses ----------
+const minutes = (st, n, from) => { for (let i = 0; i < n * 12; i++) P.addUsage(st, 5, from + i * 5000); return from + n * 60000; };
+
+test('pauses : l\'activité continue se cumule, une absence de 5 minutes compte comme une pause', () => {
+  const st = newState();
+  let t = minutes(st, 14, T0);
+  assert.equal(P.breakDue(st, t), false);
+  t = minutes(st, 1, t);
+  assert.equal(P.activeSince(st), 900);
+  assert.equal(P.breakDue(st, t), true, 'après 15 minutes');
+  P.takeBreak(st);
+  assert.equal(P.breakDue(st, t), false);
+  t = minutes(st, 10, t);
+  P.addUsage(st, 5, t + 6 * 60000);
+  assert.equal(P.activeSince(st), 5, 'six minutes d\'absence : on repart de zéro');
+  st.settings.pauseMin = 0;
+  minutes(st, 40, t + 10 * 60000);
+  assert.equal(P.breakDue(st, t + 60 * 60000), false, 'pauses désactivées');
+});
+
+test('pauses : pause douce = le renard dort quelques minutes, puis tout repart', () => {
+  const st = newState();
+  st.settings.pauseMode = 'douce'; st.settings.pauseLen = 3;
+  let t = minutes(st, 15, T0);
+  assert.equal(P.breakDue(st, t), true);
+  assert.equal(P.blocked(st, t), null);
+  P.beginSleep(st, t);
+  assert.equal(P.blocked(st, t + 60000), 'sleep');
+  assert.equal(P.sleepRemaining(st, t + 60000), 120000);
+  assert.equal(P.blocked(st, t + 181000), null);
+  assert.equal(P.breakDue(st, t + 181000), false, 'le compteur est reparti de zéro');
+  st.settings.pauseMode = 'suggestion';
+  assert.equal(P.blocked(st, t + 60000), null, 'en mode suggestion, rien ne bloque jamais');
+});
+
+test('pauses : limite du jour, levée par un adulte pour la journée seulement', () => {
+  const st = newState();
+  st.settings.pauseMode = 'limite'; st.settings.limiteMin = 20;
+  let t = minutes(st, 19, T0);
+  assert.equal(P.dailyLimitReached(st, t), false);
+  t = minutes(st, 2, t);
+  assert.equal(P.dailyLimitReached(st, t), true);
+  assert.equal(P.blocked(st, t), 'limit');
+  P.overrideLimit(st, t);
+  assert.equal(P.blocked(st, t), null);
+  assert.equal(P.dailyLimitReached(st, t + 2 * 3600e3), false, 'levée pour toute la journée');
+  const tomorrow = T0 + DAY;
+  assert.equal(P.blocked(st, tomorrow), null, 'un nouveau jour repart de zéro');
+  minutes(st, 21, tomorrow);
+  assert.equal(P.blocked(st, tomorrow + 22 * 60000), 'limit', 'et la limite s\'applique de nouveau');
+});
+
+// ---------- Ordre des lettres ----------
+test('ordre des lettres : les parents suivent l\'ordre de la classe ; un ordre incohérent est ignoré, un ordre partiel est complété', () => {
+  const st = newState();
+  const lv = LEVELS[1];
+  const ABC = lv.skills;
+  assert.deepEqual(P.levelSkills(st, lv).slice(0, 5), ['i', 'o', 'a', 'l', 'e']);
+  st.settings.order2 = ['a', 'e', 'i', 'l', 'o', ...ABC.filter((x) => !'aeilo'.includes(x))];
+  assert.deepEqual(P.levelSkills(st, lv).slice(0, 5), ['a', 'e', 'i', 'l', 'o']);
+  assert.equal(P.levelSkills(st, lv).length, 26);
+  assert.deepEqual(P.orderedSkills(st).slice(5, 10), ['a', 'e', 'i', 'l', 'o']);
+  assert.equal(P.isSkillOpen(st, 'a'), true, 'première lettre de l\'ordre choisi');
+  assert.equal(P.isSkillOpen(st, 'i'), false);
+  tried(st, 'a'); tried(st, 'e');
+  assert.equal(P.isSkillOpen(st, 'i'), true);
+  st.settings.order2 = ['a', 'a', 'i', 'l', 'o'];
+  assert.deepEqual(P.levelSkills(st, lv), ABC, 'doublon : ordre d\'origine');
+  st.settings.order2 = ['a', 'e'];
+  assert.deepEqual(P.levelSkills(st, lv).slice(0, 3), ['a', 'e', 'i'], 'ordre partiel (ancienne sauvegarde) : complété avec les autres lettres');
+  assert.equal(new Set(P.levelSkills(st, lv)).size, 26);
+  st.settings.order2 = ['a', 'e', 'chou'];
+  assert.deepEqual(P.levelSkills(st, lv), ABC, 'lettre inconnue : ordre d\'origine');
+  assert.deepEqual(P.levelSkills(st, LEVELS[0]), LEVELS[0].skills, 'les autres niveaux ne bougent pas');
+});
+
+// ---------- Anciennes sauvegardes ----------
+test('un état enregistré par une version plus ancienne reste lisible', () => {
+  const old = { v: 1, name: 'Léo', created: 1, settings: { voix: false, sons: true, souple: true, demo: false }, skills: { lignes: { sessions: 2, attempts: 5, phase: 2, mastered: true, masteredAt: T0, last: T0, history: [] } }, usage: {}, equipped: [], seen: {}, stickers: {} };
+  const st = P.hydrate(old);
+  assert.equal(st.settings.voix, false);
+  assert.equal(st.settings.souple, true);
+  assert.equal(st.settings.main, 'droite');
+  assert.equal(st.settings.pauseMin, 15);
+  assert.deepEqual(st.fiches, {});
+  assert.ok(st.rest && st.rest.since === 0);
+  assert.doesNotThrow(() => { P.recommend(st, T0 + 5 * DAY); P.awardStickers(st); P.breakDue(st); P.blocked(st); });
+});
+
+// ---------- Sauvegarde ----------
+test('sauvegarde : le code se relit à l\'identique, et les mauvais codes sont refusés avec un message clair', async () => {
+  const st = newState();
+  st.name = 'Léa — « test »';
+  mastered(st, 'lignes', T0); mastered(st, 'ronds', T0 + 1);
+  P.markPaper(st, 'i', T0); P.awardStickers(st, T0);
+  st.settings.main = 'gauche'; st.settings.order2 = ['a', 'e', 'i', 'l', 'o'];
+  const code = await encodeBackup(st, 42);
+  assert.match(code, /^RENARD1:[A-Za-z0-9+/=]+$/);
+  assert.ok(code.length < JSON.stringify(st).length, 'le code est compressé');
+  const back = await decodeBackup(code);
+  assert.deepEqual(back, P.hydrate(JSON.parse(JSON.stringify(st))));
+  assert.equal(back.settings.main, 'gauche');
+  assert.deepEqual(await decodeBackup(`  ${code.slice(0, 60)}\n${code.slice(60)}  `), back, 'retours à la ligne et espaces tolérés');
+
+  await assert.rejects(decodeBackup('bonjour'), /pas un code de sauvegarde/);
+  await assert.rejects(decodeBackup(''), /pas un code de sauvegarde/);
+  await assert.rejects(decodeBackup(code.slice(0, 40)), /incomplet|abîmé/);
+  await assert.rejects(decodeBackup('RENARD1:@@@'), /incomplet|abîmé/);
+  const other = `RENARD0:${Buffer.from(JSON.stringify({ app: 'autre', v: 1, state: { v: 1, skills: {} } })).toString('base64')}`;
+  await assert.rejects(decodeBackup(other), /ne vient pas de Renard/);
+  const future = `RENARD0:${Buffer.from(JSON.stringify({ app: 'renard', v: 9, state: { v: 9, skills: {} } })).toString('base64')}`;
+  await assert.rejects(decodeBackup(future), /ne vient pas de Renard|trop différente/);
+  const plain = `RENARD0:${Buffer.from(JSON.stringify({ app: 'renard', v: 1, state: st })).toString('base64')}`;
+  assert.deepEqual(await decodeBackup(plain), back, 'code non compressé');
+});
+
+// ---------- Fiches animaux ----------
+test('fiches animaux : chaque vignette a ses faits et un défi pour bouger', () => {
+  for (const s of STICKERS) {
+    if (s.rule === 'all') continue; // le renard doré n'a pas de fiche
+    const f = FICHES[s.animal];
+    assert.ok(f, `fiche manquante : ${s.animal}`);
+    assert.ok(f.more.length >= 2 && f.move, s.animal);
+    for (const t of factsOf(s)) assert.ok(t.length > 20 && t.length < 130 && /[.!?]$/.test(t), `${s.animal} : « ${t} »`);
+  }
+});
+
+// ---------- PDF et fiches imprimables ----------
+test('pdf : structure valide (table des références juste, pages, texte accentué)', async () => {
+  const page = new Page();
+  page.text('Écris le « é » — œuf', 20, 30, { size: 14, bold: true });
+  page.line(10, 10, 100, 10, { color: '#B7A5E2', w: 0.3 });
+  page.circle(50, 50, 4, { fill: '#E8791C' });
+  page.svg('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="red"/></svg>', 20, 60, 30, 30);
+  const bytes = await toPDF([page, new Page()], { title: 'Essai', raster: async () => ({ w: 2, h: 2, rgb: new Uint8Array(12).fill(200) }) });
+  const txt = Buffer.from(bytes).toString('latin1');
+  assert.ok(txt.startsWith('%PDF-1.4') && txt.trimEnd().endsWith('%%EOF'));
+  assert.match(txt, /\/Count 2/);
+  const at = +/startxref\n(\d+)/.exec(txt)[1];
+  assert.equal(txt.slice(at, at + 4), 'xref');
+  const size = +/\/Size (\d+)/.exec(txt)[1];
+  const table = txt.slice(at).split('\n').slice(3, 3 + size - 1);
+  table.forEach((line, i) => {
+    const off = +line.slice(0, 10);
+    assert.equal(txt.slice(off, off + `${i + 1} 0 obj`.length), `${i + 1} 0 obj`, `objet ${i + 1}`);
+  });
+  assert.match(txt, /\/Subtype \/Image/);
+  assert.ok(textWidth('Bonjour', 12) > 10 && textWidth('Bonjour', 12) < 30);
+  assert.ok(wrapText('un deux trois quatre cinq six sept huit neuf dix', 30, 12).length > 1);
+});
+
+test('fiches : chaque exercice et chaque animal donne une page A4 qui ne déborde pas', () => {
+  const inside = (page, id) => {
+    for (const o of page.ops) {
+      const xs = o.t === 'poly' ? o.pts.map((p) => p[0]) : o.t === 'text' ? (o.align === 'right' ? [o.x] : [o.x]) : [o.x, o.x + (o.w || 0)];
+      const ys = o.t === 'poly' ? o.pts.map((p) => p[1]) : [o.y, o.y + (o.h || 0)];
+      for (const x of xs) assert.ok(x >= -0.5 && x <= A4.w + 0.5, `${id} : x=${x} (${o.t})`);
+      for (const y of ys) assert.ok(y >= -0.5 && y <= A4.h + 0.5, `${id} : y=${y} (${o.t})`);
+    }
+  };
+  for (const id of Object.keys(SKILLS)) for (const reglure of [2, 2.5, 3]) for (const lefty of [false, true]) {
+    const page = writingSheet(id, { reglure, name: 'Léa', lefty });
+    inside(page, `${id}/${reglure}`);
+    assert.ok(page.ops.length > 150, `${id} : fiche presque vide`);
+    assert.ok(toSVG(page).startsWith('<svg'));
+  }
+  for (const s of STICKERS) {
+    const page = animalSheet(s.id, { reglure: 3, name: '' });
+    inside(page, s.id);
+    assert.ok(page.ops.some((o) => o.t === 'svg'), `${s.id} : dessin de l'animal`);
+  }
+});
+
+test('fiches : la fiche de gaucher donne le conseil de placement de la feuille adapté', () => {
+  const said = (lefty) => writingSheet('o', { lefty }).ops.filter((o) => o.t === 'text').map((o) => o.str).join(' ');
+  assert.match(said(true), /vers la droite/);
+  assert.match(said(false), /vers la gauche/);
+});
+
+// ---------- Voix du renard ----------
+const V = (name, lang, localService = true) => ({ name, lang, localService });
+
+test('voix : on choisit une voix qui reste sur l\'appareil, la plus naturelle d\'abord', () => {
+  const list = [
+    V('Google français', 'fr-FR', false),
+    V('Thomas', 'fr-FR'),
+    V('Amélie (Premium)', 'fr-FR'),
+    V('Amélie', 'fr-CA'),
+    V('Samantha', 'en-US'),
+  ];
+  const r = rankVoices(list);
+  assert.deepEqual(r.map((d) => d.name), ['Amélie (Premium)', 'Thomas', 'Amélie', 'Google français'], 'les voix non françaises sont écartées, les voix en ligne passent en dernier');
+  const c = chooseVoice(list);
+  assert.equal(c.name, 'Amélie (Premium)');
+  assert.equal(c.reason, 'auto');
+  assert.equal(c.local, true);
+});
+
+test('voix : une voix en ligne n\'est jamais prise automatiquement s\'il existe une voix locale, même moins bien notée', () => {
+  const c = chooseVoice([V('Microsoft Denise Online (Natural) - French (France)', 'fr-FR', false), V('Pico fr', 'fr-FR')]);
+  assert.equal(c.name, 'Pico fr');
+  assert.equal(c.local, true);
+});
+
+test('voix : sans voix locale, on prend la meilleure voix en ligne plutôt que le silence, et on le signale', () => {
+  const c = chooseVoice([V('Google français', 'fr-FR', false)]);
+  assert.equal(c.name, 'Google français');
+  assert.equal(c.reason, 'enligne');
+  assert.equal(c.local, false);
+  assert.equal(chooseVoice([V('Samantha', 'en-US')]), null);
+  assert.equal(chooseVoice([]), null);
+});
+
+test('voix : le choix des parents l\'emporte, et un nom inconnu retombe sur le mode automatique', () => {
+  const list = [V('Amélie (Premium)', 'fr-FR'), V('Thomas', 'fr-FR'), V('Google français', 'fr-FR', false)];
+  assert.equal(chooseVoice(list, 'Thomas').reason, 'choix');
+  assert.equal(chooseVoice(list, 'Thomas').name, 'Thomas');
+  assert.equal(chooseVoice(list, 'Google français').local, false, 'choix volontaire d\'une voix en ligne');
+  assert.equal(chooseVoice(list, 'Voix disparue').name, 'Amélie (Premium)');
+});
+
+test('voix : les voix robotiques (eSpeak, compactes) passent après les autres voix françaises', () => {
+  const r = rankVoices([V('eSpeak French', 'fr-FR'), V('Marie', 'fr-FR'), V('Thomas (Compact)', 'fr-FR')]);
+  assert.equal(r[0].name, 'Marie');
+  assert.ok(voiceLabel(r[0]).includes('sur l’appareil'));
+  assert.ok(voiceLabel({ name: 'X', lang: 'fr-FR', local: false }).includes('en ligne'));
+});
+
+test('voix : les réglages par défaut sont naturels (hauteur non modifiée) et les anciennes sauvegardes les reçoivent', () => {
+  const st = P.hydrate({ v: 1, name: '', settings: { voix: true }, skills: {} });
+  assert.equal(st.settings.voixNom, '');
+  assert.equal(timbres[st.settings.voixTimbre], 1.0);
+  assert.equal(vitesses[st.settings.voixVitesse], 0.92);
+  assert.ok(timbres.renard > timbres.naturel && vitesses.lent < vitesses.normal && vitesses.normal < vitesses.vif);
+});
+
+// ---------- Alignement sur les lignes du cahier ----------
+test('cahier : sommets et creux des formes du niveau 1 tombent exactement sur les lignes', () => {
+  const near = (v, tol) => Math.abs(v - Math.round(v)) <= tol;
+  for (const id of LEVELS[0].skills) {
+    const t = buildTemplate(SKILLS[id]);
+    assert.ok(near(t.bbox.y0, 0.01) && near(t.bbox.y1, 0.01), `${id} : y ${t.bbox.y0.toFixed(3)} → ${t.bbox.y1.toFixed(3)} doit tomber sur des lignes`);
+    assert.equal(Math.round(t.bbox.y1), BOARD.baseline, `${id} repose sur la ligne d'écriture`);
+  }
+  // hauteurs voulues : ponts et vagues = 2 interlignes (jusqu'à la ligne du haut des petites lettres), boucles et pluie = 3
+  const h = (id) => { const b = buildTemplate(SKILLS[id]).bbox; return Math.round(b.y1 - b.y0); };
+  assert.deepEqual(['ponts', 'vagues', 'boucles', 'lignes', 'ronds'].map(h), [2, 2, 3, 3, 3]);
+});
+
+test('cahier : lettres et mots sont calés sur les lignes (pied sur la ligne d\'écriture, hauteurs de 2 ou 3 interlignes, point du i sur la ligne de 3)', () => {
+  const bodyOf = (id) => {
+    const t = buildTemplate(SKILLS[id]);
+    const body = t.strokes.filter((s) => s.kind !== 'dot');
+    return { base: t.board.baseline, y0: Math.min(...body.map((s) => s.bbox.y0)), y1: Math.max(...body.map((s) => s.bbox.y1)), dots: t.strokes.filter((s) => s.kind === 'dot') };
+  };
+  const DESC = 'fgjpqy'; // les jambages descendent sous la ligne
+  for (const [id, h] of Object.entries(HAUTEUR)) {
+    const b = bodyOf(id);
+    assert.ok(Math.abs(b.y1 - b.base) <= 0.04, `${id} : le pied doit toucher la ligne d'écriture (${b.y1.toFixed(3)})`);
+    assert.ok(Math.abs(b.y0 - (b.base - h)) <= 0.04, `${id} : le haut doit toucher la ligne de ${h} interlignes (${b.y0.toFixed(3)})`);
+  }
+  for (const id of DESC) {
+    const b = bodyOf(id);
+    assert.ok(b.y1 - b.base >= 1.4 && b.y1 - b.base <= 2.0, `${id} : le jambage descend de ${(b.y1 - b.base).toFixed(2)} interlignes`);
+    const top = id === 'f' ? 3 : 2;
+    assert.ok(Math.abs(b.y0 - (b.base - top)) <= 0.04, `${id} : le haut touche la ligne de ${top} (${(b.base - b.y0).toFixed(3)})`);
+  }
+  const bi = bodyOf('i');
+  assert.ok(Math.abs(bi.dots[0].start.y - (bi.base - 3)) < 0.001, 'le point du i est sur la ligne de 3 interlignes');
+  const bj = bodyOf('j');
+  assert.ok(Math.abs(bj.dots[0].start.y - (bj.base - 3)) < 0.001, 'le point du j aussi');
+  // les mots héritent du calage : leur plus grande lettre touche la ligne voulue, les jambages passent sous la ligne
+  for (const id of LEVELS[2].skills) {
+    const sk = SKILLS[id], b = bodyOf(id);
+    const letters = sk.needs;
+    // à l'école : b f h k l montent à la 3e ligne, d et t à la « 2e ligne » (2,5 interlignes), les autres à 2
+    const top = letters.some((l) => 'bfhkl'.includes(l)) ? 3 : letters.some((l) => 'dt'.includes(l)) ? 2.5 : 2;
+    const desc = letters.some((l) => DESC.includes(l));
+    assert.ok(desc ? b.y1 - b.base > 1.3 : Math.abs(b.y1 - b.base) <= 0.04, `${id} : pied ${(b.y1 - b.base).toFixed(3)}`);
+    assert.ok(Math.abs(b.y0 - (b.base - top)) <= 0.04, `${id} : haut ${(b.base - b.y0).toFixed(3)}`);
+  }
+});
+
+test('séance : un parcours complet demande trois réussites par défaut, et l\'enfant qui hésite n\'est jamais bloqué', () => {
+  const st = newState();
+  assert.equal(st.settings.reps, 1);
+  assert.equal(P.hydrate({ v: 1, settings: {}, skills: {} }).settings.reps, 1, 'anciennes sauvegardes');
+  const s = new Session('vagues');
+  const res = [s.submit(ev(3)), s.submit(ev(1)), s.submit(ev(2)), s.submit(ev(3))].map((r) => r.action);
+  assert.deepEqual(res, ['phase', 'again', 'phase', 'done']);
+  assert.ok(s.mastered && s.tries === 4);
+});
+
+// ---------- Dessin libre : modèles à reproduire ----------
+test('dessin libre : chaque modèle est complet, tient sur la feuille et utilise les couleurs de la palette', () => {
+  assert.ok(DESSINS.length >= 10 && IDEES_LIBRES.length >= 1);
+  assert.equal(new Set(DESSINS.map((d) => d.id)).size, DESSINS.length, 'identifiants uniques');
+  assert.equal(new Set(DESSINS.map((d) => d.phrase)).size, DESSINS.length, 'phrases uniques');
+  for (const d of DESSINS) {
+    assert.ok(d.parts.length >= 2, `${d.id} : au moins deux éléments`);
+    for (const p of d.parts) {
+      assert.ok(TRAITS[p.c], `${d.id} : couleur inconnue ${p.c}`);
+      assert.ok(partPath(p).startsWith('M'), `${d.id} : chemin invalide`);
+      assert.ok(!/NaN|undefined/.test(partPath(p)), `${d.id} : coordonnées invalides`);
+    }
+    const b = bounds(d);
+    assert.ok(b.x0 >= 0.3 && b.y0 >= 0.3 && b.x1 <= 9.7 && b.y1 <= 6.7, `${d.id} sort de la feuille : ${JSON.stringify(b)}`);
+    assert.ok(b.x1 - b.x0 >= 2.5 && b.y1 - b.y0 >= 2.5, `${d.id} trop petit pour être suivi du doigt`);
+    assert.equal((modelGroup(d).match(/<path /g) || []).length, d.parts.length);
+    assert.ok(modelGroup(d, { dotted: true }).includes('stroke-dasharray'), 'calque en pointillés');
+  }
+});
+
+test('dessin libre : trois niveaux de difficulté, qui s\'ouvrent avec la progression, et des modèles « à Renard »', () => {
+  for (const t of [1, 2, 3]) assert.ok(DESSINS.filter((d) => d.tier === t).length >= 3, `niveau ${t} : au moins trois modèles`);
+  assert.ok(DESSINS.every((d) => [1, 2, 3].includes(d.tier) && NIVEAUX_DESSIN[d.tier]));
+  // plus un dessin est difficile, plus il a de pièces en moyenne
+  const moy = (t) => { const l = DESSINS.filter((d) => d.tier === t); return l.reduce((a, d) => a + d.parts.length, 0) / l.length; };
+  assert.ok(moy(1) < moy(2) && moy(2) < moy(3), `${moy(1)} < ${moy(2)} < ${moy(3)}`);
+  assert.deepEqual([0, 2, 3, 6, 7, 20].map((n) => tierFor(n)), [1, 1, 2, 2, 3, 3]);
+  assert.equal(tierFor(0, true), 3, 'mode démonstration : tout est ouvert');
+  for (const id of ['maison-renard', 'voiture', 'bateau', 'cerf-volant']) {
+    const d = DESSINS.find((x) => x.id === id);
+    assert.ok(d && /Renard/.test(d.phrase) && d.ask && /Renard/.test(d.ask), id);
+  }
+  // l'enfant qui débute ne voit que les modèles faciles
+  assert.ok(DESSINS.filter((d) => d.tier <= tierFor(0)).every((d) => d.tier === 1));
+});
+
+// ---- Galerie du renard : dessins accrochés par l'enfant (réglage parents, désactivé par défaut)
+const trait = (n = 60, c = '#E5392F', w = 0.22) => ({ c, w, pts: Array.from({ length: n }, (_, i) => ({ x: 1 + i * (8 / (n - 1)), y: 3.5 + Math.sin(i / 6) * 0.01 })) });
+const stOn = () => { const st = P.newState(); st.settings.galerie = true; return st; };
+
+test('galerie : désactivée par défaut, donc rien n\'est conservé tant que les parents ne l\'ouvrent pas', () => {
+  const st = P.newState();
+  assert.equal(st.settings.galerie, false);
+  const r = G.hang(st, { strokes: [trait()] });
+  assert.equal(r.entry, null);
+  assert.equal(G.galleryCount(st), 0);
+  assert.deepEqual(st.galerie, []);
+});
+
+test('galerie : on accroche, on met à jour, on retire, et le plus ancien est remplacé au-delà du maximum', () => {
+  const st = stOn();
+  const a = G.hang(st, { strokes: [trait()], title: 'La maison de Renard', model: 'maison-renard', now: 1000 }).entry;
+  assert.ok(a && a.s.length === 1 && a.title === 'La maison de Renard');
+  const up = G.hang(st, { strokes: [trait(), trait(30, '#4E9A63')], replaceId: a.id, title: 'La maison de Renard', now: 2000 });
+  assert.ok(up.replaced && st.galerie.length === 1 && st.galerie[0].s.length === 2, 'même dessin mis à jour, pas de doublon');
+  assert.equal(st.galerie[0].t, 1000, 'la date de départ est conservée');
+  for (let i = 0; i < G.MAX_DESSINS + 3; i++) G.hang(st, { strokes: [trait()], title: `n°${i}`, now: 3000 + i });
+  assert.equal(st.galerie.length, G.MAX_DESSINS);
+  assert.ok(st.galerie.every((e) => e.title !== 'La maison de Renard'), 'le plus ancien a été remplacé');
+  assert.equal(G.drawings(st)[0].title, `n°${G.MAX_DESSINS + 2}`, 'les plus récents d\'abord');
+  assert.ok(G.unhang(st, st.galerie[0].id));
+  assert.equal(st.galerie.length, G.MAX_DESSINS - 1);
+  G.clearGallery(st);
+  assert.equal(G.galleryCount(st), 0);
+  assert.equal(G.hang(st, { strokes: [] }).entry, null, 'feuille vide : rien à accrocher');
+});
+
+test('galerie : les traits sont allégés sans changer le dessin, et le tout reste petit', () => {
+  const pts = trait(600).pts.map((p, i) => ({ x: p.x, y: 3.5 + Math.sin(i / 6) * 0.004 })); // trait presque droit, avec un tremblement invisible
+  const s = G.simplify(pts, 0.012);
+  assert.ok(s.length <= 3 && s[0] === pts[0] && s.at(-1) === pts.at(-1), `points gardés : ${s.length}`);
+  const wave = Array.from({ length: 300 }, (_, i) => ({ x: i / 30, y: 3.5 + Math.sin(i / 10) })); // une vraie courbe garde sa forme
+  const sw = G.simplify(wave, 0.012);
+  assert.ok(sw.length > 20 && sw.length < 150, `courbe : ${sw.length} points`);
+  const [c] = G.compactStrokes([{ c: '#E5392F', w: 0.22, pts }]);
+  assert.ok(c.d.length < 400 && c.d.startsWith('M '), c.d.length);
+  const dot = G.compactStrokes([{ c: '#E5392F', w: 0.22, pts: [{ x: 5, y: 3 }] }])[0];
+  assert.match(dot.d, /^M 5 3 l 0\.001 0$/, 'un simple point reste un point');
+  // un dessin chargé (30 traits de 400 points) tient largement sur la tablette
+  const st = stOn();
+  const big = Array.from({ length: 30 }, (_, k) => ({ c: '#4A8FD6', w: 0.1, pts: Array.from({ length: 400 }, (_, i) => ({ x: 5 + 4 * Math.cos(i / 20 + k), y: 3.5 + 3 * Math.sin(i / 17 + k) })) }));
+  G.hang(st, { strokes: big });
+  assert.ok(JSON.stringify(st.galerie).length < 60000, JSON.stringify(st.galerie).length);
+});
+
+test('galerie : les données relues sont vérifiées (rien d\'inattendu n\'arrive dans la page)', () => {
+  const st = stOn();
+  G.hang(st, { strokes: [trait()], title: 'Mon dessin' });
+  const bon = st.galerie[0];
+  assert.ok(G.validDrawing(bon));
+  assert.ok(!G.validDrawing({ ...bon, s: [{ c: 'red', w: 0.2, d: 'M 0 0' }] }), 'couleur non hexadécimale');
+  assert.ok(!G.validDrawing({ ...bon, s: [{ c: '#E5392F', w: 0.2, d: 'M 0 0" onload="x' }] }), 'chemin avec autre chose que des nombres');
+  assert.ok(!G.validDrawing({ ...bon, s: [] }) && !G.validDrawing(null) && !G.validDrawing({ id: 3 }));
+  const h = P.hydrate({ ...P.newState(), settings: { ...P.newState().settings, galerie: true }, galerie: [bon, { id: 'x', t: 1, s: [{ c: '<script>', w: 1, d: 'M' }] }, 'n\'importe quoi'] });
+  assert.equal(h.galerie.length, 1, 'les entrées abîmées sont ignorées');
+  assert.deepEqual(P.hydrate({ v: 1, skills: {} }).galerie, [], 'ancienne sauvegarde sans galerie');
+  assert.equal(P.hydrate({ v: 1, skills: {} }).settings.galerie, false);
+  const svg = G.drawingSVG({ ...bon, title: '<b>"x"</b>' });
+  assert.ok(svg.includes('<path') && !svg.includes('<b>') && !/aria-label="[^"]*"[^>]*"x"/.test(svg));
+  assert.equal(G.titleFor('la maison de Renard'), 'La maison de Renard');
+  assert.equal(G.titleFor('ton animal préféré'), 'Mon animal préféré');
+  assert.equal(G.titleFor('ta famille'), 'Ma famille');
+  assert.equal(G.titleFor(''), 'Mon dessin');
+});
+
+test('galerie : le code de sauvegarde ne contient jamais les dessins', async () => {
+  const st = stOn();
+  st.name = 'Léa';
+  G.hang(st, { strokes: [trait()], title: 'Mon dessin' });
+  const code = await encodeBackup(st);
+  const back = await decodeBackup(code);
+  assert.deepEqual(back.galerie, []);
+  assert.equal(back.name, 'Léa');
+  assert.equal(back.settings.galerie, true, 'le réglage, lui, suit la sauvegarde');
+  assert.equal(st.galerie.length, 1, 'l\'état d\'origine n\'est pas modifié');
+});
+
+// ---------- Tableau libre ----------
+import * as T from '../src/core/tableau.js';
+test('tableau libre : le texte est nettoyé (a–z sans accent), le calque tient sur la page et la page s\'agrandit pour un texte long', () => {
+  assert.equal(T.clean('  Léa-Rose Œuf '), 'lea rose oeuf ');
+  assert.equal(T.clean('ÉLÈVE ça va 123'), 'eleve ca va ');
+  assert.equal(T.clean(''), '');
+  assert.equal(T.clean('x'.repeat(100)).length, T.TABLEAU.maxLen);
+  const a = T.calque('il');
+  assert.ok(a.strokes.length >= 3 && a.width > 2);
+  assert.equal(a.strokes.filter((s) => s.kind === 'dot').length, 1, 'le point du i');
+  assert.ok(Math.abs(a.bbox.x0 - T.TABLEAU.margin) < 1e-9, 'calque aligné à gauche');
+  assert.equal(T.page(a.width).W, 20);
+  const long = T.calque('le chat dort');
+  assert.ok(T.fits('le chat dort'));
+  const pg = T.page(long.width);
+  assert.ok(pg.W > 20 && pg.W >= long.width + 2 * T.TABLEAU.margin, 'la page s\'agrandit');
+  assert.ok(pg.H >= pg.W * 0.7 - 1e-9 && pg.rows.length >= 3 && pg.rows[0] === T.TABLEAU.rows[0]);
+  assert.equal(T.fits('abcdefghijklmnopqrstuvwxyz'), false, 'un texte trop long est refusé');
+  assert.equal(T.calque('   ').strokes.length, 0);
+  assert.equal(T.calque('chat', 8.2).strokes.every((s) => s.d.length > 0), true);
+  const st = P.newState();
+  assert.equal(T.suggestions(st).prenom, '');
+  st.name = 'Léa'; tried(st, 'i'); tried(st, 'l'); tried(st, 'mot_il');
+  const sg = T.suggestions(st);
+  assert.equal(sg.prenom, 'lea');
+  assert.deepEqual(sg.mots, ['il']);
+  st.name = 'Jean-Baptiste-Alexandre-Maximilien';
+  assert.equal(T.suggestions(st).prenom, '', 'un prénom trop long pour la page n\'est pas proposé');
+});

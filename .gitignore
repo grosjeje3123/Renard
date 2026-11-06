@@ -1,0 +1,7 @@
+node_modules/
+dist/
+www/
+*.apk
+*.aab
+.DS_Store
+/pwa/
