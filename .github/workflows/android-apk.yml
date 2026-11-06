@@ -25,7 +25,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
-      - name: SDK Android (déjà installé sur le serveur GitHub : on accepte les licences et on s'assure de la bonne plateforme)
+      - name: SDK Android (déjà sur le serveur GitHub, on accepte les licences et on vérifie la plateforme)
         run: |
           yes | sdkmanager --licenses > /dev/null || true
           sdkmanager "platforms;android-36" "build-tools;36.0.0"
