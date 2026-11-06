@@ -28,7 +28,7 @@ Contrôle : `node build.mjs --pwa && node tools/pwa-check.mjs` (installable selo
 
 ## Obtenir l'APK (tablette Android)
 
-Le projet Android (Capacitor 8, `android/`) est prêt : l'application est la même page que dans le navigateur, empaquetée dans une WebView, hors ligne. L'APK n'a pas été compilé dans l'environnement où le projet a été généré (le SDK Android n'y est pas accessible) : le premier build sur votre machine ou sur GitHub est le premier test réel sur tablette.
+Le projet Android (Capacitor 8, `android/`) est prêt : l'application est la même page que dans le navigateur, empaquetée dans une WebView, hors ligne. L'APK a été compilé une première fois par GitHub Actions (workflow `.github/workflows/android-apk.yml`, `renard.apk` dans l'onglet Releases du dépôt) et contrôlé (archive intacte, mêmes fichiers que `www/index.html`, identifiant `fr.renard.ecriture`) ; il n'a pas encore été essayé sur une tablette réelle.
 
 **Voie A, sans rien installer : GitHub Actions**
 
