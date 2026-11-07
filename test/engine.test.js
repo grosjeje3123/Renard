@@ -57,6 +57,7 @@ test('tracé incomplet : au plus 1 étoile et message "incomplet"', () => {
 test('départ au mauvais endroit : conseil donné, jamais 3 étoiles', () => {
   for (const id of IDS) {
     if (id === 'lignes' || id === 'x') continue; // un trait droit : partir un peu plus loin sur le même trait reste sur le trait
+    if (/^M\s*-?[\d.]+\s+-?[\d.]+\s*L\s*-?[\d.]+\s+-?[\d.]+\s*$/.test(SKILLS[id].strokes[0].d || '')) continue; // majuscules dont le premier trait est un segment (I, L, T, E, F, H…)
     const res = seeds.map((s) => run(id, { seed: s, from: 0.3 }));
     assert.ok(res.every((e) => e.stars < 3), `${id}`);
   }

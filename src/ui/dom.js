@@ -48,6 +48,8 @@ export const ICONS = {
   book: `<path d="M12 6.5C9.8 5 6.8 4.6 3.5 5v12c3.3-.4 6.3 0 8.5 1.5 2.2-1.5 5.2-1.9 8.5-1.5V5c-3.3-.4-6.3 0-8.5 1.5zM12 6.5v12" ${S} stroke-width="2.2"/>`,
   run: `<circle cx="14.6" cy="4.6" r="2.1" fill="currentColor"/><path d="M9.5 12.2l3-2.8 3.4 1.5 2.4 3M12.4 9.5L11 14l3.4 2.2.9 4.3M11 14l-4.4 1" ${S} stroke-width="2.2"/>`,
   trash: `<path d="M5 7h14M9.5 7V4.5h5V7M7 7l1 13h8l1-13" ${S} stroke-width="2.2"/>`,
+  gear: `<path d="M4 7h8.5M18.5 7H20M4 12h2.5M12.5 12H20M4 17h10.5M20.5 17H20" ${S} stroke-width="2.4"/><circle cx="15.5" cy="7" r="2.6" ${S} stroke-width="2.2"/><circle cx="9.5" cy="12" r="2.6" ${S} stroke-width="2.2"/><circle cx="17.5" cy="17" r="2.6" ${S} stroke-width="2.2"/>`,
+  music: `<path d="M9 18V6l10-2v12" ${S} stroke-width="2.4"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="16.5" cy="16" r="2.6" fill="currentColor"/>`,
 };
 export const icon = (name, size = 24, cls = '') => `<svg class="ico ${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${ICONS[name] || ''}</svg>`;
 

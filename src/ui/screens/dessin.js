@@ -11,6 +11,7 @@ import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { sfx, speak, stopSpeaking } from '../audio.js';
 import { deliverFile } from '../sheets.js';
+import { fitSheet } from '../sheet.js';
 import { dayKey, masteredCount } from '../../core/progress.js';
 import { hang, titleFor, galleryOn, galleryCount, pathD, MAX_DESSINS } from '../../core/galerie.js';
 import { DESSINS, IDEES_LIBRES, NIVEAUX_DESSIN, tierFor, modelGroup } from '../../content/dessins.js';
@@ -18,11 +19,12 @@ import { DESSINS, IDEES_LIBRES, NIVEAUX_DESSIN, tierFor, modelGroup } from '../.
 const NS = 'http://www.w3.org/2000/svg';
 const COLORS = [['brun', '#4A2F22'], ['rouge', '#E5392F'], ['orange', '#F08A24'], ['jaune', '#F4C84A'], ['vert', '#4E9A63'], ['bleu', '#4A8FD6'], ['violet', '#8B6FD6']];
 const SIZES = [['fin', 0.1], ['moyen', 0.22], ['gros', 0.45]];
-const PNG_W = 1600, PNG_H = 1120;
+const PNG_W = 1600;
+const SHEET_W = 10, SHEET_H0 = 7; // feuille de 10 unités de large ; sa hauteur suit la place libre (≥ 7), voir ui/sheet.js
 
 export function dessin(root, app) {
   root.classList.add('exo', 'dessin');
-  let color = COLORS[1][1], size = SIZES[1][1], active = null, penSeen = false, armed = 0, hungId = '';
+  let color = COLORS[1][1], size = SIZES[1][1], active = null, penSeen = false, armed = 0, hungId = '', sheetH = SHEET_H0, fit = null;
   const strokes = [];
 
   const foxHost = h('div', { class: 'side-fox' });
@@ -32,9 +34,20 @@ export function dessin(root, app) {
   svg.setAttribute('viewBox', '0 0 10 7');
   svg.setAttribute('role', 'img');
   svg.setAttribute('aria-label', 'Feuille de dessin');
-  svg.innerHTML = '<rect width="10" height="7" rx="0.32" fill="#FFFDF7"/><g class="calque"></g><g class="ink"></g>';
+  svg.innerHTML = '<rect class="sheet-bg" width="10" height="7" rx="0.32" fill="#FFFDF7"/><g class="calque"></g><g class="ink"></g>';
   const ink = svg.querySelector('.ink');
   const calqueG = svg.querySelector('.calque');
+  const sheetBg = svg.querySelector('.sheet-bg');
+  /** La feuille prend la hauteur demandée (par pas de 0,05) ; les modèles, dessinés pour 10 × 7, restent centrés. */
+  const setRatio = (r) => {
+    sheetH = Math.round(SHEET_W * r * 20) / 20;
+    svg.setAttribute('viewBox', `0 0 ${SHEET_W} ${sheetH}`);
+    sheetBg.setAttribute('height', String(sheetH));
+    calqueG.setAttribute('transform', `translate(0 ${((sheetH - SHEET_H0) / 2).toFixed(3)})`);
+    return sheetH / SHEET_W;
+  };
+  const boardHost = h('div', { class: 'board-host' }, svg);
+  const boardWrap = h('div', { class: 'board-wrap' }, boardHost);
 
   const swatches = COLORS.map(([name, c]) => h('button', { class: `swatch${c === color ? ' on' : ''}`, type: 'button', 'aria-label': `Couleur ${name}`, style: { '--c': c }, onClick: () => { color = c; sfx('tap'); swatches.forEach((s) => s.classList.toggle('on', s.style.getPropertyValue('--c') === c)); } }));
   const sizes = SIZES.map(([name, w]) => h('button', { class: `size${w === size ? ' on' : ''}`, type: 'button', 'aria-label': `Trait ${name}`, onClick: () => { size = w; sfx('tap'); sizes.forEach((s, i) => s.classList.toggle('on', SIZES[i][1] === w)); }, html: `<span style="width:${6 + w * 34}px;height:${6 + w * 34}px"></span>` }));
@@ -58,8 +71,9 @@ export function dessin(root, app) {
         h('div', { class: 'palette', role: 'group', 'aria-label': 'Couleurs' }, swatches),
         h('div', { class: 'sizes', role: 'group', 'aria-label': 'Épaisseur du trait' }, sizes),
         h('div', { class: 'side-actions' }, undoBtn, clearBtn)),
-      h('div', { class: 'board-wrap' }, h('div', { class: 'board-host' }, svg))),
+      boardWrap),
   );
+  fit = fitSheet(boardWrap, boardHost, { locked: () => strokes.length > 0, apply: setRatio });
 
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
@@ -91,7 +105,7 @@ export function dessin(root, app) {
     const m = svg.getScreenCTM();
     if (!m) return null;
     const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
-    return { x: Math.max(0, Math.min(10, p.x)), y: Math.max(0, Math.min(7, p.y)) };
+    return { x: Math.max(0, Math.min(SHEET_W, p.x)), y: Math.max(0, Math.min(sheetH, p.y)) };
   };
   svg.addEventListener('pointerdown', (e) => {
     if (active) return;
@@ -120,7 +134,7 @@ export function dessin(root, app) {
     active = null;
     refresh();
   };
-  const refresh = () => { doneBtn.disabled = strokes.length === 0; };
+  const refresh = () => { doneBtn.disabled = strokes.length === 0; fit?.refit(); };
   svg.addEventListener('pointerup', end);
   svg.addEventListener('pointercancel', end);
   svg.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -143,6 +157,7 @@ export function dessin(root, app) {
   async function toPNG() {
     const clone = svg.cloneNode(true);
     clone.querySelector('.calque')?.remove(); // le calque aide à dessiner, il ne fait pas partie du dessin
+    const PNG_H = Math.round((PNG_W * sheetH) / SHEET_W);
     clone.setAttribute('xmlns', NS); clone.setAttribute('width', String(PNG_W)); clone.setAttribute('height', String(PNG_H));
     const img = new Image();
     const loaded = new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
@@ -183,7 +198,10 @@ export function dessin(root, app) {
       const hangBtn = h('button', { class: 'btn-big sm hang-btn', type: 'button', html: `${icon('frame', 30)}<span>Accrocher dans la forêt</span>` });
       const hangNote = h('p', { class: 'muted hang-note' }, hungId ? 'Ce dessin est déjà dans ta galerie : il sera mis à jour.' : full ? 'La galerie est pleine : le plus ancien dessin sera remplacé.' : 'Il restera dans la galerie du renard, sur cette tablette.');
       hangBtn.addEventListener('click', () => {
-        const res = hang(app.state, { strokes: strokes.map(({ c, w, pts }) => ({ c, w, pts })), title: titleFor(current?.model?.phrase ?? current?.phrase), model: current?.model?.id || '', replaceId: hungId });
+        // la galerie a des cadres de 10 × 7 : une feuille plus haute y entre en taille réduite, centrée
+        const k = Math.min(1, SHEET_H0 / sheetH), dx = (SHEET_W - SHEET_W * k) / 2;
+        const list = strokes.map(({ c, w, pts }) => ({ c, w: w * k, pts: pts.map((p) => ({ x: p.x * k + dx, y: p.y * k })) }));
+        const res = hang(app.state, { strokes: list, title: titleFor(current?.model?.phrase ?? current?.phrase), model: current?.model?.id || '', replaceId: hungId });
         if (!res.entry) { hangNote.textContent = 'Impossible d’accrocher ce dessin.'; return; }
         hungId = res.entry.id; app.save(); sfx('win');
         const see = h('button', { class: 'btn-big sm hang-btn', type: 'button', onClick: () => { sfx('tap'); app.go('galerie'); }, html: `${icon('frame', 30)}<span>Voir ma galerie</span>` });
@@ -215,5 +233,5 @@ export function dessin(root, app) {
   /** La flèche de retour : directe si la feuille est vide, sinon on demande avant de perdre le dessin. */
   function leave() { sfx('tap'); if (strokes.length) ending('retour'); else app.go('carte-1'); }
 
-  return () => { clearTimeout(armed); stopSpeaking(); endFox?.destroy(); fox.destroy(); };
+  return () => { clearTimeout(armed); stopSpeaking(); fit?.destroy(); endFox?.destroy(); fox.destroy(); };
 }

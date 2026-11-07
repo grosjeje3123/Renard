@@ -106,6 +106,10 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   await stroke([[0.2, 0.7], [0.5, 0.8], [0.8, 0.6]]);
   let n = await s.page.$$eval('.draw-board .ink path', (a) => a.length);
   check('dessin : deux traits dessinés', n === 2, `${n}`);
+  // la feuille remplit la place libre (avant : 47 % de l'écran seulement sur iPad)
+  const fill = await s.page.evaluate(() => { const b = document.querySelector('.draw-board').getBoundingClientRect(), w = document.querySelector('.board-wrap').getBoundingClientRect(); return { part: (b.width * b.height) / (w.width * w.height), vb: document.querySelector('.draw-board').getAttribute('viewBox'), ecran: (b.width * b.height) / (innerWidth * innerHeight) }; });
+  check('dessin : la feuille occupe presque toute la zone libre', fill.part > 0.95, `${Math.round(fill.part * 100)} % de la zone, ${Math.round(fill.ecran * 100)} % de l’écran, viewBox ${fill.vb}`);
+  check('dessin : la feuille prend au moins 55 % de l’écran', fill.ecran > 0.55, `${Math.round(fill.ecran * 100)} %`);
   const colors = await s.page.$$eval('.draw-board .ink path', (a) => a.map((p) => p.getAttribute('stroke')));
   check('dessin : deux couleurs différentes', colors[0] !== colors[1], colors.join(' / '));
   await clickText(s.page, 'Défaire');
@@ -382,7 +386,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     check('tableau : « Calque » masque les modèles', (await s.page.$$eval('.cal-row', (a) => a.length)) === 0);
     // mode dessin : calques de dessins, grille, feuille à part
     await s.page.click('.ms-btn[data-view="dessiner"]'); await s.page.waitForTimeout(300);
-    check('dessiner : la feuille de dessin (10 × 7) remplace la page lignée', (await s.page.$eval('.tableau-board', (e) => e.getAttribute('viewBox'))) === '0 0 10 7' && !(await s.page.$('.tableau-board .rules')));
+    check('dessiner : la feuille de dessin (10 de large, 7 de haut au moins) remplace la page lignée', /^0 0 10 (\d+(\.\d+)?)$/.test(await s.page.$eval('.tableau-board', (e) => e.getAttribute('viewBox'))) && +(await s.page.$eval('.tableau-board', (e) => e.getAttribute('viewBox'))).split(' ')[3] >= 7 && !(await s.page.$('.tableau-board .rules')));
     check('dessiner : la feuille de dessin est vide (l’écriture reste sur son autre feuille)', (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) === 0 && !(await s.page.$eval('.model-card:not(.tb-card)', (e) => e.hidden)));
     await clickText(s.page, 'Choisir'); await s.page.waitForTimeout(300);
     check('dessiner : le choix de calque propose la feuille blanche et tous les dessins', (await s.page.$$eval('.mp-card', (a) => a.length)) === 1 + 15);
@@ -445,6 +449,75 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     check('parents : aucune erreur', s.errs.length === 0, s.errs.join(' | '));
     await s.ctx.close();
   }
+}
+
+// Premier lancement : écran de démarrage, présentation (prénom, classe, main), Options, Crédits
+{
+  const fresh = async (viewport = { width: 1180, height: 820 }) => {
+    const ctx = await browser.newContext({ viewport, hasTouch: true });
+    const page = await ctx.newPage();
+    const errs = [];
+    page.on('console', (m) => { if (['error', 'warning'].includes(m.type())) errs.push(m.text()); });
+    page.on('pageerror', (e) => errs.push('PAGEERROR ' + e.message));
+    await page.goto(`file://${process.cwd()}/${PAGE}/index.html`); // sans ancre : comme à l'ouverture de l'application
+    await page.waitForTimeout(700);
+    return { page, ctx, errs, state: () => page.evaluate(() => JSON.parse(localStorage.getItem('renard-v1') || 'null')), hash: () => page.evaluate(() => location.hash) };
+  };
+  const s = await fresh();
+  check('démarrage : l’écran « Touche pour jouer » s’affiche à l’ouverture', !!(await s.page.$('.screen.splash')) && /Touche pour jouer/.test(await s.page.innerText('.splash .btn-big')));
+  await s.page.click('.splash .home-main'); await s.page.waitForTimeout(1900);
+  check('présentation : tablette neuve, le renard se présente', (await s.hash()) === '#bienvenue' && !!(await s.page.$('.screen.welcome .wl-input')), await s.hash());
+  const skipBox = await s.page.evaluate(() => { const b = document.querySelector('.wl-skip').getBoundingClientRect(); return { right: b.right, top: b.top, w: innerWidth }; });
+  check('présentation : « Passer » est en haut à droite', skipBox.right > skipBox.w - 60 && skipBox.top < 40, JSON.stringify(skipBox));
+  await s.page.fill('.wl-input', 'léa-rose'); await s.page.click('.wl-body .btn-big'); await s.page.waitForTimeout(400);
+  check('présentation : la deuxième question propose quatre classes', (await s.page.$$('[data-classe]')).length === 4);
+  await s.page.click('[data-classe=gs]'); await s.page.waitForTimeout(700);
+  check('présentation : la troisième question propose la main', (await s.page.$$('[data-main]')).length === 2);
+  await s.page.click('[data-main=droite]'); await s.page.waitForTimeout(700);
+  await s.page.click('.wl-body .btn-big'); await s.page.waitForTimeout(800);
+  let st = await s.state();
+  check('présentation : prénom nettoyé, classe et main enregistrés', st.name === 'Léa-Rose' && st.settings.classe === 'gs' && st.settings.depart === 1 && st.settings.main === 'droite' && st.settings.accueilFait === true, JSON.stringify({ n: st.name, c: st.settings.classe, d: st.settings.depart }));
+  check('présentation : on arrive à l’accueil', (await s.hash()) === '#accueil');
+  const opt = await s.page.evaluate(() => { const b = document.querySelector('.top-right [aria-label=Options]'); if (!b) return null; const r = b.getBoundingClientRect(); return { right: r.right, top: r.top, w: innerWidth }; });
+  check('accueil : le bouton Options est en haut à droite', !!opt && opt.right > opt.w - 160 && opt.top < 40, JSON.stringify(opt));
+  // Options
+  await s.page.click('[aria-label=Options]'); await s.page.waitForTimeout(500);
+  check('options : la page s’ouvre', (await s.hash()) === '#options' && /Mélodie du démarrage/.test(await s.page.innerText('body')));
+  await clickText(s.page, 'CP, fin d’année', '.seg-b'); await s.page.waitForTimeout(300);
+  st = await s.state();
+  check('options : changer de classe règle le niveau de départ', st.settings.classe === 'cp2' && st.settings.depart === 3, JSON.stringify({ c: st.settings.classe, d: st.settings.depart }));
+  await clickText(s.page, 'Mélodie du démarrage', 'label'); await s.page.waitForTimeout(300);
+  check('options : la mélodie peut être coupée', (await s.state()).settings.jingle === false);
+  // Crédits
+  await clickText(s.page, 'Crédits'); await s.page.waitForTimeout(500);
+  check('crédits : la page s’ouvre', (await s.hash()) === '#credits' && /L’idée/.test(await s.page.innerText('body')) && /Jérôme Hosdez/.test(await s.page.innerText('body')));
+  check('crédits : rien ne dépasse de la fenêtre en largeur', await s.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+  // Rouvrir l'application : plus de présentation, mais l'écran de démarrage ; mélodie coupée => pas de son attendu
+  await s.page.goto(`file://${process.cwd()}/${PAGE}/index.html`); await s.page.waitForTimeout(600);
+  await s.page.click('.splash .home-main'); await s.page.waitForTimeout(1900);
+  check('réouverture : on va droit à l’accueil, sans refaire la présentation', (await s.hash()) === '#accueil', await s.hash());
+  check('premier lancement : aucune erreur', s.errs.length === 0, s.errs.join(' | '));
+  await s.ctx.close();
+  // Les parents règlent le niveau de départ : la classe suit sans se contredire
+  const p = await open((x) => { x.settings.classe = 'gs'; x.settings.depart = 1; x.settings.accueilFait = true; }, 'parents');
+  await p.page.focus('.gate-btn'); await p.page.keyboard.press('Enter'); await p.page.waitForTimeout(500);
+  await clickText(p.page, 'Début du CP', '.seg-b'); await p.page.waitForTimeout(300);
+  st = await p.state();
+  check('parents : « Début du CP » met aussi la classe à « CP, début d’année »', st.settings.depart === 2 && st.settings.classe === 'cp1', JSON.stringify({ c: st.settings.classe, d: st.settings.depart }));
+  await clickText(p.page, 'Avant le CP', '.seg-b'); await p.page.waitForTimeout(300);
+  st = await p.state();
+  check('parents : « Avant le CP » redonne une classe de maternelle', st.settings.depart === 1 && ['ms', 'gs'].includes(st.settings.classe), st.settings.classe);
+  check('parents : aucune erreur (classe)', p.errs.length === 0, p.errs.join(' | '));
+  await p.ctx.close();
+  // Grande section : la carte du niveau 1 ouvre d'emblée la première majuscule
+  const g = await open((x) => { x.skills = {}; x.settings.classe = 'gs'; x.settings.depart = 1; x.settings.accueilFait = true; }, 'carte-1-1');
+  const ouverts = await g.page.$$eval('.node:not(.locked)', (a) => a.map((n) => n.textContent.trim()));
+  check('grande section : la première majuscule est ouverte', ouverts.length >= 1 && ouverts.some((t) => /(^|\s)I$/.test(t)), ouverts.join(','));
+  const ex = await open((x) => { x.skills = {}; x.settings.classe = 'gs'; x.settings.depart = 1; x.settings.accueilFait = true; }, 'exercice-maj_I');
+  check('majuscule : l’exercice « I » s’ouvre', (await ex.hash()) === '#exercice-maj_I' && /Le I majuscule/.test(await ex.page.innerText('.exo-bar')));
+  check('majuscule : la colonne de gauche tient dans la fenêtre', await ex.page.evaluate(() => [...document.querySelectorAll('.exo-card,.model-chip')].every((e) => e.getBoundingClientRect().bottom <= innerHeight)));
+  check('majuscule : aucune erreur', ex.errs.length === 0 && g.errs.length === 0, ex.errs.concat(g.errs).join(' | '));
+  await g.ctx.close(); await ex.ctx.close();
 }
 
 await browser.close();

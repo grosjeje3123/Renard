@@ -40,7 +40,10 @@ export function map(root, app, arg) {
   }
   const section = sections[si];
   const ids = section.skills;
-  const free = lv.id === 1 ? 'dessin' : si === sections.length - 1 ? 'tableau' : null; // niveau 1 : dessin libre ; niveaux d'écriture : tableau libre
+  // niveau 1 : dessin libre avec les formes, puis le tableau libre en majuscules (son prénom !) au bout des majuscules ; niveaux d'écriture : tableau libre à la dernière étape
+  const last = si === sections.length - 1;
+  const free = lv.id === 1 ? (si === 0 ? 'dessin' : last ? 'tableau' : null) : last ? 'tableau' : null;
+  const prenom = lv.id === 1 && free === 'tableau' && !!st.name;
   const n = ids.length + (free ? 1 : 0);
   const pos = layout(n);
   const d = pos.reduce((acc, p, i) => {
@@ -70,8 +73,8 @@ export function map(root, app, arg) {
 
   if (free) {
     const i = ids.length;
-    const label = free === 'dessin' ? 'Dessin libre' : 'Tableau libre';
-    nodes.push(h('button', { class: 'node free', type: 'button', 'data-free': free, style: { left: pos[i].x + '%', top: pos[i].y + '%' }, 'aria-label': free === 'dessin' ? 'Dessin libre, pour le plaisir' : 'Tableau libre : écrire ce que je veux, avec un modèle à calquer' },
+    const label = free === 'dessin' ? 'Dessin libre' : prenom ? 'Mon prénom' : 'Tableau libre';
+    nodes.push(h('button', { class: 'node free', type: 'button', 'data-free': free, style: { left: pos[i].x + '%', top: pos[i].y + '%' }, 'aria-label': free === 'dessin' ? 'Dessin libre, pour le plaisir' : prenom ? 'Écrire mon prénom en majuscules, dans le tableau libre' : 'Tableau libre : écrire ce que je veux, avec un modèle à calquer' },
       h('span', { class: 'disc', html: icon(free === 'dessin' ? 'pencil' : 'tableau', 38) }), h('span', { class: 'nlabel' }, label)));
   }
 
@@ -106,7 +109,7 @@ export function map(root, app, arg) {
 
   nodes.forEach((node) => node.addEventListener('click', () => {
     const id = node.dataset.skill;
-    if (node.dataset.free) { sfx('pop'); app.tableauFrom = `carte-${lv.id}-${si}`; app.go(node.dataset.free); return; }
+    if (node.dataset.free) { sfx('pop'); app.tableauFrom = `carte-${lv.id}-${si}`; if (prenom) app.tableauCasse = 'maj'; app.go(node.dataset.free); return; }
     if (node.classList.contains('locked')) {
       sfx('oops');
       node.classList.remove('wiggle'); void node.offsetWidth; node.classList.add('wiggle');

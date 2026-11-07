@@ -125,6 +125,7 @@ test('parcours conseillé : les mots arrivent dès que leurs lettres sont connue
   for (const id of LEVELS[2].skills) for (const l of SKILLS[id].needs) assert.ok(pos(l) < pos(id), `${id} : après la lettre ${l}`);
   // le conseil suit ce parcours, pas à pas
   const st2 = newState();
+  st2.settings.depart = 2; // les formes et les majuscules (niveau 1) sont derrière nous : on suit l'alphabet et les premiers mots
   for (let k = 0; k < 24; k++) {
     const rec = P.recommend(st2, T0 + k * 10);
     assert.equal(rec.skillId, P.learningOrder(st2).find((id) => P.skillStatus(st2, id) === 'new'), `étape ${k}`);
@@ -132,6 +133,7 @@ test('parcours conseillé : les mots arrivent dès que leurs lettres sont connue
     mastered(st2, rec.skillId, T0 + k * 10);
   }
   const done = P.learningOrder(st2).slice(0, 24);
+  assert.ok(done.every((id) => SKILLS[id].level >= 2), 'départ au CP : plus de formes ni de majuscules dans le conseil');
   assert.ok(done.some((id) => SKILLS[id].kind === 'word'), 'des sons ou des mots apparaissent avant la fin de l\'alphabet');
   assert.ok(done.indexOf('son_oi') < done.indexOf('e'), 'le son « oi » dès que le o et le i sont connus');
 });
@@ -163,7 +165,9 @@ test('étapes de la carte : les étapes couvrent le niveau, et un ordre de class
     assert.deepEqual(secs.flatMap((x) => x.skills), lv.skills);
     assert.ok(secs.every((x) => x.title && x.skills.length >= 5 && x.skills.length <= 14), lv.name);
   }
-  assert.equal(P.levelSections(st, LEVELS[0]).length, 1, 'niveau 1 : une seule liste');
+  assert.deepEqual(P.levelSections(st, LEVELS[0]).flatMap((x) => x.skills), LEVELS[0].skills, 'niveau 1 : les formes, puis les majuscules par familles');
+  assert.equal(LEVELS[0].sections.length, 6);
+  assert.equal(LEVELS[0].sections.flatMap((x) => x.skills).filter((id) => SKILLS[id].capital).length, 26);
   st.settings.order2 = ['z', 'y', ...LEVELS[1].skills.filter((x) => x !== 'z' && x !== 'y').reverse()];
   const secs = P.levelSections(st, LEVELS[1]);
   assert.deepEqual(secs.flatMap((x) => x.skills), P.levelSkills(st, LEVELS[1]));
@@ -317,7 +321,7 @@ test('ordre des lettres : les parents suivent l\'ordre de la classe ; un ordre i
   st.settings.order2 = ['a', 'e', 'i', 'l', 'o', ...ABC.filter((x) => !'aeilo'.includes(x))];
   assert.deepEqual(P.levelSkills(st, lv).slice(0, 5), ['a', 'e', 'i', 'l', 'o']);
   assert.equal(P.levelSkills(st, lv).length, 26);
-  assert.deepEqual(P.orderedSkills(st).slice(5, 10), ['a', 'e', 'i', 'l', 'o']);
+  assert.deepEqual(P.orderedSkills(st).slice(LEVELS[0].skills.length, LEVELS[0].skills.length + 5), ['a', 'e', 'i', 'l', 'o']);
   assert.equal(P.isSkillOpen(st, 'a'), true, 'première lettre de l\'ordre choisi');
   assert.equal(P.isSkillOpen(st, 'i'), false);
   tried(st, 'a'); tried(st, 'e');
@@ -495,7 +499,7 @@ test('voix : les réglages par défaut sont naturels (hauteur non modifiée) et 
 // ---------- Alignement sur les lignes du cahier ----------
 test('cahier : sommets et creux des formes du niveau 1 tombent exactement sur les lignes', () => {
   const near = (v, tol) => Math.abs(v - Math.round(v)) <= tol;
-  for (const id of LEVELS[0].skills) {
+  for (const id of LEVELS[0].core) {
     const t = buildTemplate(SKILLS[id]);
     assert.ok(near(t.bbox.y0, 0.01) && near(t.bbox.y1, 0.01), `${id} : y ${t.bbox.y0.toFixed(3)} → ${t.bbox.y1.toFixed(3)} doit tomber sur des lignes`);
     assert.equal(Math.round(t.bbox.y1), BOARD.baseline, `${id} repose sur la ligne d'écriture`);
@@ -694,4 +698,84 @@ test('tableau libre : le texte est nettoyé (a–z sans accent), le calque tient
   assert.deepEqual(sg.mots, ['il']);
   st.name = 'Jean-Baptiste-Alexandre-Maximilien';
   assert.equal(T.suggestions(st).prenom, '', 'un prénom trop long pour la page n\'est pas proposé');
+});
+
+// ---------- Les majuscules, avant le CP ----------
+test('majuscules : 26 exercices dans le niveau 1, par familles, droits et posés sur la ligne d\'écriture', () => {
+  const caps = Object.values(SKILLS).filter((s) => s.capital);
+  assert.equal(caps.length, 26);
+  assert.equal(caps.map((s) => s.glyph).sort().join(''), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+  for (const sk of caps) {
+    assert.equal(sk.level, 1, sk.id);
+    assert.ok(LEVELS[0].skills.includes(sk.id), `${sk.id} est au niveau 1`);
+    assert.ok(sk.say.intro && sk.say.how && sk.say.bubble, `${sk.id} : consignes`);
+    assert.ok(sk.say.intro.includes(`Le ${sk.glyph} majuscule`), sk.id);
+    const t = buildTemplate(SKILLS[sk.id]);
+    // la lettre tient dans le cahier : sommet à 3 interlignes, pied sur la ligne (la queue du Q et le crochet du J descendent un peu)
+    assert.ok(Math.abs((BOARD.baseline - t.bbox.y0) - 3) < 0.05, `${sk.id} : sommet à 3 interlignes (${(BOARD.baseline - t.bbox.y0).toFixed(2)})`);
+    assert.ok(t.bbox.y1 >= BOARD.baseline - 0.05 && t.bbox.y1 <= BOARD.baseline + 0.5, `${sk.id} : pied sur la ligne (${(t.bbox.y1 - BOARD.baseline).toFixed(2)})`);
+    assert.ok(t.bbox.w < 3.2, `${sk.id} : largeur raisonnable (${t.bbox.w.toFixed(2)})`);
+  }
+  const I = buildTemplate(SKILLS.maj_I).strokes[0];
+  assert.ok(I.bbox.w < 0.01, 'le I est une barre bien verticale (pas penchée comme l\'écriture cursive)');
+  const sections = LEVELS[0].sections.slice(1);
+  assert.deepEqual(sections.map((x) => x.skills.length), [6, 6, 5, 5, 4]);
+  assert.ok(sections.every((x) => x.title && x.skills.every((id) => SKILLS[id].section === x.id)));
+});
+
+test('majuscules : on avance pas à pas ; la grande section commence directement par les majuscules', () => {
+  const st = newState();
+  assert.equal(P.isSkillOpen(st, 'maj_I'), false, 'pas avant d\'avoir essayé les formes');
+  tried(st, 'lignes'); tried(st, 'ronds'); tried(st, 'ponts'); tried(st, 'vagues'); tried(st, 'boucles');
+  assert.equal(P.isSkillOpen(st, 'maj_I'), true);
+  assert.equal(P.isSkillOpen(st, 'maj_L'), false, 'une à la fois');
+
+  const gs = newState();
+  gs.settings.classe = 'gs';
+  assert.equal(P.isSkillOpen(gs, 'maj_I'), true, 'grande section : les formes sont derrière nous');
+  assert.equal(P.isSkillOpen(gs, 'maj_L'), false);
+  assert.equal(P.recommend(gs).skillId, 'maj_I', 'on conseille d\'abord les majuscules');
+  assert.deepEqual(P.learningOrder(gs).slice(0, 6), ['maj_I', 'maj_L', 'maj_T', 'maj_E', 'maj_F', 'maj_H']);
+  tried(gs, 'maj_I');
+  assert.equal(P.isSkillOpen(gs, 'maj_L'), true);
+
+  const ms = newState();
+  ms.settings.classe = 'ms';
+  assert.equal(P.recommend(ms).skillId, 'lignes', 'moyenne section : on commence par les formes');
+});
+
+test('majuscules : l\'étape du hibou ne demande que les formes de départ ; au CP, les majuscules sont déjà ouvertes', () => {
+  const st = newState();
+  LEVELS[0].core.forEach((id, i) => mastered(st, id, T0 + i));
+  P.awardStickers(st);
+  assert.ok(st.stickers.hibou, 'les cinq formes suffisent au hibou');
+  const cp = newState();
+  cp.settings.depart = 2;
+  assert.equal(P.isSkillOpen(cp, 'maj_Z'), true);
+  assert.ok(!P.learningOrder(cp).some((id) => SKILLS[id].level === 1), 'plus de formes ni de majuscules dans le conseil au CP');
+});
+
+test('première ouverture : la classe règle le niveau de départ', () => {
+  assert.equal(P.CLASSES.length, 4);
+  const st = newState();
+  assert.equal(st.settings.classe, '');
+  assert.equal(st.settings.accueilFait, false);
+  for (const [id, depart] of [['ms', 1], ['gs', 1], ['cp1', 2], ['cp2', 3]]) {
+    P.setClasse(st, id);
+    assert.equal(st.settings.classe, id);
+    assert.equal(st.settings.depart, depart, id);
+  }
+  P.setClasse(st, 'nimporte');
+  assert.equal(st.settings.classe, 'cp2', 'une classe inconnue ne change rien');
+  assert.equal(P.classeLabel('gs'), 'Grande section');
+  assert.equal(P.needsWelcome(newState()), true, 'tablette neuve : on se présente');
+  const used = newState(); tried(used, 'lignes');
+  assert.equal(P.needsWelcome(used), false, 'une tablette déjà utilisée ne redemande rien');
+  const done = newState(); done.settings.accueilFait = true;
+  assert.equal(P.needsWelcome(done), false);
+  assert.equal(P.cleanName('  léa  '), 'Léa');
+  assert.equal(P.cleanName('jean-pierre'), 'Jean-Pierre');
+  assert.equal(P.cleanName('<b>Zoé</b>'), 'Bzoéb', 'les caractères étranges disparaissent');
+  assert.equal(P.cleanName('x'.repeat(40)).length, 14, 'quatorze lettres au plus');
+  assert.equal(P.cleanName('123'), '');
 });

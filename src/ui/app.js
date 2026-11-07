@@ -54,6 +54,11 @@ export const app = {
     if (location.hash === '#' + route) this.render();
     else location.hash = route;
   },
+  /** Comme go(), mais sans laisser l'écran quitté dans l'historique (le bouton retour ne revient pas sur l'écran de démarrage). */
+  replace(route) {
+    try { history.replaceState(null, '', '#' + route); } catch { location.hash = route; return; }
+    this.render();
+  },
 
   equipped() {
     const have = new Set(unlockedItems(this.state));
@@ -69,7 +74,10 @@ export const app = {
     this.cleanup?.();
     this.cleanup = null;
     stopSpeaking();
-    const [name, ...rest] = (location.hash.slice(1) || 'accueil').split('-');
+    // À l'ouverture de l'application (adresse sans ancre), un premier écran « Touche pour jouer » : le geste de l'enfant
+    // débloque le son, et la petite musique de marimba peut alors jouer. Les liens directs (#carte-1…) l'évitent.
+    const start = !location.hash && !this.splashDone && !this.noSplash;
+    const [name, ...rest] = (start ? 'demarrage' : location.hash.slice(1) || 'accueil').split('-');
     const arg = rest.join('-');
     const screen = this.screens[name] || this.screens.accueil;
     this.root.replaceChildren();

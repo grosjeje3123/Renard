@@ -10,6 +10,7 @@ import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { sfx, speak, stopSpeaking } from '../audio.js';
 import { deliverFile } from '../sheets.js';
+import { fitSheet, RATIO_MIN } from '../sheet.js';
 import { confetti } from '../confetti.js';
 import { dayKey, masteredCount } from '../../core/progress.js';
 import { hang, titleFor, galleryOn, galleryCount, pathD, MAX_DESSINS } from '../../core/galerie.js';
@@ -22,7 +23,7 @@ const NS = 'http://www.w3.org/2000/svg';
 const COLORS = [['brun', '#4A2F22'], ['rouge', '#E5392F'], ['orange', '#F08A24'], ['jaune', '#F4C84A'], ['vert', '#4E9A63'], ['bleu', '#4A8FD6'], ['violet', '#8B6FD6']];
 // [nom, épaisseur pour écrire (en interlignes), épaisseur pour dessiner (feuille de 10 × 7)]
 const SIZES = [['fin', 0.12, 0.1], ['moyen', 0.2, 0.22], ['gros', 0.34, 0.45]];
-const DRAW = { W: 10, H: 7, rows: [] };
+const DRAW = { W: 10, H: 7, rows: [] }; // la hauteur du dessin suit la place libre (ui/sheet.js), 7 au minimum
 const CALQUES = [['plein', 'Plein'], ['pointille', 'Pointillés'], ['aucun', 'Caché']];
 const PNG_W = 1600;
 const ABC = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -50,6 +51,7 @@ export function tableau(root, app) {
   let casse = app.tableauCasse || (first.prenom ? 'debut' : 'min');
   if (!fits(text, casse)) casse = 'min';
   let sugg = suggestions(st, casse);
+  let wantRatio = RATIO_MIN, fit = null; // rapport hauteur/largeur offert par l'écran (voir ui/sheet.js)
   let pg = page(calque(text, TABLEAU.rows[0], casse).width);
   const rowStates = new Map(); // rangée → { ok, stars } : les rangées déjà félicitées
   const dirty = new Set(); // rangées écrites depuis la dernière évaluation
@@ -114,6 +116,7 @@ export function tableau(root, app) {
     const m = current?.model;
     if (m && calqueMode !== 'aucun') {
       const g = svgEl('g', { class: `cal-model ${calqueMode}` }, calqueG);
+      g.setAttribute('transform', `translate(0 ${((DRAW.H - 7) / 2).toFixed(3)})`); // les modèles sont dessinés pour 10 × 7 : on les centre
       g.innerHTML = calqueMode === 'plein' ? modelGroup(m) : modelGroup(m, { dotted: true });
     }
   };
@@ -149,6 +152,8 @@ export function tableau(root, app) {
   const modeBtns = [['ecrire', 'Écrire', 'tableau'], ['dessiner', 'Dessiner', 'pencil']].map(([id, label, ic]) => h('button', { class: `ms-btn${id === view ? ' on' : ''}`, type: 'button', 'data-view': id, 'aria-pressed': String(id === view), onClick: () => setView(id), html: `${icon(ic, 22)}<span>${label}</span>` }));
   const subtitle = h('p', {}, 'Écris ce que tu veux, sans note');
 
+  const boardHost = h('div', { class: 'board-host' }, svg);
+  const boardWrap = h('div', { class: 'board-wrap' }, boardHost);
   let main; // la zone sous l'en-tête : c'est là que volent les confettis
   root.append(
     h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }),
@@ -162,7 +167,7 @@ export function tableau(root, app) {
         h('div', { class: 'palette', role: 'group', 'aria-label': 'Couleurs' }, swatches),
         h('div', { class: 'sizes', role: 'group', 'aria-label': 'Épaisseur du trait' }, sizes),
         h('div', { class: 'side-actions' }, calqueBtn, gridBtn, undoBtn, clearBtn)),
-      h('div', { class: 'board-wrap' }, h('div', { class: 'board-host' }, svg))),
+      boardWrap),
   );
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
@@ -174,13 +179,13 @@ export function tableau(root, app) {
 
   /** Le texte, la casse ou les deux ont changé : nouvelle page, nouveaux calques, les rangées félicitées repartent de zéro. */
   function applyText() {
-    pg = page(calque(text, TABLEAU.rows[0], casse).width);
+    pg = page(calque(text, TABLEAU.rows[0], casse).width, sheets.ecrire.strokes.length ? pg.H / pg.W : wantRatio);
     shownText.textContent = shown();
     shownText.title = shown();
     sugg = suggestions(st, casse);
     resetRows();
     syncCasse();
-    if (view === 'ecrire') buildPage();
+    if (view === 'ecrire') { buildPage(); fit?.set(pg.H / pg.W); }
   }
   const askText = () => speaker.say(`Écris « ${shown()} » : suis la première ligne, puis les pointillés, puis écris tout seul !`, { icon: 'pencil', dit: `Écris « ${shown().toLowerCase()} » : suis la première ligne, puis les pointillés, puis écris tout seul !` });
 
@@ -307,6 +312,7 @@ export function tableau(root, app) {
     let neuve = false; // l'idée vient d'être annoncée : on ne la répète pas
     if (!writing && !drawReady) { drawReady = true; idea(); neuve = true; }
     buildPage();
+    fit?.set(geom().H / geom().W);
     refresh();
     if (writing) askText(); else if (current && !neuve) speaker.say(current.model?.ask || (current.phrase ? `Une idée : dessine ${current.phrase} !` : 'Dessine ce que tu veux sur la feuille !'), { icon: 'pencil' });
   }
@@ -347,7 +353,7 @@ export function tableau(root, app) {
     if (view === 'ecrire') { s.row = rowOf(pg.rows, s.pts); scheduleEval(s.row); }
     refresh();
   };
-  const refresh = () => { doneBtn.disabled = strokes().length === 0; };
+  const refresh = () => { doneBtn.disabled = strokes().length === 0; fit?.refit(); };
   svg.addEventListener('pointerup', end);
   svg.addEventListener('pointercancel', end);
   svg.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -524,8 +530,10 @@ export function tableau(root, app) {
       const hangBtn = h('button', { class: 'btn-big sm hang-btn', type: 'button', html: `${icon('frame', 30)}<span>Accrocher dans la forêt</span>` });
       const hangNote = h('p', { class: 'muted hang-note' }, sh.hung ? (writing ? 'Cette page est déjà dans ta galerie : elle sera mise à jour.' : 'Ce dessin est déjà dans ta galerie : il sera mis à jour.') : full ? 'La galerie est pleine : le plus ancien dessin sera remplacé.' : `${writing ? 'Elle' : 'Il'} restera dans la galerie du renard, sur cette tablette.`);
       hangBtn.addEventListener('click', () => {
-        const k = writing ? Math.min(10 / pg.W, 7 / pg.H) : 1; // la page entre dans le cadre de la galerie
-        const list = sh.strokes.map(({ c, w, pts }) => ({ c, w: w * k, pts: pts.map((p) => ({ x: p.x * k, y: p.y * k })) }));
+        // la page entre, réduite et centrée, dans le cadre de 10 × 7 de la galerie
+        const gw = writing ? pg.W : DRAW.W, gh = writing ? pg.H : DRAW.H;
+        const k = Math.min(10 / gw, 7 / gh), dx = (10 - gw * k) / 2, dy = (7 - gh * k) / 2;
+        const list = sh.strokes.map(({ c, w, pts }) => ({ c, w: w * k, pts: pts.map((p) => ({ x: p.x * k + dx, y: p.y * k + dy })) }));
         const res = hang(st, { strokes: list, title: writing ? `Tableau : ${shown()}` : titleFor(current?.model?.phrase ?? current?.phrase), model: writing ? '' : current?.model?.id || '', replaceId: sh.hung });
         if (!res.entry) { hangNote.textContent = writing ? 'Impossible d’accrocher cette page.' : 'Impossible d’accrocher ce dessin.'; return; }
         sh.hung = res.entry.id; app.save(); sfx('win');
@@ -568,6 +576,15 @@ export function tableau(root, app) {
   root.dataset.view = view;
   applyText();
   askText();
+  /** La feuille remplit la place libre : la hauteur du dessin et le nombre de rangées d'écriture suivent l'écran. */
+  const setRatio = (want) => {
+    wantRatio = want;
+    if (!sheets.ecrire.strokes.length) pg = page(calque(text, TABLEAU.rows[0], casse).width, Math.min(want, 1)); // au plus 4 rangées : les lettres restent grandes
+    if (!sheets.dessiner.strokes.length) DRAW.H = Math.round(DRAW.W * want * 20) / 20;
+    buildPage();
+    return geom().H / geom().W;
+  };
+  fit = fitSheet(boardWrap, boardHost, { locked: () => strokes().length > 0, apply: setRatio });
 
-  return () => { clearTimeout(armed); clearTimeout(evalTimer); stopSpeaking(); endFox?.destroy(); fox.destroy(); };
+  return () => { clearTimeout(armed); fit?.destroy(); clearTimeout(evalTimer); stopSpeaking(); endFox?.destroy(); fox.destroy(); };
 }

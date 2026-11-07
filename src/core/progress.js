@@ -15,6 +15,7 @@ export function newState() {
     created: Date.now(),
     settings: {
       voix: true, sons: true, souple: false, demo: false,
+      jingle: true, // la petite musique de marimba à l'ouverture (les sons doivent aussi être activés)
       voixNom: '', // voix choisie par les parents ('' = la plus naturelle disponible sur l'appareil)
       voixVitesse: 'normal', // 'lent' | 'normal' | 'vif'
       voixTimbre: 'naturel', // 'naturel' | 'renard' (un peu plus aigu)
@@ -30,6 +31,8 @@ export function newState() {
       reglure: 3, // interligne des fiches à imprimer, en mm
       order2: null, // ordre des lettres du niveau 2, choisi par les parents (null = ordre d'origine)
       depart: 1, // niveau de départ : 1 (avant le CP), 2 (début du CP), 3 (fin du CP) ; les niveaux d'avant sont ouverts
+      classe: '', // classe choisie à la première ouverture : 'ms' | 'gs' | 'cp1' | 'cp2' ('' = pas encore dite) ; elle règle `depart` (la grande section ouvre aussi les majuscules d'emblée)
+      accueilFait: false, // la présentation du premier lancement (prénom, classe, main) a été faite ou passée
     },
     skills: {},
     usage: {}, // 'AAAA-MM-JJ' -> secondes d'activité
@@ -40,6 +43,42 @@ export function newState() {
     fiches: {}, // id de vignette -> nombre de lectures de la fiche animal
     galerie: [], // dessins accrochés par l'enfant (seulement si les parents l'ont activé) : voir core/galerie.js
   };
+}
+
+/**
+ * La classe de l'enfant, dite à la première ouverture (ou plus tard dans Options / l'espace parents) : elle règle le niveau
+ * de départ. La grande section est la seule à compter pour deux : les formes y sont acquises, on part des majuscules.
+ */
+export const CLASSES = [
+  { id: 'ms', label: 'Moyenne section', sub: 'Je découvre les formes', depart: 1 },
+  { id: 'gs', label: 'Grande section', sub: 'J’apprends les majuscules', depart: 1 },
+  { id: 'cp1', label: 'CP, début d’année', sub: 'J’apprends les lettres', depart: 2 },
+  { id: 'cp2', label: 'CP, fin d’année ou CE1', sub: 'J’écris des mots', depart: 3 },
+];
+export const classeLabel = (id) => CLASSES.find((c) => c.id === id)?.label || '';
+/** Choisit la classe (une classe inconnue ne change rien) et règle le niveau de départ en conséquence. */
+export function setClasse(st, id) {
+  const c = CLASSES.find((x) => x.id === id);
+  if (!c) return false;
+  st.settings.classe = c.id;
+  st.settings.depart = c.depart;
+  return true;
+}
+/** Les parents règlent directement le niveau de départ (1 à 3) : la classe affichée suit, sans jamais le contredire. */
+export function setDepart(st, depart) {
+  const d = Math.min(3, Math.max(1, Math.round(depart) || 1));
+  st.settings.depart = d;
+  const cur = CLASSES.find((c) => c.id === st.settings.classe);
+  if (!cur || cur.depart !== d) st.settings.classe = CLASSES.find((c) => c.depart === d).id;
+  return d;
+}
+/** Tablette neuve, sans progression ni réglage fait : on se présente (prénom, classe, main) avant de jouer. */
+export const needsWelcome = (st) => !st.settings.accueilFait && !st.settings.classe && !st.name && Object.keys(st.skills || {}).length === 0;
+/** Le prénom tapé par l'enfant ou l'adulte : des lettres seulement, une majuscule au début de chaque partie, quatorze lettres au plus. */
+export function cleanName(raw) {
+  const letters = String(raw || '').replace(/[^\p{L}\- ]/gu, '').replace(/\s+/g, ' ').replace(/-+/g, '-').trim().replace(/^[- ]+|[- ]+$/g, '');
+  const cut = letters.slice(0, 14).replace(/[- ]+$/g, '');
+  return cut.toLowerCase().replace(/(^|[- ])(\p{L})/gu, (m, sep, c) => sep + c.toUpperCase());
 }
 
 /** Complète un état enregistré avec les réglages et champs ajoutés depuis (les anciennes sauvegardes restent valables). */
@@ -201,6 +240,8 @@ export function isSkillOpen(st, id) {
   if (sk.needs) return sk.needs.every((l) => known(st, l));
   const list = levelSkills(st, level);
   const i = list.indexOf(id);
+  // Grande section : les formes de départ sont acquises, on commence directement par les majuscules
+  if (sk.capital && st.settings.classe === 'gs' && !SKILLS[list[i - 1]]?.capital) return true;
   return i === 0 || skillState(st, list[i - 1]).sessions > 0;
 }
 /** Raison pour laquelle un exercice est fermé : 'before' (exercice d'avant) ou 'letters' (lettres du mot). */
@@ -217,7 +258,9 @@ export const missingLetters = (st, id) => (SKILLS[id].needs || []).filter((l) =>
 export function learningOrder(st) {
   const d = departLevel(st);
   const lv = (n) => LEVELS.find((l) => l.id === n);
-  const out = d <= 1 ? [...levelSkills(st, lv(1))] : [];
+  const first = levelSkills(st, lv(1));
+  // Grande section : les majuscules d'abord (les formes restent disponibles, à la fin)
+  const out = d > 1 ? [] : st.settings?.classe === 'gs' ? [...first.filter((id) => SKILLS[id].capital), ...first.filter((id) => !SKILLS[id].capital)] : [...first];
   const letters = levelSkills(st, lv(2));
   const words = levelSkills(st, lv(3));
   const seen = new Set(d >= 3 ? letters : []);
@@ -298,7 +341,7 @@ function stickerEarned(st, sticker) {
     case 'persist': return Object.values(st.skills).some((s) => persisted(s.history) || (s.mastered && s.sessions >= 2));
     // Trois étoiles… ou l'exercice acquis : tout enfant qui apprend finit par l'obtenir, même sans jamais décrocher 3 étoiles.
     case 'star3': { const s = skillState(st, sticker.skill); return s.mastered || s.history.some((e) => e.st === 3); }
-    case 'level': return LEVELS.find((l) => l.id === sticker.level).skills.every((id) => skillState(st, id).mastered);
+    case 'level': { const lv = LEVELS.find((l) => l.id === sticker.level); return (lv.core || lv.skills).every((id) => skillState(st, id).mastered); }
     case 'count': return LEVELS.find((l) => l.id === sticker.level).skills.filter((id) => skillState(st, id).mastered).length >= sticker.n;
     case 'paper': return paperCount(st) >= sticker.n;
     // La vignette dorée récompense l'album des exercices ; celles du cahier sont un bonus, jamais une condition.

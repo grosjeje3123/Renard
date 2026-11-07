@@ -12,10 +12,14 @@ import { cahier } from './ui/screens/cahier.js';
 import { dessin } from './ui/screens/dessin.js';
 import { tableau } from './ui/screens/tableau.js';
 import { galerie } from './ui/screens/galerie.js';
+import { demarrage } from './ui/screens/demarrage.js';
+import { bienvenue } from './ui/screens/bienvenue.js';
+import { options } from './ui/screens/options.js';
+import { credits } from './ui/screens/credits.js';
 import { FOX_CSS } from './ui/fox.js';
 
 const style = document.createElement('style');
 style.textContent = FOX_CSS;
 document.head.append(style);
 
-app.start(document.getElementById('app'), { accueil: home, niveaux: levels, carte: map, exercice: exercise, tresors: rewards, album, parents, pause, fiche, cahier, dessin, galerie, tableau });
+app.start(document.getElementById('app'), { accueil: home, niveaux: levels, carte: map, exercice: exercise, tresors: rewards, album, parents, pause, fiche, cahier, dessin, galerie, tableau, demarrage, bienvenue, options, credits });

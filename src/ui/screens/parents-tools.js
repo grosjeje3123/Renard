@@ -3,7 +3,7 @@ import { h, icon } from '../dom.js';
 import { glyphIcon } from '../art.js';
 import { SKILLS, LEVELS } from '../../content/skills.js';
 import { STICKERS } from '../../content/stickers.js';
-import { levelSkills, masteredCount, stickerCount } from '../../core/progress.js';
+import { levelSkills, masteredCount, stickerCount, setDepart } from '../../core/progress.js';
 import { encodeBackup, decodeBackup } from '../../core/backup.js';
 import { toSVG } from '../../core/pdf.js';
 import { speak, frenchVoices, currentVoice, onVoicesChanged, unlockAudio, hasClips } from '../audio.js';
@@ -12,10 +12,10 @@ import { drawings, drawingSVG, clearGallery, MAX_DESSINS } from '../../core/gale
 import { writingSheet, animalSheet, sheetPDF, deliverPDF, shareText, isNative, partageFichiers, REGLURES } from '../sheets.js';
 
 export const card = (title, ...kids) => h('section', { class: 'pcard' }, h('h3', {}, title), ...kids);
-const row = (label, hint, control, cls = '') => h('div', { class: `setrow stack ${cls}`.trim() }, h('span', {}, h('strong', {}, label), hint ? h('small', {}, hint) : null), control);
+export const row = (label, hint, control, cls = '') => h('div', { class: `setrow stack ${cls}`.trim() }, h('span', {}, h('strong', {}, label), hint ? h('small', {}, hint) : null), control);
 
 /** Boutons à choix unique (plus faciles à toucher qu'une liste déroulante). */
-function seg(label, options, value, onPick) {
+export function seg(label, options, value, onPick) {
   const btns = options.map(([v, text]) => h('button', { class: `seg-b${v === value ? ' on' : ''}`, type: 'button', role: 'radio', 'aria-checked': String(v === value) }, text));
   const wrap = h('div', { class: 'seg', role: 'radiogroup', 'aria-label': label }, btns);
   btns.forEach((b, i) => b.addEventListener('click', () => {
@@ -25,7 +25,7 @@ function seg(label, options, value, onPick) {
   return wrap;
 }
 
-const toggle = (app, id, label, hint, key) => {
+export const toggle = (app, id, label, hint, key) => {
   const input = h('input', { id, type: 'checkbox', class: 'sw' });
   input.checked = !!app.state.settings[key];
   input.addEventListener('change', () => { app.state.settings[key] = input.checked; app.applySettings(); });
@@ -78,8 +78,8 @@ export function settingsCards(app) {
 
   const child = card('Enfant',
     h('label', { class: 'setrow', for: 'child-name' }, h('span', {}, h('strong', {}, 'Prénom de l’enfant'), h('small', {}, 'Utilisé par le renard pour dire bonjour. Reste sur cet appareil.')), nameInput),
-    row('Où en est l’enfant ?', 'Ouvre d’emblée ce qui précède : avec « Début du CP », les formes du niveau 1 sont déjà ouvertes ; avec « Fin du CP », toutes les lettres le sont et on peut commencer par les sons, les mots et les phrases. Rien n’est marqué comme acquis, et on peut changer à tout moment.',
-      seg('Niveau de départ', [[1, 'Avant le CP'], [2, 'Début du CP'], [3, 'Fin du CP']], Math.min(3, Math.max(1, set.depart || 1)), (v) => { set.depart = v; save(); })),
+    row('Où en est l’enfant ?', 'Ouvre d’emblée ce qui précède : avec « Début du CP », les formes du niveau 1 sont déjà ouvertes ; avec « Fin du CP », toutes les lettres le sont et on peut commencer par les sons, les mots et les phrases. Rien n’est marqué comme acquis, et on peut changer à tout moment. La classe exacte (moyenne ou grande section, CP…) se règle dans Options, sur l’écran d’accueil de l’enfant.',
+      seg('Niveau de départ', [[1, 'Avant le CP'], [2, 'Début du CP'], [3, 'Fin du CP']], Math.min(3, Math.max(1, set.depart || 1)), (v) => { setDepart(st, v); save(); })),
     row('Main qui écrit', 'Gaucher : l’écran passe en miroir (la main ne cache ni le renard ni les boutons), le modèle disparaît de la zone de la main et la pente des lettres (plus droite, ou penchée en arrière) est acceptée un peu plus largement. Le sens d’écriture reste de gauche à droite.',
       seg('Main qui écrit', [['droite', 'Droitier'], ['gauche', 'Gaucher']], set.main || 'droite', (v) => { set.main = v; save(); app.render(); })),
     tiltRow,
@@ -108,7 +108,7 @@ export function settingsCards(app) {
 const fsElement = () => document.fullscreenElement || document.webkitFullscreenElement || null;
 const canFullscreen = () => !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
 const isInstalled = () => ['fullscreen', 'standalone'].some((m) => matchMedia(`(display-mode: ${m})`).matches) || navigator.standalone === true;
-function affichageCard() {
+export function affichageCard() {
   const status = h('p', { class: 'muted', 'aria-live': 'polite' });
   const btn = h('button', { class: 'btn-sec', type: 'button' });
   const label = () => { btn.innerHTML = `${icon(fsElement() ? 'close' : 'arrowR', 22)}<span>${fsElement() ? 'Quitter le plein écran' : 'Passer en plein écran'}</span>`; };

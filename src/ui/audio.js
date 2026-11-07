@@ -3,13 +3,14 @@
 
 import { chooseVoice, rankVoices, timbres, vitesses } from '../core/voices.js';
 import { decouper, idPhrase } from '../core/voixId.js';
+import { jouerMotif, MOTIF_DUREE } from './marimba.js';
 
 // Voix enregistrées : { identifiant de phrase → extension }, fixé à la fabrication (build.mjs) d'après le dossier voix/.
 /* global __VOIX__ */
 const clips = typeof __VOIX__ !== 'undefined' ? __VOIX__ : {};
 
 let ctx = null;
-const cfg = { sons: true, voix: true, voixNom: '', vitesse: vitesses.normal, timbre: timbres.naturel };
+const cfg = { sons: true, jingle: true, voix: true, voixNom: '', vitesse: vitesses.normal, timbre: timbres.naturel };
 let voice = null; // voix retenue (description de voices.js)
 let current = null;
 const listeners = new Set();
@@ -17,7 +18,7 @@ const listeners = new Set();
 const allVoices = () => { try { return 'speechSynthesis' in window ? speechSynthesis.getVoices() : []; } catch { return []; } };
 
 export function configureAudio(s) {
-  cfg.sons = s.sons; cfg.voix = s.voix;
+  cfg.sons = s.sons; cfg.voix = s.voix; cfg.jingle = s.jingle !== false;
   cfg.voixNom = s.voixNom || '';
   cfg.vitesse = vitesses[s.voixVitesse] ?? vitesses.normal;
   cfg.timbre = timbres[s.voixTimbre] ?? timbres.naturel;
@@ -51,6 +52,13 @@ function tone(freq, start, dur, { type = 'sine', gain = 0.1, to = null } = {}) {
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
   o.connect(g).connect(ctx.destination);
   o.start(t); o.stop(t + dur + 0.05);
+}
+
+/** La petite musique de marimba du démarrage (ou de l'écran Options). Renvoie sa durée en secondes ; 0 si elle est coupée. */
+export function jingle({ force = false } = {}) {
+  if (!ctx || !cfg.sons || !(cfg.jingle || force)) return 0;
+  try { jouerMotif(ctx, ctx.destination, ctx.currentTime + 0.03); } catch { return 0; }
+  return MOTIF_DUREE;
 }
 
 const N = { do: 523.25, re: 587.33, mi: 659.25, sol: 783.99, la: 880, do2: 1046.5, mi2: 1318.5 };

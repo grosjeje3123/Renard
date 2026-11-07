@@ -6,13 +6,13 @@ Prototype jouable pour enfants de 4 à 8 ans : un renard accompagne l'enfant dan
 
 ```
 npm install
-npm test            # 79 tests : reconnaissance des tracés, progression, pauses, sauvegarde, PDF, tableau libre (reconnaissance d'un mot, majuscules)
+npm test            # 84 tests : reconnaissance des tracés, progression, pauses, sauvegarde, PDF, tableau libre (reconnaissance d'un mot, majuscules)
 npm run build       # produit dist/index.html (un seul fichier, polices incluses)
 npm run build:app   # produit www/index.html (page complète pour l'application Android)
 node build.mjs --pwa  # produit pwa/ : la version installable en plein écran (voir ci-dessous)
 ```
 
-Ouvrir `dist/index.html` dans un navigateur (tablette, ou ordinateur avec souris). Routes : `#accueil`, `#niveaux`, `#carte-1` à `#carte-3` (ou `#carte-3-<section>`), `#exercice-<id>`, `#tresors`, `#album`, `#pause`, `#fiche-<vignette>`, `#cahier-<exercice>`, `#dessin`, `#galerie`, `#tableau`, `#parents` (maintenir le cadenas 2 s).
+Ouvrir `dist/index.html` dans un navigateur (tablette, ou ordinateur avec souris). Routes : `#accueil`, `#niveaux`, `#carte-1` à `#carte-3` (ou `#carte-3-<section>`), `#exercice-<id>`, `#tresors`, `#album`, `#pause`, `#fiche-<vignette>`, `#cahier-<exercice>`, `#dessin`, `#galerie`, `#tableau`, `#options`, `#credits`, `#bienvenue` (présentation du premier lancement ; l'adresse sans ancre affiche d'abord l'écran « Touche pour jouer »), `#parents` (maintenir le cadenas 2 s).
 
 ## Plein écran sur la tablette (iPad et Android) : version installable
 
@@ -95,6 +95,11 @@ Pas de tirage au sort, pas de série à maintenir, rien ne se retire jamais, et 
 - **Une réussite par étape** (réglage parents : une ou deux) : un exercice dure trois essais réussis (guide, pointillés, de mémoire). La répétition utile est reportée à d'autres jours (rappel express, consolidation).
 - **Alphabet complet en cursive (niveau 2)** : 26 lettres en 6 familles (premières lettres, petites pointes, lettres rondes, grandes lettres, lettres qui voyagent…), lettres descendantes libres (p, g, q, j, y), calage sur les lignes de cahier (`HAUTEUR`), l'« e » redessiné avec une vraie boucle ouverte pour ne plus ressembler à un « l ». Le moteur accepte les lettres repassées (m, n, p) : le recouvrement du gabarit est plafonné par la portée du tracé (`dtwOpenEndAt`), et un mauvais point de départ plafonne la note à 2 étoiles.
 - **Niveau 3 : sons, mots, phrases (74 exercices)** : sons (ou, on, an, in, ch, oi, au, eau, ai, eu, gn, qu), mots par thèmes (famille, animaux, nature, maison…) et phrases simples (`composeText`, lettres détachées, point du i/j en fin de mot, point final). La page de travail s'agrandit pour les mots longs et les phrases (`boardFor`) ; la tolérance s'élargit avec la largeur (`widthFactor`). Un exercice s'ouvre quand toutes ses lettres sont acquises ou au moins essayées ; les lettres restent dans l'ordre.
+- **Premier lancement** (`bienvenue.js`) : sur une tablette neuve, l'écran « Touche pour jouer » (`demarrage.js`, le geste débloque le son et joue la petite mélodie de marimba) mène à trois questions lues à voix haute, toutes passables : le prénom, la classe (moyenne section, grande section, CP début, CP fin ou CE1) et la main qui écrit. La classe règle le niveau de départ (`setClasse`) ; la grande section ouvre d'emblée les majuscules. Rien n'est demandé sur une tablette qui a déjà une progression ou des réglages.
+- **Options et Crédits** (`options.js`, `credits.js`, engrenage en haut à droite de l'accueil) : voix, petits sons, mélodie du démarrage (avec « Écouter la mélodie »), prénom, classe, main, plein écran, revoir la présentation, version, crédits (`src/content/credits.js`). Les réglages d'adultes (pauses, galerie, voix du système, sauvegarde) restent dans l'espace parents, où « Niveau de départ » (`setDepart`) garde la classe cohérente.
+- **Marimba de démarrage** (`src/ui/marimba.js`) : un motif de 11 notes synthétisé (aucun fichier audio) ; `node tools/marimba-wav.mjs` le rend hors ligne en WAV pour le vérifier ou l'écouter.
+- **Majuscules d'imprimerie avant le CP** (niveau 1, 26 exercices `maj_<lettre>`, 5 sections de formes proches : bâtons, pointes, croix et crochets, rondes, bedaines) : tracé droit (`slant: 0`), départ et sens de tracé comme à l'école, même moteur de reconnaissance et trois étapes (guide, pointillés, seul). Le Tableau propose « Mon prénom » en majuscules ; le dessin libre est en tête du niveau 1. Les majuscules cursives (CE1) ne sont pas encore faites.
+- **Feuille de dessin et de tableau qui s'adapte** (`src/ui/sheet.js`) : largeur de 10 interlignes, hauteur selon la place libre (rapport 0,7 à 1,25, figé dès qu'il y a des traits) ; la galerie garde ses cadres 10 × 7.
 - **Classe de l'enfant** (parents) : « Où en est l'enfant ? » ouvre d'emblée les niveaux d'avant (avant le CP / début du CP / fin du CP) ; l'ordre des lettres propose aussi l'ordre alphabétique.
 - **Tableau libre** (`#tableau`, menu d'accueil) : **Écrire** ou **Dessiner**, deux feuilles distinctes dans le même écran.
   - *Écrire* : une page lignée (interligne de cahier Seyès) où l'enfant écrit n'importe quel texte (lettres a–z, sans accents). Au choix **minuscules attachées**, **MAJUSCULES d'imprimerie** ou **majuscule au début** (`src/core/tableau.js` : `CASSES`, `cased`). Le calque est plein sur la 1re rangée (route + points de départ), en pointillés sur la 2e, absent ensuite ; il peut être masqué. Texte choisi au clavier de lettres, prénom, mots déjà connus ; page agrandie pour un texte long.
@@ -115,7 +120,7 @@ Le moteur de reconnaissance est remplaçable : `recognizer.evaluateStroke(trait 
 ## Outils de test (`tools/`)
 
 - `shots.mjs`, `shots2.mjs`, `shots3.mjs` : captures des écrans (tablette paysage/portrait, téléphone, thème sombre, mode gaucher, pause, fiche, cahier, dessin, espace parents ; progression semée par `seed.mjs [gauche] [pause]`).
-- `flow.mjs <seed.json> [dist|www]` : parcours automatisés des pauses (suggestion, douce, limite), du cahier, des fiches et du dessin.
+- `flow.mjs <seed.json> [dist|www]` : parcours automatisés des pauses (suggestion, douce, limite), du cahier, des fiches, du dessin, du tableau, du premier lancement (démarrage, présentation, Options, Crédits) et des majuscules.
 - `csp-check.mjs` : vérifie en navigateur que la version application ne peut contacter aucun serveur.
 - `pwa-check.mjs` : vérifie la version installable (manifest, installabilité, démarrage hors connexion, icônes, vie privée, plein écran) ; `make-pwa-icons.mjs` regénère ses icônes.
 - `voice-check.mjs [ipad|android|chrome|aucune]` : vérifie l'écran « Voix du renard » avec une synthèse vocale simulée (le navigateur de test n'a pas de voix).

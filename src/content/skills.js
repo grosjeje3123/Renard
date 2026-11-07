@@ -3,7 +3,7 @@
 import { P } from './helpers.js';
 import { parsePath } from '../engine/pathdata.js';
 import { LETTRES, hampe, ent, sortie, ovale } from './lettres.js';
-import { CAPITALES } from './majuscules.js';
+import { CAPITALES, MAJUSCULES } from './majuscules.js';
 import { BOARD } from '../core/board.js';
 
 const TAU = Math.PI * 2;
@@ -213,6 +213,60 @@ export function composeText(text, { period = false, skills = SKILLS } = {}) {
   if (period) out.push({ dot: [cursor - WORD_GAP + 0.55, 0] });
   return out;
 }
+// ---- Niveau 1 (suite) : les 26 majuscules d'imprimerie, la grande étape de la grande section avant le CP.
+// Mêmes tracés que le tableau libre (majuscules.js), mais droits dès le départ (`slant: 0`) : on les pose tels quels sur le cahier.
+// Pas de récompense d'objet (le niveau 1 en a déjà) : l'enfant gagne des étoiles, et ses majuscules servent ensuite à écrire son prénom.
+const MAJ_TEXTES = {
+  A: ['Je monte en pointe, je redescends de l’autre côté… et je pose la barre au milieu !', 'Monte en pointe, redescends, puis trace la barre au milieu.', 'Une pointe, puis la barre'],
+  B: ['Je descends tout droit, puis je fais deux bedaines vers la droite.', 'Descends tout droit. Puis repars du haut et fais deux bedaines.', 'Un bâton, deux bedaines'],
+  C: ['Je tourne vers la gauche, comme une lune ouverte à droite.', 'Pars en haut à droite, tourne vers la gauche et finis en bas à droite.', 'Tourne et ouvre à droite'],
+  D: ['Je descends tout droit, puis je fais une grande bedaine vers la droite.', 'Descends tout droit. Puis repars du haut et fais une grande bedaine jusqu’en bas.', 'Un bâton, une grande bedaine'],
+  E: ['Un bâton, et trois barres : en haut, au milieu et en bas.', 'Descends tout droit. Puis trace trois barres vers la droite : en haut, au milieu, en bas.', 'Un bâton, trois barres'],
+  F: ['Un bâton, et deux barres : en haut et au milieu.', 'Descends tout droit. Puis trace deux barres vers la droite : en haut, puis au milieu.', 'Un bâton, deux barres'],
+  G: ['Je fais un grand C, et je rentre une petite barre au milieu.', 'Fais un grand C qui remonte jusqu’au milieu, puis rentre une barre vers la gauche.', 'Un grand C, puis une barre'],
+  H: ['Deux bâtons, et une barre au milieu pour les relier.', 'Descends tout droit à gauche, puis à droite. Trace la barre au milieu.', 'Deux bâtons, une barre'],
+  I: ['Un seul bâton, tout droit, de haut en bas.', 'Pars du point vert et descends tout droit.', 'Descends tout droit'],
+  J: ['Je descends tout droit, et je fais un crochet vers la gauche.', 'Descends tout droit, puis recourbe vers la gauche en bas.', 'Descends, puis le crochet'],
+  K: ['Un bâton, puis un V couché qui touche le bâton.', 'Descends tout droit. Puis pars en haut à droite, touche le bâton, et redescends en bas à droite.', 'Un bâton, puis un V couché'],
+  L: ['Je descends tout droit, puis je pars vers la droite.', 'Descends tout droit, puis trace la barre vers la droite.', 'Descends, puis la barre'],
+  M: ['Je monte, je descends jusqu’au milieu, je remonte, et je redescends.', 'Monte tout droit, descends en biais, remonte en biais, puis redescends tout droit.', 'Monte, descends, remonte, descends'],
+  N: ['Je monte tout droit, je descends en biais, et je remonte tout droit.', 'Monte tout droit, descends en biais, puis remonte tout droit.', 'Monte, descends en biais, monte'],
+  O: ['Un grand rond : je tourne vers la gauche et je le ferme.', 'Pars du point vert, tourne vers la gauche et ferme le grand rond.', 'Un grand rond'],
+  P: ['Je descends tout droit, puis je fais une bedaine en haut.', 'Descends tout droit. Puis repars du haut et fais une bedaine jusqu’au milieu.', 'Un bâton, une bedaine'],
+  Q: ['Je fais un grand rond, et une petite queue en bas à droite.', 'Fais le grand rond vers la gauche. Puis trace la petite queue en biais.', 'Un rond, puis la queue'],
+  R: ['Je fais un P, puis une jambe en biais.', 'Descends tout droit. Fais la bedaine en haut. Puis trace la jambe en biais vers le bas.', 'Un P, puis la jambe'],
+  S: ['Je serpente : je tourne à gauche, puis à droite.', 'Pars en haut à droite, tourne vers la gauche, puis vers la droite, et finis en bas à gauche.', 'Serpente comme un serpent'],
+  T: ['Une barre en haut, puis un bâton qui descend du milieu.', 'Trace la barre vers la droite. Puis descends tout droit, au milieu.', 'Une barre, puis un bâton'],
+  U: ['Je descends, je tourne en bas, et je remonte.', 'Descends tout droit, arrondis en bas, puis remonte tout droit.', 'Descends, arrondis, remonte'],
+  V: ['Je descends en biais, et je remonte en biais.', 'Descends en biais jusqu’en bas, puis remonte en biais.', 'Descends, puis remonte'],
+  W: ['Deux V qui se touchent : je descends, je remonte, je redescends, je remonte.', 'Descends en biais, remonte un peu, redescends, puis remonte en haut.', 'Deux V côte à côte'],
+  X: ['Deux traits en biais qui se croisent.', 'Descends en biais de haut à gauche vers le bas à droite. Puis de haut à droite vers le bas à gauche.', 'Deux traits qui se croisent'],
+  Y: ['Deux bras qui se rejoignent, puis un bâton vers le bas.', 'Descends en biais jusqu’au milieu depuis la gauche. Puis depuis la droite, et continue tout droit jusqu’en bas.', 'Deux bras, puis un bâton'],
+  Z: ['Une barre en haut, un biais, une barre en bas.', 'Trace la barre en haut, descends en biais, puis trace la barre en bas.', 'Barre, biais, barre'],
+};
+const MAJ_SECTIONS = [
+  { id: 'maj_batons', title: 'Les majuscules en bâtons', lettres: 'ILTEFH' },
+  { id: 'maj_pointes', title: 'Les majuscules pointues', lettres: 'VANMWZ' },
+  { id: 'maj_croix', title: 'Les croix et les crochets', lettres: 'KXYUJ' },
+  { id: 'maj_rondes', title: 'Les majuscules rondes', lettres: 'OCQGS' },
+  { id: 'maj_bedaines', title: 'Les majuscules à bedaine', lettres: 'DPBR' },
+];
+for (const sec of MAJ_SECTIONS) {
+  sec.skills = [...sec.lettres].map((L) => {
+    const id = `maj_${L}`;
+    const [intro, how, bubble] = MAJ_TEXTES[L];
+    SKILLS[id] = {
+      id, kind: 'letter', level: 1, capital: true, slant: 0, glyph: L, section: sec.id,
+      title: `Le ${L} majuscule`, short: `Le ${L} majuscule`, label: L,
+      skillLabel: `Écrire le ${L} majuscule`,
+      strokes: MAJUSCULES[L],
+      say: { intro: `Le ${L} majuscule. ${intro}`, how, bubble },
+      item: null,
+    };
+    return id;
+  });
+}
+
 /** Minuscules cursives (a–z) et majuscules d'imprimerie (A–Z) : le registre du tableau libre. */
 export const ECRITURE = { ...SKILLS, ...CAPITALES };
 export const composeWord = (letters, skills = SKILLS) => composeText(letters.join(''), { skills });
@@ -271,8 +325,11 @@ const SEC2 = [
 export const LEVELS = [
   {
     id: 1, name: 'Les petits explorateurs', classe: 'Avant le CP', ages: 'MS · GS', env: 'foret', available: true,
-    skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'],
-    blurb: 'Lignes, ronds, ponts, vagues et boucles',
+    // `core` : les formes de départ (récompenses, vignette du hibou) ; les majuscules viennent ensuite, par familles
+    core: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'],
+    sections: [{ id: 'formes', title: 'Les formes', skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'] }, ...MAJ_SECTIONS],
+    skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles', ...MAJ_SECTIONS.flatMap((x) => x.skills)],
+    blurb: 'Les formes, puis les 26 majuscules',
   },
   {
     id: 2, name: 'Les apprentis écrivains', classe: 'Début du CP', ages: 'CP', env: 'foret', available: true,

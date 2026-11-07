@@ -8,7 +8,7 @@ Ce dossier contient tout pour donner au renard une voix enregistrée, plus natur
   generer-voix.py      le script qui fabrique les fichiers audio avec l'API OpenAI
 
 COMMENT FAIRE
-1. Créez une clé API sur platform.openai.com (la facturation est à l'usage : la liste fait environ 33 000 caractères ;
+1. Créez une clé API sur platform.openai.com (la facturation est à l'usage : la liste fait environ 38 000 caractères, soit 1 034 phrases et une quarantaine de minutes d'audio ;
    vérifiez le tarif actuel de la synthèse vocale sur le site d'OpenAI).
 2. Dans un terminal, dans ce dossier :
        pip install openai
@@ -17,7 +17,7 @@ COMMENT FAIRE
    Écoutez les fichiers du dossier essai/ (6 voix x 6 phrases), puis retenez-en une.
 4. Générer : python generer-voix.py --voix coral        (remplacez coral par la voix choisie)
    Les fichiers arrivent dans le dossier voix/, nommés <identifiant>.mp3. Si ça s'arrête, relancez : il reprend.
-5. Écoutez d'abord les phrases qui parlent de lettres (origine « consigne », « carte ») : si une lettre est mal
+5. Écoutez d'abord les phrases qui parlent de lettres (origine « consigne », « carte ») et celles des majuscules (« Le A majuscule. »…) : si une lettre est mal
    prononcée, corrigez la colonne « lecture » du CSV (ex. « le eu », « un vé ») et relancez avec  --refaire --origine consigne.
 6. Remettez le dossier voix/ à la racine du projet (à côté de package.json), sur GitHub : l'APK se recompile tout seul
    avec les voix. (Ou envoyez-moi le dossier.)

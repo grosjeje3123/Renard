@@ -23,6 +23,8 @@ export function home(root, app) {
   const stayBtn = due && st.settings.pauseMode === 'suggestion' ? h('button', { class: 'btn-sec sm stay', type: 'button' }, 'Jouer quand même') : null;
   const voiceBtn = h('button', { class: 'round sm', type: 'button', 'aria-label': st.settings.voix ? 'Couper la voix' : 'Remettre la voix', html: icon(st.settings.voix ? 'speaker' : 'mute', 26) });
 
+  const optBtn = h('button', { class: 'round sm', type: 'button', 'aria-label': 'Options', onClick: () => { sfx('tap'); app.go('options'); }, html: icon('gear', 26) });
+
   // Appui long de deux secondes pour l'espace parents (les enfants n'y entrent pas par hasard).
   const lockBtn = h('button', { class: 'round nav', type: 'button', 'aria-label': 'Espace parents : maintenir appuyé 2 secondes', html: `<span class="ring"></span>${icon('lock', 30)}<span class="lbl">Parents</span>` });
   const navBtn = (ic, label, route) => h('button', { class: 'round nav', type: 'button', onClick: () => { sfx('tap'); app.go(route); }, html: `${icon(ic, 32)}<span class="lbl">${label}</span>` });
@@ -43,7 +45,7 @@ export function home(root, app) {
   root.classList.add('home');
   root.append(
     h('div', { class: 'scene-wrap', html: forestScene() }),
-    h('header', { class: 'top-right' }, voiceBtn),
+    h('header', { class: 'top-right' }, optBtn, voiceBtn),
     h('div', { class: 'home-main' },
       foxHost,
       h('div', { class: 'home-panel' },

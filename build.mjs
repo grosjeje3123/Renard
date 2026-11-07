@@ -16,7 +16,7 @@ const font = (pkg, file, family, weights) => {
 };
 const fonts = font('fredoka', 'fredoka-latin-wght-normal.woff2', 'Fredoka', '300 700') + font('nunito', 'nunito-latin-wght-normal.woff2', 'Nunito', '200 1000');
 async function assemble(voix) {
-  const out = await build({ entryPoints: ['src/main.js'], bundle: true, minify: process.env.NOMIN ? false : true, format: 'iife', target: ['es2020'], write: false, legalComments: 'none', define: { __VOIX__: JSON.stringify(voix) } });
+  const out = await build({ entryPoints: ['src/main.js'], bundle: true, minify: process.env.NOMIN ? false : true, format: 'iife', target: ['es2020'], write: false, legalComments: 'none', define: { __VOIX__: JSON.stringify(voix), __APP_VERSION__: JSON.stringify(JSON.parse(fs.readFileSync('package.json', 'utf8')).version), __APP_DATE__: JSON.stringify(new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })) } });
   const js = out.outputFiles[0].text.replace(/<\/script>/gi, '<\\/script>');
   return fs.readFileSync('src/index.template.html', 'utf8').replace('/*FONTS*/', () => fonts).replace('/*CSS*/', () => css).replace('/*JS*/', () => js);
 }

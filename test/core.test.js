@@ -96,7 +96,7 @@ test('vignettes : chaque vignette a son dessin et ses règles sont complètes', 
     if (x.rule === 'paper') assert.equal(x.page, 'paper', x.id);
   }
   // une vignette par exercice du niveau 1 et par lettre du début du niveau 2 ; ensuite, des paliers (lettres, sons, mots et phrases)
-  for (const id of [...LEVELS[0].skills, 'i', 'o', 'a', 'l', 'e']) assert.ok(STICKERS.some((x) => x.rule === 'star3' && x.skill === id), id);
+  for (const id of [...LEVELS[0].core, 'i', 'o', 'a', 'l', 'e']) assert.ok(STICKERS.some((x) => x.rule === 'star3' && x.skill === id), id);
   for (const lv of [2, 3]) assert.ok(STICKERS.filter((x) => x.rule === 'count' && x.level === lv).length >= 2, `paliers du niveau ${lv}`);
 });
 
@@ -127,7 +127,7 @@ test('vignettes : la persévérance (rater puis réussir dans la même séance) 
 
 test('vignettes : les étapes de niveau (hibou, cerf) et la vignette dorée', () => {
   const st = newState();
-  const l1 = LEVELS[0].skills, l2 = LEVELS[1].skills, l3 = LEVELS[2].skills;
+  const l1 = LEVELS[0].core, l2 = LEVELS[1].skills, l3 = LEVELS[2].skills;
   masterAll(st, l1.slice(0, 4));
   assert.ok(!st.stickers.hibou);
   masterAll(st, l1.slice(4), 2000);

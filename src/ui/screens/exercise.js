@@ -48,7 +48,7 @@ export function exercise(root, app, skillId) {
 
   const cardText = writing || !item ? skill.short : already ? `Gagné : ${item.name}` : `À gagner : ${item.name}`;
   const card = h('button', { class: 'exo-card', type: 'button', 'aria-label': cardText },
-    h('span', { class: 'ec-art', html: item ? itemSVG(skill.item, { locked: !already && !writing }) : glyphIcon(skillId, { stroke: 'var(--accent-deep)', width: 0.3 }) }),
+    skill.capital ? null : h('span', { class: `ec-art${item ? '' : ' ec-glyph'}`, html: item ? itemSVG(skill.item, { locked: !already && !writing }) : glyphIcon(skillId, { stroke: 'var(--accent-deep)', width: 0.3 }) }),
     h('span', { class: 'ec-text' },
       writing ? h('span', { class: `ec-letter${skill.kind === 'word' ? ' word' : ''}${skill.phrase ? ' phrase' : ''}` }, skill.glyph) : null,
       h('span', {}, cardText)));
