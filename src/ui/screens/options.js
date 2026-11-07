@@ -4,7 +4,7 @@ import { h, icon } from '../dom.js';
 import { forestScene } from '../art.js';
 import { sfx, jingle, unlockAudio } from '../audio.js';
 import { CLASSES, setClasse, cleanName } from '../../core/progress.js';
-import { card, row, seg, toggle, affichageCard } from './parents-tools.js';
+import { card, row, seg, toggle, affichageCard, traitRows } from './parents-tools.js';
 import { isNative } from '../sheets.js';
 import { version } from '../version.js';
 
@@ -41,7 +41,8 @@ export function options(root, app) {
     h('label', { class: 'setrow', for: 'opt-name' }, h('span', {}, h('strong', {}, 'Prénom'), h('small', {}, 'Le renard l’utilise pour dire bonjour, et tu peux l’écrire en majuscules. Il reste sur cette tablette.')), nameInput),
     classe,
     row('Main qui écrit', 'Pour un gaucher, l’écran passe en miroir : la main ne cache ni le renard ni les boutons.',
-      seg('Main qui écrit', [['droite', 'Droitier'], ['gauche', 'Gaucher']], set.main || 'droite', (v) => { set.main = v; app.applySettings(); app.render(); })));
+      seg('Main qui écrit', [['droite', 'Droitier'], ['gauche', 'Gaucher']], set.main || 'droite', (v) => { set.main = v; app.applySettings(); app.render(); })),
+    ...traitRows(app, 'opt'));
 
   // ---- À propos
   const about = card('À propos',

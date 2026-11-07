@@ -46,6 +46,13 @@ export class Board {
     this.build();
   }
 
+  /** Épaisseur du trait (voir core/epaisseur.js) : { ink, route, aux } sont des multiplicateurs appliqués par la feuille de style. */
+  setEpaisseur({ ink = 1, route = 1, aux = 1 } = {}) {
+    this.svg.style.setProperty('--e-ink', String(ink));
+    this.svg.style.setProperty('--e-route', String(route));
+    this.svg.style.setProperty('--e-aux', String(aux));
+  }
+
   build() {
     const { W, H, baseline } = this.bd;
     // Cadrage : on zoome sur la zone utile (lettres plus grandes = plus faciles à tracer pour de petites mains).

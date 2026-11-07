@@ -550,6 +550,25 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   check('capitales : la phrase TU AS FAIM s\'ouvre', (await mp.hash()) === '#exercice-mp_TU_AS_FAIM' && /TU AS FAIM/.test(await mp.page.innerText('.exo-bar')));
   check('capitales : aucune erreur', [mm, mx, mp].every((z) => z.errs.length === 0), [mm, mx, mp].flatMap((z) => z.errs).join(' | '));
   for (const z of [mm, mx, mp]) await z.ctx.close();
+
+  // Épaisseur du trait : plus fine à mesure que le niveau monte, réglable, et plus épaisse si l'enfant a du mal
+  const widths = {};
+  for (const [id, trait] of [['lignes', 'auto'], ['e', 'auto'], ['mot_il', 'auto'], ['e', 'fin'], ['e', 'epais']]) {
+    const z = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; x.settings.trait = trait; }, `exercice-${id}`);
+    widths[`${id}/${trait}`] = await z.page.evaluate(() => parseFloat(document.querySelector('svg.board').style.getPropertyValue('--e-ink')));
+    check(`épaisseur : ${id} (${trait}) s'ouvre sans erreur`, z.errs.length === 0, z.errs.join(' | '));
+    await z.ctx.close();
+  }
+  check('épaisseur : le trait s\'affine du niveau 1 au niveau 3', widths['lignes/auto'] > widths['e/auto'] && widths['e/auto'] > widths['mot_il/auto'], JSON.stringify(widths));
+  check('épaisseur : « Fin » < « Selon le niveau » (niveau 2) < « Épais »', widths['e/fin'] < widths['e/auto'] && widths['e/auto'] < widths['e/epais']);
+  const dif = await open((x) => { x.settings.accueilFait = true; x.settings.demo = false; x.settings.depart = 3; x.settings.classe = 'cp2'; x.skills.e = { sessions: 2, attempts: 3, phase: 0, mastered: false, masteredAt: null, last: Date.now(), history: [0.2, 0.3, 0.4].map((sc) => ({ t: 1, ph: 0, sc, st: 1, c: {}, tg: [] })) }; }, 'exercice-e');
+  check('épaisseur : un exercice difficile démarre plus épais', (await dif.page.evaluate(() => parseFloat(document.querySelector('svg.board').style.getPropertyValue('--e-ink')))) > widths['e/auto']);
+  await dif.ctx.close();
+  const op = await open((x) => { x.settings.accueilFait = true; }, 'options');
+  await op.page.getByRole('radio', { name: 'Fin', exact: true }).click();
+  await op.page.waitForTimeout(800);
+  check('épaisseur : le choix « Fin » est enregistré depuis Options', (await op.state()).settings.trait === 'fin');
+  await op.ctx.close();
 }
 
 await browser.close();

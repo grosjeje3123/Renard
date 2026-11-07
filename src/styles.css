@@ -192,10 +192,10 @@ button:focus-visible,input:focus-visible,.home-fox:focus-visible{outline:4px sol
 .r-main{stroke:var(--rule);stroke-width:calc(.035px * var(--k,1));opacity:.85}
 .r-base{stroke:var(--rule);stroke-width:calc(.075px * var(--k,1));opacity:1}
 .r-vert{stroke:var(--rule);stroke-width:calc(.014px * var(--k,1));opacity:.35}
-.road{fill:none;stroke:var(--guide);stroke-width:.95;stroke-linecap:round;stroke-linejoin:round;opacity:.16}
+.road{fill:none;stroke:var(--guide);stroke-width:calc(.95px * var(--e-route,1));stroke-linecap:round;stroke-linejoin:round;opacity:.16;transition:stroke-width .5s}
 .dotroad{stroke-width:.06;stroke-dasharray:.14 .12;opacity:.7;fill:#6E7FD022}
-.center{fill:none;stroke:var(--guide);stroke-width:calc(.075px * var(--k,1));stroke-linecap:round;stroke-dasharray:.02 .2;opacity:.9}
-.arrows path{fill:none;stroke:var(--guide);stroke-width:calc(.075px * var(--k,1));stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.center{fill:none;stroke:var(--guide);stroke-width:calc(.075px * var(--k,1) * var(--e-aux,1));stroke-linecap:round;stroke-dasharray:.02 .2;opacity:.9}
+.arrows path{fill:none;stroke:var(--guide);stroke-width:calc(.075px * var(--k,1) * var(--e-aux,1));stroke-linecap:round;stroke-linejoin:round;opacity:.9}
 .start .sdot{fill:var(--ok);stroke:#fff;stroke-width:.05}
 .start .pulse{fill:var(--ok);opacity:.35;transform-box:fill-box;transform-origin:center;animation:pulse 1.4s ease-out infinite}
 @keyframes pulse{0%{transform:scale(.7);opacity:.5}100%{transform:scale(2);opacity:0}}
@@ -211,14 +211,14 @@ button:focus-visible,input:focus-visible,.home-fox:focus-visible{outline:4px sol
 .board[data-phase="2"] .dotroad{opacity:0}
 .board[data-phase="2"] .gs.current .sdot{opacity:.8;r:.17px}
 .board.demoing .gs .pulse{display:none}
-.ink-path{fill:none;stroke:var(--ink);stroke-width:calc(.17px * var(--k,1));stroke-linecap:round;stroke-linejoin:round}
+.ink-path{fill:none;stroke:var(--ink);stroke-width:calc(.17px * var(--k,1) * var(--e-ink,1));stroke-linecap:round;stroke-linejoin:round}
 .ink-path.good{stroke:#2C8D63}
 .ink-path.meh{stroke:#D98A1F}
 .ink-path.miss{stroke:#C96A5A;opacity:.6}
-.m-shape{fill:none;stroke:var(--ok);stroke-width:calc(.14px * var(--k,1));stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:.3 .22;opacity:0;transition:opacity .35s}
+.m-shape{fill:none;stroke:var(--ok);stroke-width:calc(.14px * var(--k,1) * var(--e-aux,1));stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:.3 .22;opacity:0;transition:opacity .35s}
 circle.m-shape{fill:var(--ok);stroke:none}
 .show-model .m-shape{opacity:.85}
-.demo-path{fill:none;stroke:var(--accent);stroke-width:calc(.3px * var(--k,1));stroke-linecap:round;stroke-linejoin:round}
+.demo-path{fill:none;stroke:var(--accent);stroke-width:calc(.3px * var(--k,1) * var(--e-aux,1));stroke-linecap:round;stroke-linejoin:round}
 .demo-dot{fill:var(--accent);transform-box:fill-box;transform-origin:center}
 @keyframes demo-pop{from{transform:scale(0)}60%{transform:scale(1.8)}to{transform:scale(1.3)}}
 .demo.fade{opacity:0;transition:opacity .4s}

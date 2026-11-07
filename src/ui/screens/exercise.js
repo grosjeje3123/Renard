@@ -6,6 +6,7 @@ import { bubble, makeSpeaker } from '../say.js';
 import { SKILLS, ITEMS, LEVELS, isWriting } from '../../content/skills.js';
 import { Session } from '../../core/session.js';
 import { recognizerContext } from '../../core/tolerance.js';
+import { epaisseur } from '../../core/epaisseur.js';
 import { recognizer } from '../../engine/recognizer.js';
 import { buildFeedback } from '../../engine/feedback.js';
 import { recordSession, awardStickers, isSkillOpen, skillState, startPhaseFor, breakDue, beginSleep, blocked } from '../../core/progress.js';
@@ -83,7 +84,12 @@ export function exercise(root, app, skillId) {
     onStrokeEnd: (s) => onStrokeEnd(s),
   });
 
+  // Épaisseur du trait : celle du niveau ou des parents, et un cran de plus si l'enfant a du mal (cette séance ou les précédentes).
+  const applyEpaisseur = () => board.setEpaisseur(epaisseur(st, skill, session.log));
+  applyEpaisseur();
+
   function updateUI() {
+    applyEpaisseur();
     phaseEls.forEach((el, i) => { el.classList.toggle('on', i === session.phase); el.classList.toggle('past', i < session.phase); });
     const need = session.totalNeeded;
     leavesEl.innerHTML = Array.from({ length: need }, (_, i) => `<span class="lf ${i < session.totalWins ? 'on' : ''}">${icon(i < session.totalWins ? 'leaf' : 'leafO', 26)}</span>`).join('');

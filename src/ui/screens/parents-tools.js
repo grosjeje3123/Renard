@@ -5,6 +5,7 @@ import { SKILLS, LEVELS } from '../../content/skills.js';
 import { STICKERS } from '../../content/stickers.js';
 import { levelSkills, masteredCount, stickerCount, setDepart } from '../../core/progress.js';
 import { encodeBackup, decodeBackup } from '../../core/backup.js';
+import { EPAISSEURS } from '../../core/epaisseur.js';
 import { toSVG } from '../../core/pdf.js';
 import { speak, frenchVoices, currentVoice, onVoicesChanged, unlockAudio, hasClips } from '../audio.js';
 import { voiceLabel } from '../../core/voices.js';
@@ -66,6 +67,16 @@ function galerieCard(app) {
     h('p', { class: 'muted' }, 'Les dessins sont enregistrés sur cette tablette seulement, comme la progression : rien n’est envoyé sur Internet. Ils ne sont pas dans le code de sauvegarde. Au-delà de 12, le plus ancien est remplacé. L’enfant peut retirer un dessin lui-même ; « Effacer la progression » vide aussi la galerie.'));
 }
 
+/** Épaisseur du trait des exercices guidés, et aide automatique si l'enfant a du mal (voir core/epaisseur.js). */
+export function traitRows(app, idPrefix = 'set') {
+  const set = app.state.settings;
+  return [
+    row('Épaisseur du trait', 'Le chemin du guide et la trace du doigt. « Selon le niveau » : épais au niveau 1, de plus en plus fin ensuite. Les autres choix fixent la même épaisseur partout. Dans les mots, le chemin garde sa largeur pour que les lettres voisines ne se mélangent pas.',
+      seg('Épaisseur du trait', EPAISSEURS, set.trait || 'auto', (v) => { set.trait = v; app.applySettings(); })),
+    toggle(app, `${idPrefix}-aide`, 'Épaissir si l’enfant a du mal', 'Après quelques essais ratés (ou si l’exercice a déjà été difficile), le trait et le chemin s’élargissent d’un cran, deux au plus. Le renard n’en dit rien : l’enfant le remarque à peine.', 'traitAide'),
+  ];
+}
+
 export function settingsCards(app) {
   const st = app.state, set = st.settings;
   const save = () => app.applySettings();
@@ -85,6 +96,7 @@ export function settingsCards(app) {
     tiltRow,
     row('Réussites par étape', 'Chaque exercice a trois étapes (guide, pointillés, de mémoire). « Une » : on passe à l’étape suivante dès la première réussite, c’est plus rapide. « Deux » : plus d’entraînement, au risque de lasser. De toute façon, l’exercice est revu plus tard, à des jours différents.',
       seg('Réussites par étape', [[1, 'Une'], [2, 'Deux']], set.reps === 2 ? 2 : 1, (v) => { set.reps = v; save(); })),
+    ...traitRows(app, 'set'),
     toggle(app, 'set-sound', 'Sons', 'Petits sons de réussite.', 'sons'),
     toggle(app, 'set-soft', 'Tracé plus souple', 'Plus d’indulgence pour les petites mains.', 'souple'),
     toggle(app, 'set-demo', 'Mode démonstration', 'Ouvre tous les exercices et raccourcit les séances (1 réussite par étape).', 'demo'));

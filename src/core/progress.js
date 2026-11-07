@@ -20,6 +20,8 @@ export function newState() {
       voixVitesse: 'normal', // 'lent' | 'normal' | 'vif'
       voixTimbre: 'naturel', // 'naturel' | 'renard' (un peu plus aigu)
       avisVoix: false, // l'avis « pas de voix française sur cette tablette » a été lu par un adulte
+      trait: 'auto', // épaisseur du trait : 'auto' (plus fin à mesure que le niveau monte) | 'fin' | 'moyen' | 'epais' (voir core/epaisseur.js)
+      traitAide: true, // épaissir le trait d'un cran (deux au plus) quand l'enfant a du mal
       reps: 1, // réussites demandées à chaque étape d'un exercice (1 ou 2)
       main: 'droite', // main d'écriture : 'droite' | 'gauche' (miroir de l'écran, tolérance de pente élargie)
       plateau: 0, // inclinaison du cahier à l'écran, en degrés (positif = vers la droite)

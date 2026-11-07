@@ -931,3 +931,72 @@ test('capitales : les mots sont droits sur la feuille et le Tableau propose le m
   const sug = T.suggestions(st, 'min');
   assert.deepEqual(sug.mots.filter((w) => w === 'lune' || w === 'LUNE'), ['lune'], 'un seul « lune », en minuscules');
 });
+
+// ---------- Épaisseur du trait ----------
+import * as E from '../src/core/epaisseur.js';
+
+test('épaisseur : par défaut, le trait est plus fin à mesure que le niveau monte', () => {
+  const st = P.newState();
+  const f = (id) => E.epaisseur(st, SKILLS[id]);
+  const l1 = f('lignes'), l2 = f('i'), l3 = f(LEVELS[2].skills.find((id) => SKILLS[id].kind === 'word'));
+  assert.ok(l1.ink > l2.ink && l2.ink > l3.ink, `${l1.ink} > ${l2.ink} > ${l3.ink}`);
+  assert.equal(l2.ink, 1, 'le niveau 2 garde l’épaisseur d’origine');
+  assert.ok(E.PAR_NIVEAU[3] > E.PAR_NIVEAU[4]);
+  assert.equal(st.settings.trait, 'auto');
+  assert.equal(st.settings.traitAide, true);
+});
+
+test('épaisseur : un réglage fixé par les parents vaut pour tous les niveaux', () => {
+  const st = P.newState();
+  st.settings.trait = 'fin';
+  assert.equal(E.epaisseur(st, SKILLS.lignes).ink, E.epaisseur(st, SKILLS.i).ink);
+  const fin = E.epaisseur(st, SKILLS.i).ink;
+  st.settings.trait = 'moyen'; const moyen = E.epaisseur(st, SKILLS.i).ink;
+  st.settings.trait = 'epais'; const epais = E.epaisseur(st, SKILLS.i).ink;
+  assert.ok(fin < moyen && moyen < epais);
+});
+
+test('épaisseur : le chemin d’un mot ne dépasse jamais sa largeur d’origine, celui d’une lettre reste borné', () => {
+  const st = P.newState();
+  st.settings.trait = 'epais';
+  const mot = SKILLS[LEVELS[2].skills.find((id) => SKILLS[id].kind === 'word')];
+  const e = E.epaisseur(st, mot, [{ stars: 0 }, { stars: 0 }, { stars: 0 }, { stars: 0 }, { stars: 0 }]);
+  assert.equal(e.route, 1);
+  assert.ok(e.ink > 1 && e.ink <= E.MAX_EPAISSEUR);
+  assert.ok(E.epaisseur(st, SKILLS.i).route <= 1.05, 'une minuscule cursive garde ses boucles ouvertes');
+  const aidee = E.epaisseur(st, SKILLS.i, Array.from({ length: 9 }, () => ({ stars: 0 })));
+  assert.ok(aidee.route > 1.05 && aidee.route <= 1.05 + 0.08 * E.MAX_CRANS + 1e-9, 'l’aide élargit un peu le chemin d’une minuscule');
+  assert.ok(E.epaisseur(st, SKILLS.maj_E, [{ stars: 0 }, { stars: 0 }]).route <= 1.2);
+  assert.equal(E.epaisseur(P.newState(), SKILLS.maj_E).route, 1.2);
+});
+
+test('épaisseur : l’aide s’active après des essais ratés, par cran, et se coupe', () => {
+  const st = P.newState();
+  const log = (n) => Array.from({ length: n }, () => ({ stars: 1 }));
+  const base = E.epaisseur(st, SKILLS.i).ink;
+  assert.equal(E.epaisseur(st, SKILLS.i, log(1)).crans, 0);
+  assert.equal(E.epaisseur(st, SKILLS.i, log(2)).crans, 1);
+  assert.equal(E.epaisseur(st, SKILLS.i, log(5)).crans, 2);
+  assert.ok(Math.abs(E.epaisseur(st, SKILLS.i, log(2)).ink - base * E.CRAN) < 0.002);
+  assert.ok(E.epaisseur(st, SKILLS.i, log(9)).ink > E.epaisseur(st, SKILLS.i, log(2)).ink);
+  // les réussites ne comptent pas
+  assert.equal(E.epaisseur(st, SKILLS.i, [{ stars: 3 }, { stars: 2 }, { stars: 3 }]).crans, 0);
+  // l'historique des séances précédentes compte aussi : un exercice difficile démarre déjà plus épais
+  st.skills.i = { sessions: 2, attempts: 4, phase: 0, mastered: false, history: [{ sc: 0.2 }, { sc: 0.3 }, { sc: 0.4 }, { sc: 0.5 }] };
+  assert.equal(E.epaisseur(st, SKILLS.i).crans, 1);
+  assert.equal(E.epaisseur(st, SKILLS.i, log(9)).crans, E.MAX_CRANS, 'deux crans au plus');
+  // un exercice acquis ne compte plus comme difficile
+  st.skills.i.mastered = true;
+  assert.equal(E.epaisseur(st, SKILLS.i).crans, 0);
+  st.skills.i.mastered = false;
+  st.settings.traitAide = false;
+  assert.equal(E.epaisseur(st, SKILLS.i, log(9)).crans, 0, 'aide coupée par les parents');
+});
+
+test('épaisseur : un ancien enregistrement reçoit les réglages par défaut', () => {
+  const old = P.newState();
+  delete old.settings.trait; delete old.settings.traitAide;
+  const st = P.hydrate(JSON.parse(JSON.stringify(old)));
+  assert.equal(st.settings.trait, 'auto');
+  assert.equal(st.settings.traitAide, true);
+});
