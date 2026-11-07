@@ -330,8 +330,8 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     await s.page.evaluate(() => { location.hash = 'carte-3-3'; }); await s.page.waitForTimeout(700);
     await s.page.click('.node.locked'); await s.page.waitForTimeout(500);
     check('niveau 3 : un mot fermé dit quelles lettres manquent', /Il te manque/.test(await s.page.innerText('.side .bubble')), await s.page.innerText('.side .bubble'));
-    await s.page.evaluate(() => { location.hash = 'carte-3-7'; }); await s.page.waitForTimeout(700);
-    check('niveau 3 : les phrases et le tableau libre sont sur la carte', (await s.page.$$eval('.node', (a) => a.length)) === 15 && !!(await s.page.$('.node.free')));
+    await s.page.evaluate(() => { location.hash = 'carte-3-17'; }); await s.page.waitForTimeout(700);
+    check('niveau 3 : les grandes phrases et le tableau libre sont sur la carte', (await s.page.$$eval('.node', (a) => a.length)) === 9 && !!(await s.page.$('.node.free')));
     await s.page.click('.node.free'); await s.page.waitForTimeout(800);
     check('carte : « Tableau libre » ouvre le tableau', (await s.hash()) === '#tableau' && !!(await s.page.$('.tableau-board')));
     await s.ctx.close();
@@ -465,7 +465,15 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   };
   const s = await fresh();
   check('démarrage : l’écran « Touche pour jouer » s’affiche à l’ouverture', !!(await s.page.$('.screen.splash')) && /Touche pour jouer/.test(await s.page.innerText('.splash .btn-big')));
-  await s.page.click('.splash .home-main'); await s.page.waitForTimeout(1900);
+  // Un deuxième toucher, une fois la musique commencée, passe à la suite sans attendre la fin ; un double toucher immédiat ne coupe pas la musique
+  const sk = await fresh();
+  await sk.page.click('.splash .home-main'); await sk.page.click('.splash .home-main', { force: true }); await sk.page.waitForTimeout(500);
+  check('démarrage : un double toucher immédiat ne saute pas la musique', (await sk.hash()) === '', await sk.hash());
+  await sk.page.waitForTimeout(900); await sk.page.click('.splash .home-main', { force: true }); await sk.page.waitForTimeout(600);
+  check('démarrage : un toucher plus tard passe à la suite sans attendre la fin de la musique', (await sk.hash()) === '#bienvenue', await sk.hash());
+  check('démarrage : aucune erreur', sk.errs.length === 0, sk.errs.join(' | '));
+  await sk.ctx.close();
+  await s.page.click('.splash .home-main'); await s.page.waitForTimeout(3600);
   check('présentation : tablette neuve, le renard se présente', (await s.hash()) === '#bienvenue' && !!(await s.page.$('.screen.welcome .wl-input')), await s.hash());
   const skipBox = await s.page.evaluate(() => { const b = document.querySelector('.wl-skip').getBoundingClientRect(); return { right: b.right, top: b.top, w: innerWidth }; });
   check('présentation : « Passer » est en haut à droite', skipBox.right > skipBox.w - 60 && skipBox.top < 40, JSON.stringify(skipBox));
@@ -494,7 +502,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   check('crédits : rien ne dépasse de la fenêtre en largeur', await s.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
   // Rouvrir l'application : plus de présentation, mais l'écran de démarrage ; mélodie coupée => pas de son attendu
   await s.page.goto(`file://${process.cwd()}/${PAGE}/index.html`); await s.page.waitForTimeout(600);
-  await s.page.click('.splash .home-main'); await s.page.waitForTimeout(1900);
+  await s.page.click('.splash .home-main'); await s.page.waitForTimeout(3600);
   check('réouverture : on va droit à l’accueil, sans refaire la présentation', (await s.hash()) === '#accueil', await s.hash());
   check('premier lancement : aucune erreur', s.errs.length === 0, s.errs.join(' | '));
   await s.ctx.close();
@@ -518,6 +526,30 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   check('majuscule : la colonne de gauche tient dans la fenêtre', await ex.page.evaluate(() => [...document.querySelectorAll('.exo-card,.model-chip')].every((e) => e.getBoundingClientRect().bottom <= innerHeight)));
   check('majuscule : aucune erreur', ex.errs.length === 0 && g.errs.length === 0, ex.errs.concat(g.errs).join(' | '));
   await g.ctx.close(); await ex.ctx.close();
+  // Les chiffres : la carte, l'exercice du 5 (deux traits), et l'échelle des mots et des phrases
+  const ch = await open((x) => { x.skills = {}; x.settings.classe = 'gs'; x.settings.depart = 1; x.settings.accueilFait = true; }, 'carte-1-6');
+  check('chiffres : la carte montre les dix chiffres et « Mon prénom »', (await ch.page.$$('.node:not(.free)')).length === 10 && !!(await ch.page.$('.node.free')), String((await ch.page.$$('.node:not(.free)')).length));
+  const c5 = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'exercice-chf_5');
+  check('chiffres : l\'exercice du 5 s\'ouvre', (await c5.hash()) === '#exercice-chf_5' && /Le chiffre 5/.test(await c5.page.innerText('.exo-bar')));
+  check('chiffres : la colonne de gauche tient dans la fenêtre', await c5.page.evaluate(() => [...document.querySelectorAll('.exo-card,.model-chip')].every((e) => e.getBoundingClientRect().bottom <= innerHeight)));
+  const lad = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'carte-3-17');
+  check('échelle : les grandes phrases sont à la fin du niveau 3', /Les grandes phrases/.test(await lad.page.innerText('.bar-title')) && (await lad.page.$$('.node:not(.free)')).length === 8);
+  check('échelle : les paliers de mots et de phrases se suivent dans le bandeau', await lad.page.$$eval('.sections button', (b) => b.slice(-11).map((x) => x.textContent).join('|').includes('Les mots de 4 lettres') && b.at(-1).textContent.includes('grandes phrases')));
+  const lg = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'exercice-mot_champignon');
+  check('échelle : un très grand mot s\'ouvre et se lit', (await lg.hash()) === '#exercice-mot_champignon' && /champignon/.test(await lg.page.innerText('.exo-bar')));
+  check('chiffres et échelle : aucune erreur', [ch, c5, lad, lg].every((z) => z.errs.length === 0), [ch, c5, lad, lg].flatMap((z) => z.errs).join(' | '));
+  for (const z of [ch, c5, lad, lg]) await z.ctx.close();
+  // Des mots et des phrases en capitales, à la fin du niveau 1, du plus simple au plus difficile
+  const mm = await open((x) => { x.skills = {}; x.settings.classe = 'gs'; x.settings.depart = 1; x.settings.accueilFait = true; }, 'carte-1-7');
+  check('capitales : les premiers mots sont sur la carte, fermés tant que les majuscules ne sont pas essayées', /Mes premiers mots en capitales/.test(await mm.page.innerText('.bar-title')) && (await mm.page.$$('.node:not(.free)')).length === 10 && (await mm.page.$$('.node.locked')).length === 10);
+  check('capitales : l\'échelle se suit dans le bandeau (4 paliers de mots, 2 de phrases)', await mm.page.$$eval('.sections button', (b) => b.slice(-6).map((x) => x.textContent).join('|').includes('Les mots de 4 lettres') && b.at(-1).textContent.includes('Des phrases courtes')));
+  const mx = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'exercice-mm_LUNE');
+  check('capitales : le mot LUNE s\'ouvre', (await mx.hash()) === '#exercice-mm_LUNE' && /LUNE/.test(await mx.page.innerText('.exo-bar')));
+  check('capitales : la colonne de gauche tient dans la fenêtre', await mx.page.evaluate(() => [...document.querySelectorAll('.exo-card,.model-chip')].every((e) => e.getBoundingClientRect().bottom <= innerHeight)));
+  const mp = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'exercice-mp_TU_AS_FAIM');
+  check('capitales : la phrase TU AS FAIM s\'ouvre', (await mp.hash()) === '#exercice-mp_TU_AS_FAIM' && /TU AS FAIM/.test(await mp.page.innerText('.exo-bar')));
+  check('capitales : aucune erreur', [mm, mx, mp].every((z) => z.errs.length === 0), [mm, mx, mp].flatMap((z) => z.errs).join(' | '));
+  for (const z of [mm, mx, mp]) await z.ctx.close();
 }
 
 await browser.close();

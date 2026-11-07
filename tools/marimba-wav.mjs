@@ -15,15 +15,26 @@ await page.setContent('<html><body></body></html>');
 await page.addScriptTag({ content: bundle.outputFiles[0].text });
 const res = await page.evaluate(async () => {
   const SR = 44100;
-  const ctx = new OfflineAudioContext(2, Math.ceil(SR * (M.MOTIF_DUREE + 0.3)), SR);
+  const ctx = new OfflineAudioContext(2, Math.ceil(SR * (M.MOTIF_FIN + 0.3)), SR);
   const fin = M.jouerMotif(ctx, ctx.destination, 0.05);
   const buf = await ctx.startRendering();
-  return { fin, sr: SR, l: Array.from(buf.getChannelData(0)), r: Array.from(buf.getChannelData(1)) };
+  const notes = M.MELODIE.map(([pos, d]) => [0.05 + pos * 60 / M.TEMPO / 4, M.hz(d)]);
+  return { fin, sr: SR, notes, l: Array.from(buf.getChannelData(0)), r: Array.from(buf.getChannelData(1)) };
 });
 await browser.close();
 const n = res.l.length;
 let peak = 0, sum = 0, last = 0;
 for (let i = 0; i < n; i++) { const v = Math.max(Math.abs(res.l[i]), Math.abs(res.r[i])); peak = Math.max(peak, v); sum += res.l[i] ** 2; if (v > 0.002) last = i; }
+// Vérification des attaques : à chaque note de la mélodie, l'énergie à la bonne hauteur doit monter juste après l'instant prévu
+const goertzel = (x, from, to, f, sr) => { if (to <= from) return 0; from = Math.max(0, from); let s1 = 0, s2 = 0; const k = 2 * Math.cos((2 * Math.PI * f) / sr); for (let i = from; i < to; i++) { const s0 = x[i] + k * s1 - s2; s2 = s1; s1 = s0; } return (s1 * s1 + s2 * s2 - k * s1 * s2) / (to - from); };
+let bonnes = 0; const ratees = [];
+for (const [t, f] of res.notes) {
+  const a = Math.round(t * res.sr);
+  const apres = goertzel(res.l, a + Math.round(0.012 * res.sr), a + Math.round(0.07 * res.sr), f, res.sr);
+  const avant = goertzel(res.l, a - Math.round(0.06 * res.sr), a - Math.round(0.005 * res.sr), f, res.sr);
+  if (apres > avant * 1.15 + 1e-12) bonnes++; else ratees.push(`${t.toFixed(2)} s (${f.toFixed(0)} Hz)`);
+}
+console.log(`attaques repérées à la bonne hauteur : ${bonnes} sur ${res.notes.length}${ratees.length ? ` (non repérées : ${ratees.join(', ')} — notes répétées ou couvertes par la précédente)` : ''}`);
 const db = (x) => (20 * Math.log10(x || 1e-9)).toFixed(1);
 console.log(`crête ${peak.toFixed(3)} (${db(peak)} dBFS), niveau moyen ${db(Math.sqrt(sum / n))} dBFS, dernier son audible à ${(last / res.sr).toFixed(2)} s, fin annoncée ${res.fin.toFixed(2)} s`);
 const wav = Buffer.alloc(44 + n * 4);

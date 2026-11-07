@@ -20,15 +20,16 @@ export function demarrage(root, app) {
   );
   const fox = app.makeFox(foxHost);
   fox.setMood('wave', 2800);
-  let started = false, timer = 0;
+  let started = false, timer = 0, parti = false, debut = 0;
+  const suite = () => { if (parti) return; parti = true; clearTimeout(timer); app.splashDone = true; app.replace(needsWelcome(app.state) ? 'bienvenue' : 'accueil'); };
   const start = () => {
-    if (started) return;
-    started = true;
+    if (started) { if (Date.now() - debut > 1200) suite(); return; } // un deuxième toucher (après un moment) passe à la suite sans attendre la fin de la musique
+    started = true; debut = Date.now();
     unlockAudio();
     const d = jingle(); // 0 si les sons ou la mélodie sont coupés
-    fox.setMood('joy', 1600);
+    fox.setMood('joy', d ? Math.round(d * 1000) : 1600);
     root.classList.add('leaving');
-    timer = setTimeout(() => { app.splashDone = true; app.replace(needsWelcome(app.state) ? 'bienvenue' : 'accueil'); }, d ? 1200 : 300);
+    timer = setTimeout(suite, d ? Math.round(d * 1000 - 400) : 300); // on enchaîne quand l'accord final vient de tomber
   };
   root.addEventListener('click', start);
   go.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start(); } });

@@ -23,10 +23,10 @@ export const CASSES = [
   { id: 'debut', label: 'Abc', name: 'Majuscule au début', hint: 'Pour un prénom ou une phrase' },
 ];
 
-/** « Léa-Rose » → « lea rose » : minuscules, sans accent, seulement a–z et espaces simples. */
+/** « Léa-Rose » → « lea rose » : minuscules, sans accent, seulement a–z, 0–9 et espaces simples. */
 export function clean(s) {
   return String(s || '').toLowerCase().replace(/œ/g, 'oe').replace(/æ/g, 'ae').normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z]+/g, ' ').replace(/^ /, '').slice(0, TABLEAU.maxLen);
+    .replace(/[^a-z0-9]+/g, ' ').replace(/^ /, '').slice(0, TABLEAU.maxLen);
 }
 
 /** Le texte tel qu'on l'écrit : « lea » → « LEA » (majuscules) ou « Lea » (majuscule au début). */
@@ -88,7 +88,7 @@ export const fits = (text, mode = 'min') => calque(text, TABLEAU.rows[0], mode).
 export function suggestions(st, mode = 'min') {
   const prenom = clean(st.name).trim();
   const known = Object.keys(st.skills || {}).filter((id) => st.skills[id].sessions > 0 && SKILLS[id]?.kind === 'word' && !SKILLS[id].phrase && !SKILLS[id].groupe);
-  const mots = known.map((id) => SKILLS[id].glyph).filter((w) => fits(w, mode));
+  const mots = [...new Set(known.map((id) => SKILLS[id].glyph.toLowerCase()))].filter((w) => fits(w, mode)); // les mots écrits en capitales proposent le même texte
   return { prenom: prenom && fits(prenom, mode) ? prenom : '', mots };
 }
 

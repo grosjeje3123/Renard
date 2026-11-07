@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Session } from '../src/core/session.js';
-import { SKILLS, LEVELS, isWriting } from '../src/content/skills.js';
+import { SKILLS, LEVELS, isWriting, nbLettres, difficulte, ECRITURE } from '../src/content/skills.js';
 import { STICKERS } from '../src/content/stickers.js';
 import { FICHES, factsOf } from '../src/content/fiches.js';
 import { buildTemplate } from '../src/core/template.js';
@@ -53,7 +53,7 @@ test('alphabet : les 26 lettres existent, chacune avec un seul rôle, des phrase
 // ---------- Niveau 3 : sons, mots, phrases ----------
 test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tiennent sur le cahier et finissent par leurs points', () => {
   const all = LEVELS[2].skills;
-  assert.ok(all.length >= 60, 'beaucoup de contenu');
+  assert.ok(all.length >= 150, 'beaucoup de contenu');
   assert.ok(LEVELS[2].available);
   assert.equal(new Set(all).size, all.length, 'pas de doublon');
   assert.equal(LEVELS[2].sections.flatMap((x) => x.skills).length, all.length);
@@ -68,7 +68,7 @@ test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tienne
     const t = buildTemplate(sk);
     assert.ok(t.bbox.x0 >= 0.3 && t.bbox.x1 <= t.board.W - 0.3, `${id} : déborde (${t.bbox.x0.toFixed(2)}–${t.bbox.x1.toFixed(2)})`);
     assert.ok(t.bbox.y0 >= 0.2 && t.bbox.y1 <= t.board.H - 0.2, `${id} : hors du cahier en hauteur`);
-    assert.ok(t.board.W <= 40, `${id} : cahier trop large (${t.board.W})`);
+    assert.ok(t.board.W <= 48, `${id} : cahier trop large (${t.board.W})`);
     const dots = t.strokes.filter((s) => s.kind === 'dot');
     const expected = sk.glyph.split('').filter((c) => c === 'i' || c === 'j').length + (sk.phrase ? 1 : 0);
     assert.equal(dots.length, expected, `${id} : points du i, du j et point final`);
@@ -79,7 +79,7 @@ test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tienne
       assert.ok(last.start.x > Math.max(...body.map((s) => s.bbox.x1)) - 0.5, `${id} : le point final est à la fin`);
     }
   }
-  assert.ok(kinds.groupe >= 12 && kinds.phrase >= 12 && kinds.mot >= 40, JSON.stringify(kinds));
+  assert.ok(kinds.groupe >= 12 && kinds.phrase >= 30 && kinds.mot >= 100, JSON.stringify(kinds));
 });
 
 test('cahier : un mot long agrandit la page en gardant l\'interligne, la ligne d\'écriture reste sur une ligne', () => {
@@ -166,7 +166,7 @@ test('étapes de la carte : les étapes couvrent le niveau, et un ordre de class
     assert.ok(secs.every((x) => x.title && x.skills.length >= 5 && x.skills.length <= 14), lv.name);
   }
   assert.deepEqual(P.levelSections(st, LEVELS[0]).flatMap((x) => x.skills), LEVELS[0].skills, 'niveau 1 : les formes, puis les majuscules par familles');
-  assert.equal(LEVELS[0].sections.length, 6);
+  assert.equal(LEVELS[0].sections.length, 13, 'les formes, cinq familles de majuscules, les chiffres, quatre paliers de mots et deux de phrases en capitales');
   assert.equal(LEVELS[0].sections.flatMap((x) => x.skills).filter((id) => SKILLS[id].capital).length, 26);
   st.settings.order2 = ['z', 'y', ...LEVELS[1].skills.filter((x) => x !== 'z' && x !== 'y').reverse()];
   const secs = P.levelSections(st, LEVELS[1]);
@@ -537,7 +537,7 @@ test('cahier : lettres et mots sont calés sur les lignes (pied sur la ligne d\'
     const letters = sk.needs;
     // à l'école : b f h k l montent à la 3e ligne, d et t à la « 2e ligne » (2,5 interlignes), les autres à 2
     const top = letters.some((l) => 'bfhkl'.includes(l)) ? 3 : letters.some((l) => 'dt'.includes(l)) ? 2.5 : 2;
-    const desc = letters.some((l) => DESC.includes(l));
+    const desc = letters.some((l) => (DESC + 'z').includes(l)); // le z cursif descend aussi sous la ligne
     assert.ok(desc ? b.y1 - b.base > 1.3 : Math.abs(b.y1 - b.base) <= 0.04, `${id} : pied ${(b.y1 - b.base).toFixed(3)}`);
     assert.ok(Math.abs(b.y0 - (b.base - top)) <= 0.04, `${id} : haut ${(b.base - b.y0).toFixed(3)}`);
   }
@@ -674,7 +674,8 @@ test('galerie : le code de sauvegarde ne contient jamais les dessins', async () 
 import * as T from '../src/core/tableau.js';
 test('tableau libre : le texte est nettoyé (a–z sans accent), le calque tient sur la page et la page s\'agrandit pour un texte long', () => {
   assert.equal(T.clean('  Léa-Rose Œuf '), 'lea rose oeuf ');
-  assert.equal(T.clean('ÉLÈVE ça va 123'), 'eleve ca va ');
+  assert.equal(T.clean('ÉLÈVE ça va 123'), 'eleve ca va 123', 'les chiffres sont gardés');
+  assert.equal(T.clean('Léa : 6 ans !!'), 'lea 6 ans ');
   assert.equal(T.clean(''), '');
   assert.equal(T.clean('x'.repeat(100)).length, T.TABLEAU.maxLen);
   const a = T.calque('il');
@@ -718,7 +719,7 @@ test('majuscules : 26 exercices dans le niveau 1, par familles, droits et posés
   }
   const I = buildTemplate(SKILLS.maj_I).strokes[0];
   assert.ok(I.bbox.w < 0.01, 'le I est une barre bien verticale (pas penchée comme l\'écriture cursive)');
-  const sections = LEVELS[0].sections.slice(1);
+  const sections = LEVELS[0].sections.slice(1, 6); // les cinq familles de majuscules (les chiffres viennent après)
   assert.deepEqual(sections.map((x) => x.skills.length), [6, 6, 5, 5, 4]);
   assert.ok(sections.every((x) => x.title && x.skills.every((id) => SKILLS[id].section === x.id)));
 });
@@ -735,7 +736,8 @@ test('majuscules : on avance pas à pas ; la grande section commence directement
   assert.equal(P.isSkillOpen(gs, 'maj_I'), true, 'grande section : les formes sont derrière nous');
   assert.equal(P.isSkillOpen(gs, 'maj_L'), false);
   assert.equal(P.recommend(gs).skillId, 'maj_I', 'on conseille d\'abord les majuscules');
-  assert.deepEqual(P.learningOrder(gs).slice(0, 6), ['maj_I', 'maj_L', 'maj_T', 'maj_E', 'maj_F', 'maj_H']);
+  assert.deepEqual(P.learningOrder(gs).filter((id) => SKILLS[id].capital).slice(0, 6), ['maj_I', 'maj_L', 'maj_T', 'maj_E', 'maj_F', 'maj_H']);
+  assert.deepEqual(P.learningOrder(gs).slice(0, 3), ['maj_I', 'maj_L', 'mm_IL'], 'le premier mot arrive dès que ses deux majuscules sont connues');
   tried(gs, 'maj_I');
   assert.equal(P.isSkillOpen(gs, 'maj_L'), true);
 
@@ -778,4 +780,154 @@ test('première ouverture : la classe règle le niveau de départ', () => {
   assert.equal(P.cleanName('<b>Zoé</b>'), 'Bzoéb', 'les caractères étranges disparaissent');
   assert.equal(P.cleanName('x'.repeat(40)).length, 14, 'quatorze lettres au plus');
   assert.equal(P.cleanName('123'), '');
+});
+
+// ---------- Les chiffres, avant le CP ----------
+test('chiffres : 0 à 9 dans le niveau 1, droits, du haut vers le bas (le 1 part de sa pointe), posés sur la ligne d\'écriture', () => {
+  const sec = LEVELS[0].sections.find((x) => x.id === 'chiffres');
+  assert.deepEqual(sec.skills, [...'0123456789'].map((d) => `chf_${d}`));
+  assert.ok(LEVELS[0].skills.includes('chf_9'));
+  for (const id of sec.skills) {
+    const sk = SKILLS[id], D = sk.glyph;
+    assert.equal(sk.level, 1); assert.equal(sk.kind, 'letter'); assert.ok(isWriting(sk)); assert.equal(sk.slant, 0, `${id} : droit`);
+    assert.ok(sk.say.intro.includes('Le chiffre') && sk.say.how && sk.say.bubble, `${id} : consignes`);
+    const t = buildTemplate(sk);
+    assert.ok(Math.abs(t.bbox.y0 - (t.frame.baseline - 3)) < 0.35 && Math.abs(t.bbox.y1 - t.frame.baseline) < 0.5, `${id} : hauteur de 3 interlignes (${(t.frame.baseline - t.bbox.y0).toFixed(2)})`);
+    assert.ok(t.bbox.x0 >= 0.3 && t.bbox.x1 <= t.board.W - 0.3, `${id} : tient sur le cahier`);
+    const first = t.strokes[0].start;
+    if (D !== '1') assert.ok(first.y < t.frame.baseline - 2.6 + 0.5, `${id} : on part du haut`);
+    else assert.ok(first.y > t.frame.baseline - 2.2, '1 : on part de la petite pointe, plus bas');
+    assert.ok(ECRITURE[D] && ECRITURE[D].upright, `${id} : le tableau libre sait écrire « ${D} »`);
+  }
+  // une seule levée de crayon pour presque tous ; le 4 et le 5 en font deux
+  const traits = (D) => SKILLS[`chf_${D}`].strokes.length;
+  assert.deepEqual([...'0123456789'].map(traits), [1, 1, 1, 1, 2, 2, 1, 1, 1, 1]);
+});
+
+test('chiffres : une file à part, ouverte dès que les ronds sont essayés (d\'emblée en grande section), pas à pas ensuite', () => {
+  const st = newState();
+  assert.equal(P.isSkillOpen(st, 'chf_0'), false, 'pas avant les ronds');
+  tried(st, 'ronds');
+  assert.equal(P.isSkillOpen(st, 'chf_0'), true);
+  assert.equal(P.isSkillOpen(st, 'chf_1'), false, 'un à la fois');
+  tried(st, 'chf_0');
+  assert.equal(P.isSkillOpen(st, 'chf_1'), true);
+  const gs = newState(); gs.settings.classe = 'gs'; gs.settings.depart = 1;
+  assert.equal(P.isSkillOpen(gs, 'chf_0'), true, 'grande section : les chiffres sont proposés d\'emblée');
+  const ordre = P.learningOrder(gs);
+  assert.ok(ordre.indexOf('maj_Z') < ordre.indexOf('chf_0') && ordre.indexOf('chf_9') < ordre.indexOf('lignes'), 'majuscules, puis chiffres, puis les formes');
+  const cp = newState(); cp.settings.depart = 2;
+  assert.equal(P.isSkillOpen(cp, 'chf_9'), true, 'au CP : le niveau 1 est derrière nous');
+});
+
+test('tableau libre : les chiffres s\'écrivent aussi (un âge, un numéro), droits à côté des lettres', async () => {
+  const T = await import('../src/core/tableau.js');
+  assert.equal(T.clean('Léa a 6 ans !').trim(), 'lea a 6 ans');
+  assert.equal(T.cased('lea 6', 'maj'), 'LEA 6');
+  const c = T.calque('lea 6', undefined, 'debut');
+  assert.equal(c.text, 'Lea 6');
+  assert.ok(c.width > 0 && c.strokes.length >= 4, 'une lettre ou un chiffre par trait au moins');
+  assert.ok(T.fits('lea 6', 'min'));
+});
+
+// ---------- L'échelle des mots et des phrases, du plus simple au plus difficile ----------
+test('échelle : mots puis phrases, de plus en plus longs, et à longueur égale de plus en plus difficiles', () => {
+  const sections = LEVELS[2].sections;
+  const echelle = (prefixe) => sections.filter((x) => x.id.startsWith(prefixe));
+  const mots = echelle('mots_p'), phrases = echelle('phr_p');
+  assert.equal(mots.length, 7); assert.equal(phrases.length, 4);
+  assert.deepEqual(sections.slice(-11).map((x) => x.id), [...mots, ...phrases].map((x) => x.id), 'l\'échelle est à la fin du niveau 3 : d\'abord les mots, puis les phrases');
+  for (const groupe of [mots, phrases]) {
+    const textes = groupe.flatMap((x) => x.skills.map((id) => SKILLS[id].glyph));
+    for (let i = 1; i < textes.length; i++) {
+      const a = textes[i - 1], b = textes[i];
+      assert.ok(nbLettres(a) < nbLettres(b) || (nbLettres(a) === nbLettres(b) && difficulte(a) <= difficulte(b)), `« ${a} » (${nbLettres(a)}/${difficulte(a)}) doit précéder « ${b} » (${nbLettres(b)}/${difficulte(b)})`);
+    }
+    let precedent = 0;
+    for (const sec of groupe) { // les paliers se suivent sans se chevaucher
+      const longueurs = sec.skills.map((id) => nbLettres(SKILLS[id].glyph));
+      assert.ok(sec.skills.length >= 4, `${sec.id} : assez d'exercices`);
+      assert.ok(Math.min(...longueurs) > precedent && Math.max(...longueurs) <= sec.max, `${sec.id} : de ${Math.min(...longueurs)} à ${Math.max(...longueurs)} lettres (limite ${precedent + 1}–${sec.max})`);
+      precedent = sec.max;
+    }
+  }
+  assert.ok(phrases.flatMap((x) => x.skills).every((id) => SKILLS[id].phrase), 'que des phrases à la fin');
+  assert.ok(mots.flatMap((x) => x.skills).every((id) => !SKILLS[id].phrase && !SKILLS[id].groupe), 'que des mots dans l\'échelle des mots');
+  const tous = LEVELS[2].skills.map((id) => SKILLS[id].glyph);
+  assert.equal(new Set(tous).size, tous.length, 'aucun texte en double dans le niveau 3');
+});
+
+test('échelle : les mots difficiles s\'ouvrent quand leurs lettres sont connues, les lettres rares comptent', () => {
+  assert.ok(difficulte('zoo') > difficulte('mot') - 1 && difficulte('kiwi') > difficulte('lune'), 'k, w, x, y, z pèsent plus que i, o, a, l, e');
+  const st = newState();
+  assert.equal(P.isSkillOpen(st, 'mot_zoo'), false);
+  for (const l of 'zo') tried(st, l);
+  assert.equal(P.isSkillOpen(st, 'mot_zoo'), true);
+  assert.equal(P.isSkillOpen(st, 'mot_kiwi'), false, 'le k et le w ne sont pas encore connus');
+});
+
+// ---------- Des mots et des phrases en capitales, à la fin du niveau 1 ----------
+test('niveau 1 : des mots puis des phrases en capitales, du plus simple au plus difficile, à la suite des chiffres', () => {
+  const ids = LEVELS[0].sections.map((x) => x.id);
+  assert.deepEqual(ids.slice(-6), ['mm_p1', 'mm_p2', 'mm_p3', 'mm_p4', 'mp_p1', 'mp_p2'], 'après les majuscules et les chiffres');
+  assert.ok(ids.indexOf('chiffres') < ids.indexOf('mm_p1'));
+  const secs = LEVELS[0].sections.filter((x) => /^m[mp]_/.test(x.id));
+  for (const pre of ['mm_', 'mp_']) {
+    const textes = secs.filter((x) => x.id.startsWith(pre)).flatMap((x) => x.skills.map((id) => SKILLS[id].glyph));
+    assert.ok(textes.length >= 14, `${pre} : assez d'exercices`);
+    for (let i = 1; i < textes.length; i++) assert.ok(nbLettres(textes[i - 1]) <= nbLettres(textes[i]), `« ${textes[i - 1]} » avant « ${textes[i]} »`);
+  }
+  const tous = secs.flatMap((x) => x.skills);
+  assert.equal(new Set(tous).size, tous.length, 'aucun identifiant en double');
+  for (const id of tous) {
+    const sk = SKILLS[id];
+    assert.ok(sk.kind === 'word' && sk.level === 1 && sk.majMot && !sk.capital, id);
+    assert.ok(/^[A-Z ]+$/.test(sk.glyph), `${id} : écrit en capitales`);
+    assert.ok(sk.needs.length > 0 && sk.needs.every((n) => SKILLS[n]?.capital), `${id} : dépend de majuscules existantes`);
+    assert.ok(sk.strokes.length >= sk.glyph.replace(/ /g, '').length, `${id} : un trait au moins par lettre`);
+    assert.ok(sk.say.intro && sk.say.how && sk.say.bubble, `${id} : consignes`);
+  }
+  assert.ok(secs.filter((x) => x.id.startsWith('mp_')).flatMap((x) => x.skills).every((id) => SKILLS[id].phrase && SKILLS[id].strokes.some((st) => st.dot)), 'les phrases ont leur point final');
+  assert.ok(LEVELS[0].skills.includes('mm_IL') && LEVELS[0].skills.includes('mp_TU_LIS'));
+});
+
+test('capitales : un mot s\'ouvre dès que ses majuscules sont essayées (et dans l\'ordre conseillé, juste après)', () => {
+  const st = newState();
+  assert.equal(P.isSkillOpen(st, 'mm_IL'), false);
+  assert.equal(P.lockReason(st, 'mm_IL'), 'letters');
+  assert.deepEqual(P.missingLetters(st, 'mm_IL'), ['maj_I', 'maj_L']);
+  const gs = newState();
+  gs.settings.classe = 'gs';
+  tried(gs, 'maj_I');
+  assert.equal(P.isSkillOpen(gs, 'mm_IL'), false, 'il manque le L');
+  tried(gs, 'maj_L');
+  assert.equal(P.isSkillOpen(gs, 'mm_IL'), true);
+  assert.equal(P.isSkillOpen(gs, 'mm_LIT'), false, 'il manque le T');
+  const ordre = P.learningOrder(gs);
+  assert.ok(ordre.indexOf('mm_IL') === ordre.indexOf('maj_L') + 1, 'le mot suit sa dernière majuscule');
+  assert.ok(ordre.indexOf('mm_LIT') === ordre.indexOf('maj_T') + 1 || ordre.indexOf('mm_LIT') === ordre.indexOf('maj_T') + 2);
+  assert.equal(new Set(ordre).size, ordre.length, 'aucun exercice proposé deux fois');
+  assert.equal(ordre.length, LEVELS[0].skills.length + 26 + LEVELS[2].skills.length, 'tous les exercices du niveau 1, des lettres et des mots du niveau 3');
+  const ms = newState();
+  ms.settings.classe = 'ms';
+  const ordreMs = P.learningOrder(ms);
+  assert.ok(ordreMs.indexOf('mm_IL') > ordreMs.indexOf('maj_L') && ordreMs.indexOf('maj_I') > ordreMs.indexOf('boucles'), 'moyenne section : les formes, puis les majuscules, et le mot dès que ses lettres sont connues');
+  const apresCp = newState();
+  apresCp.settings.depart = 2;
+  assert.ok(!P.learningOrder(apresCp).includes('mm_IL'), 'au CP on ne propose plus le niveau 1');
+  assert.equal(P.isSkillOpen(apresCp, 'mm_IL'), true, 'mais il reste ouvert');
+});
+
+test('capitales : les mots sont droits sur la feuille et le Tableau propose le même texte en minuscules', () => {
+  const tpl = buildTemplate(SKILLS.mm_IL);
+  const [i, l] = tpl.strokes;
+  assert.ok(Math.abs(i.start.x - i.end.x) < 0.02, 'le I est vertical (pas incliné comme une cursive)');
+  assert.ok(Math.abs(l.start.x - l.pts[Math.floor(l.pts.length / 2)].x) < 0.02, 'la tige du L aussi');
+  assert.ok(tpl.bbox.w > 2.5 && tpl.bbox.w < 3.2 && tpl.bbox.h > 2.9 && tpl.bbox.h < 3.1, `taille d'un IL : ${tpl.bbox.w.toFixed(1)} × ${tpl.bbox.h.toFixed(1)} (trois interlignes de haut)`);
+  const long = buildTemplate(SKILLS.mp_TU_AS_FAIM);
+  assert.ok(long.board.W > BOARD.W, 'une phrase en capitales agrandit la page');
+  const st = newState();
+  st.skills.mm_LUNE = { sessions: 1 }; st.skills.mot_lune = { sessions: 1 };
+  const sug = T.suggestions(st, 'min');
+  assert.deepEqual(sug.mots.filter((w) => w === 'lune' || w === 'LUNE'), ['lune'], 'un seul « lune », en minuscules');
 });

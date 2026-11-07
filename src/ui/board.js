@@ -74,7 +74,9 @@ export class Board {
     this.gFx = el('g', { class: 'fx' }, svg);
 
     this.tpl.strokes.forEach((s, i) => {
-      const g = el('g', { class: 'gs future', 'data-i': i }, this.gGuide);
+      // Deux traits qui partent du même point (5, E, F, B, P…) : la pastille du second ne s'affiche que quand c'est son tour.
+      const partage = this.tpl.strokes.slice(0, i).some((o) => Math.hypot(o.start.x - s.start.x, o.start.y - s.start.y) < 0.35);
+      const g = el('g', { class: `gs future${partage ? ' shared' : ''}`, 'data-i': i }, this.gGuide);
       if (s.kind === 'dot') {
         el('circle', { class: 'road dotroad', cx: s.start.x, cy: s.start.y, r: 0.42 }, g);
       } else {

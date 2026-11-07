@@ -53,7 +53,7 @@ export const MAJUSCULES = {
  */
 const NUM = /[MLCQZ]|-?\d*\.?\d+(?:e-?\d+)?/gi;
 const r3 = (v) => String(+v.toFixed(3));
-const redresse = (strokes) => strokes.map((st) => {
+export const redresse = (strokes) => strokes.map((st) => {
   if (!st.d) return st;
   const nums = (st.d.match(NUM) || []).filter((t) => !/[MLCQZ]/i.test(t)).map(parseFloat);
   for (let i = 0; i + 1 < nums.length; i += 2) nums[i] -= BOARD.slant * nums[i + 1];

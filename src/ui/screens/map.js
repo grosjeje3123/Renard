@@ -40,9 +40,9 @@ export function map(root, app, arg) {
   }
   const section = sections[si];
   const ids = section.skills;
-  // niveau 1 : dessin libre avec les formes, puis le tableau libre en majuscules (son prénom !) au bout des majuscules ; niveaux d'écriture : tableau libre à la dernière étape
+  // niveau 1 : dessin libre avec les formes, puis le tableau libre en majuscules (son prénom !) au bout des majuscules, puis après les chiffres ; niveaux d'écriture : tableau libre à la dernière étape
   const last = si === sections.length - 1;
-  const free = lv.id === 1 ? (si === 0 ? 'dessin' : last ? 'tableau' : null) : last ? 'tableau' : null;
+  const free = lv.id === 1 ? (si === 0 ? 'dessin' : ['maj_bedaines', 'chiffres'].includes(section.id) ? 'tableau' : null) : last ? 'tableau' : null;
   const prenom = lv.id === 1 && free === 'tableau' && !!st.name;
   const n = ids.length + (free ? 1 : 0);
   const pos = layout(n);

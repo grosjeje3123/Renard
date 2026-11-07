@@ -201,6 +201,7 @@ button:focus-visible,input:focus-visible,.home-fox:focus-visible{outline:4px sol
 @keyframes pulse{0%{transform:scale(.7);opacity:.5}100%{transform:scale(2);opacity:0}}
 .snum{font-family:var(--f-display);font-weight:600;font-size:.26px;fill:#fff;pointer-events:none}
 .gs:not(.current) .pulse{display:none}
+.gs.shared:not(.current) .start{display:none}
 .gs.future .sdot{opacity:.55}
 .gs.done .road,.gs.done .arrows,.gs.done .center{opacity:.18}
 .gs.done .start{opacity:.35}

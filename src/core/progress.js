@@ -242,6 +242,8 @@ export function isSkillOpen(st, id) {
   const i = list.indexOf(id);
   // Grande section : les formes de départ sont acquises, on commence directement par les majuscules
   if (sk.capital && st.settings.classe === 'gs' && !SKILLS[list[i - 1]]?.capital) return true;
+  // Les chiffres forment leur propre file : le 0 s'ouvre dès que les ronds sont essayés (ou d'emblée en grande section)
+  if (sk.chiffre && !SKILLS[list[i - 1]]?.chiffre) return st.settings.classe === 'gs' || known(st, 'ronds');
   return i === 0 || skillState(st, list[i - 1]).sessions > 0;
 }
 /** Raison pour laquelle un exercice est fermé : 'before' (exercice d'avant) ou 'letters' (lettres du mot). */
@@ -259,8 +261,18 @@ export function learningOrder(st) {
   const d = departLevel(st);
   const lv = (n) => LEVELS.find((l) => l.id === n);
   const first = levelSkills(st, lv(1));
-  // Grande section : les majuscules d'abord (les formes restent disponibles, à la fin)
-  const out = d > 1 ? [] : st.settings?.classe === 'gs' ? [...first.filter((id) => SKILLS[id].capital), ...first.filter((id) => !SKILLS[id].capital)] : [...first];
+  // Niveau 1 : les formes, les majuscules, les chiffres ; chaque mot en capitales arrive dès que ses majuscules sont connues.
+  // Grande section : les majuscules d'abord, puis les chiffres (les formes restent disponibles, à la fin).
+  const motsMaj = first.filter((id) => SKILLS[id].needs);
+  const sans = first.filter((id) => !SKILLS[id].needs);
+  const base = st.settings?.classe === 'gs' ? [...sans.filter((id) => SKILLS[id].capital), ...sans.filter((id) => SKILLS[id].chiffre), ...sans.filter((id) => !SKILLS[id].capital && !SKILLS[id].chiffre)] : sans;
+  const out = [];
+  if (d <= 1) {
+    const vues = new Set(), pris = new Set();
+    const prendre = () => motsMaj.forEach((w) => { if (!pris.has(w) && SKILLS[w].needs.every((l) => vues.has(l))) { pris.add(w); out.push(w); } });
+    for (const id of base) { out.push(id); if (SKILLS[id].capital) { vues.add(id); prendre(); } }
+    motsMaj.forEach((w) => { if (!pris.has(w)) out.push(w); });
+  }
   const letters = levelSkills(st, lv(2));
   const words = levelSkills(st, lv(3));
   const seen = new Set(d >= 3 ? letters : []);

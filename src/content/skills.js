@@ -4,6 +4,7 @@ import { P } from './helpers.js';
 import { parsePath } from '../engine/pathdata.js';
 import { LETTRES, hampe, ent, sortie, ovale } from './lettres.js';
 import { CAPITALES, MAJUSCULES } from './majuscules.js';
+import { CHIFFRES, CHIFFRES_TRACES } from './chiffres.js';
 import { BOARD } from '../core/board.js';
 
 const TAU = Math.PI * 2;
@@ -194,23 +195,23 @@ const SPACE_GAP = 1.5; // entre deux mots d'une phrase
  * Écrit un texte (lettres a–z, espaces) avec les tracés des lettres : lettres détachées, points des i et des j à la fin de chaque mot,
  * point final de la phrase si `period`.
  */
-export function composeText(text, { period = false, skills = SKILLS } = {}) {
+export function composeText(text, { period = false, skills = SKILLS, gap = WORD_GAP, space = SPACE_GAP } = {}) {
   const out = [];
   let cursor = 0;
   text.split(' ').forEach((word, wi) => {
     const paths = [], dots = [];
-    if (wi) cursor += SPACE_GAP - WORD_GAP;
+    if (wi) cursor += space - gap;
     for (const id of word) {
       const strokes = skills[id].strokes;
       const sk = skills[id];
       const xs = strokes.filter((st) => st.d).flatMap((st) => parsePath(st.d)).map((q) => (sk.upright ? q.x + BOARD.slant * q.y : q.x));
       const dx = cursor - Math.min(...xs);
       for (const st of strokes) (st.d ? paths : dots).push(st.d ? { d: shiftD(st.d, dx) } : { dot: [st.dot[0] + dx, st.dot[1]] });
-      cursor += Math.max(...xs) - Math.min(...xs) + WORD_GAP;
+      cursor += Math.max(...xs) - Math.min(...xs) + gap;
     }
     out.push(...paths, ...dots);
   });
-  if (period) out.push({ dot: [cursor - WORD_GAP + 0.55, 0] });
+  if (period) out.push({ dot: [cursor - gap + 0.55, 0] });
   return out;
 }
 // ---- Niveau 1 (suite) : les 26 majuscules d'imprimerie, la grande étape de la grande section avant le CP.
@@ -267,12 +268,80 @@ for (const sec of MAJ_SECTIONS) {
   });
 }
 
-/** Minuscules cursives (a–z) et majuscules d'imprimerie (A–Z) : le registre du tableau libre. */
-export const ECRITURE = { ...SKILLS, ...CAPITALES };
+// ---- Niveau 1 (fin) : les chiffres de 0 à 9, droits comme les majuscules (chiffres.js), pour compter et écrire son âge.
+const NOMS_CHIFFRES = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
+const CHIFFRES_TEXTES = [
+  ['Je fais un ovale : je pars du haut et je tourne vers la gauche.', 'Pars du haut, tourne vers la gauche et ferme l’ovale.', 'Un ovale bien fermé'],
+  ['Je pars de la petite pointe, je monte, puis je descends tout droit.', 'Pars de la petite pointe, monte jusqu’en haut, puis descends tout droit.', 'Monte, puis descends tout droit'],
+  ['Je fais un petit chapeau, je descends en biais, et je trace la barre en bas.', 'Fais le chapeau vers la droite, descends en biais jusqu’en bas, puis trace la barre.', 'Un chapeau, un biais, une barre'],
+  ['Je fais deux ventres l’un sous l’autre, qui s’ouvrent vers la gauche.', 'Fais le premier ventre, reviens au milieu, puis fais le deuxième ventre.', 'Deux ventres vers la droite'],
+  ['Je descends en biais, je vais vers la droite, puis je trace un bâton qui descend.', 'Descends en biais, trace la barre vers la droite. Puis repars du haut et descends tout droit.', 'Un biais, une barre, un bâton'],
+  ['Je descends un peu, je fais un ventre, et je pose le chapeau.', 'Descends un peu, puis fais le grand ventre vers la droite. Pose le chapeau en haut.', 'Un ventre, puis le chapeau'],
+  ['Je descends en courbe, et je ferme une boucle en bas.', 'Pars en haut à droite, descends en courbe, tourne en bas et ferme la boucle.', 'Descends, puis la boucle'],
+  ['Je trace une barre en haut, puis je descends en biais.', 'Trace la barre vers la droite, puis descends en biais jusqu’en bas.', 'Une barre, puis un biais'],
+  ['Je fais un petit rond en haut, un grand rond en bas, en un seul trait.', 'Pars en haut, tourne vers la gauche, croise au milieu, fais le rond du bas, et remonte.', 'Deux ronds, en un seul trait'],
+  ['Je fais un petit rond en haut, et un bâton qui descend.', 'Fais le rond en haut, tourne vers la gauche, ferme-le, puis descends tout droit.', 'Un rond, puis un bâton'],
+];
+const CHIFFRES_SECTION = {
+  id: 'chiffres', title: 'Les chiffres',
+  skills: Object.keys(CHIFFRES_TRACES).map((D) => {
+    const id = `chf_${D}`;
+    const [intro, how, bubble] = CHIFFRES_TEXTES[+D];
+    SKILLS[id] = {
+      id, kind: 'letter', level: 1, chiffre: true, slant: 0, glyph: D, section: 'chiffres',
+      title: `Le chiffre ${D}`, short: `Le chiffre ${D}`, label: D,
+      skillLabel: `Écrire le chiffre ${D}`,
+      strokes: CHIFFRES_TRACES[D],
+      say: { intro: `Le chiffre ${NOMS_CHIFFRES[+D]}. ${intro}`, how, bubble },
+      item: null,
+    };
+    return id;
+  }),
+};
+
+/** Minuscules cursives (a–z), majuscules d'imprimerie (A–Z) et chiffres (0–9) : le registre du tableau libre. */
+export const ECRITURE = { ...SKILLS, ...CAPITALES, ...CHIFFRES };
 export const composeWord = (letters, skills = SKILLS) => composeText(letters.join(''), { skills });
 
 // ---- Niveau 3 : les sons, les mots, les phrases. Tout est composé avec les lettres : on n'écrit ici que du texte.
 const GROUPES = ['ou', 'on', 'an', 'in', 'ch', 'oi', 'au', 'eau', 'ai', 'eu', 'gn', 'qu'];
+// L'échelle de la fin du niveau 3 : des mots, puis des phrases, du plus simple au plus difficile.
+// La difficulté d'un texte, c'est d'abord sa longueur (nombre de lettres), puis la difficulté de ses lettres : celles qu'on apprend
+// d'abord comptent 1 (i, o, a, l, e), puis 2 (u, t, n, m, r), 3 (c, d, s, g, q), 4 (b, h, k, f, p) et 5 (j, y, v, w, x, z), comme dans l'ordre du niveau 2.
+const POIDS_LETTRE = Object.fromEntries(['ioale', 'utnmr', 'cdsgq', 'bhkfp', 'jyvwxz'].flatMap((g, i) => [...g].map((l) => [l, i + 1])));
+/** Nombre de lettres d'un mot ou d'une phrase (sans les espaces). */
+export const nbLettres = (t) => t.replace(/ /g, '').length;
+/** Poids total des lettres : à longueur égale, c'est ce qui départage le plus simple du plus difficile. */
+export const difficulte = (t, poids = POIDS_LETTRE) => [...t.replace(/ /g, '')].reduce((a, l) => a + (poids[l] || 0), 0);
+const parDifficulte = (liste) => [...liste].sort((a, b) => nbLettres(a) - nbLettres(b) || difficulte(a) - difficulte(b) || a.localeCompare(b, 'fr'));
+
+const PALIERS_MOTS = [
+  { id: 'mots_p1', title: 'Les tout petits mots', max: 3, mots: ['ma', 'un', 'tu', 'roi', 'une', 'mon', 'rat', 'rue', 'nid', 'zoo', 'riz', 'bus'] },
+  { id: 'mots_p2', title: 'Les mots de 4 lettres', max: 4, mots: ['moto', 'main', 'nuit', 'gare', 'dent', 'pied', 'bois', 'jour', 'cube', 'kiwi'] },
+  { id: 'mots_p3', title: 'Les mots de 5 lettres', max: 5, mots: ['balle', 'route', 'tigre', 'avion', 'singe', 'plage', 'jouet', 'fruit', 'herbe', 'wagon', 'merci', 'lundi'] },
+  { id: 'mots_p4', title: 'Les mots de 6 lettres', max: 6, mots: ['ballon', 'maison', 'tortue', 'orange', 'citron', 'bateau', 'girafe', 'jardin', 'crayon', 'pyjama', 'samedi'] },
+  { id: 'mots_p5', title: 'Les mots de 7 lettres', max: 7, mots: ['bonjour', 'bonsoir', 'chameau', 'poussin', 'piscine', 'biscuit', 'cuisine', 'poisson'] },
+  { id: 'mots_p6', title: 'Les mots de 8 lettres', max: 8, mots: ['cartable', 'papillon', 'tracteur', 'chocolat', 'champion', 'vacances', 'mercredi'] },
+  { id: 'mots_p7', title: 'Les très grands mots', max: 99, mots: ['crocodile', 'dinosaure', 'parapluie', 'kangourou', 'xylophone', 'coccinelle', 'grenouille', 'hirondelle', 'champignon'] },
+];
+const PHRASES_ECHELLE = [
+  'tu lis', 'il dort', 'il joue', 'elle rit', 'il pleut', 'il neige', 'papa lit', 'papa rit', 'il a un ami', 'maman lit',
+  'tu as un ami', 'mon ami joue', 'il a un chien', 'le chat dort', 'un ours dort', 'le bebe dort', 'le lion rugit', 'le loup a faim',
+  'la lune brille', 'le lapin saute', 'le chien aboie', 'la pluie tombe', 'la vache mange', 'je sais ecrire', 'le soleil brille', 'papa lit un livre',
+  'le renard a faim', 'le lapin a un nid',
+  'le petit chat dort', 'tu as un joli livre', 'le chat aime le lait', 'le renard est malin', 'le chien est gentil', 'le soleil est chaud',
+  'le chat lit un livre', 'le chat boit du lait',
+];
+const PALIERS_PHRASES = [
+  { id: 'phr_p1', title: 'Mes premières phrases', max: 8 },
+  { id: 'phr_p2', title: 'Des phrases courtes', max: 11 },
+  { id: 'phr_p3', title: 'Des phrases plus longues', max: 14 },
+  { id: 'phr_p4', title: 'Les grandes phrases', max: 99 },
+];
+const palier = (paliers, t) => paliers.find((p) => nbLettres(t) <= p.max);
+const ECHELLE_MOTS = PALIERS_MOTS.map(({ id, title, max, mots }) => ({ id, title, max, mots: parDifficulte(mots) }));
+const ECHELLE_PHRASES = PALIERS_PHRASES.map((p) => ({ id: p.id, title: p.title, max: p.max, phrases: parDifficulte(PHRASES_ECHELLE.filter((t) => palier(PALIERS_PHRASES, t) === p)) }));
+
 const MOT_SECTIONS = [
   { id: 'premiers', title: 'Mes premiers mots', mots: ['il', 'la', 'le', 'loi', 'oie', 'aile'] },
   { id: 'sons', title: 'Les sons', groupes: GROUPES },
@@ -281,7 +350,8 @@ const MOT_SECTIONS = [
   { id: 'nature', title: 'La nature', mots: ['lune', 'soleil', 'fleur', 'arbre', 'pluie', 'neige', 'vent', 'sable'] },
   { id: 'maison', title: 'À la maison', mots: ['table', 'livre', 'porte', 'lit', 'sac', 'robe', 'pomme', 'poire', 'pain', 'lait'] },
   { id: 'couleurs', title: 'Les couleurs', mots: ['rouge', 'vert', 'bleu', 'jaune', 'noir', 'blanc', 'gris', 'rose'] },
-  { id: 'phrases', title: 'Mes premières phrases', phrases: ['il pleut', 'il neige', 'papa lit', 'il a un ami', 'le chat dort', 'un ours dort', 'le bebe dort', 'tu as un ami', 'le lion rugit', 'il a un chien', 'mon ami joue', 'la lune brille', 'le loup a faim', 'le lapin saute'] },
+  ...ECHELLE_MOTS,
+  ...ECHELLE_PHRASES,
 ];
 const needsOf = (text) => [...new Set(text.replace(/ /g, ''))];
 const mkText = (sec, text, kind) => {
@@ -314,6 +384,47 @@ for (const sec of MOT_SECTIONS) {
   ];
 }
 
+// ---- Niveau 1 (fin) : des mots, puis des phrases, en MAJUSCULES d'imprimerie, du plus simple au plus difficile.
+// Même échelle qu'au niveau 3 (longueur, puis difficulté des lettres), mais la difficulté d'une lettre suit ici l'ordre des familles de majuscules.
+// Un mot ne s'ouvre que lorsque ses majuscules ont été essayées (comme les mots du niveau 3 avec leurs lettres).
+const ECART_MAJ = 1.15, ESPACE_MAJ = 2.6; // entre deux majuscules, entre deux mots : plus large que les cursives, pour que les « routes » du guide ne se chevauchent pas
+const POIDS_MAJ = Object.fromEntries(MAJ_SECTIONS.flatMap((sec, i) => [...sec.lettres].map((L) => [L, i + 1])));
+const parDifficulteMaj = (liste) => [...liste].sort((a, b) => nbLettres(a) - nbLettres(b) || difficulte(a, POIDS_MAJ) - difficulte(b, POIDS_MAJ) || a.localeCompare(b, 'fr'));
+const MOTS_MAJ = [
+  { id: 'mm_p1', title: 'Mes premiers mots en capitales', max: 3, mots: ['IL', 'LA', 'LE', 'UN', 'TU', 'LIT', 'OUI', 'ROI', 'RAT', 'BUS'] },
+  { id: 'mm_p2', title: 'Les mots de 4 lettres', max: 4, mots: ['LUNE', 'PAPA', 'MAIN', 'DENT', 'NUIT', 'GARE', 'MOTO', 'JOUR', 'PAIN', 'LAIT'] },
+  { id: 'mm_p3', title: 'Les mots de 5 lettres', max: 5, mots: ['MAMAN', 'AVION', 'BALLE', 'TIGRE', 'ROUTE', 'SINGE', 'FRUIT', 'LUNDI', 'MERCI'] },
+  { id: 'mm_p4', title: 'Les grands mots', max: 99, mots: ['BALLON', 'MAISON', 'ORANGE', 'BATEAU', 'JARDIN', 'CRAYON', 'BONJOUR', 'CARTABLE'] },
+];
+// Les capitales sont deux fois plus larges que les cursives : au-delà de 8 lettres, une phrase serait trop réduite à l'écran (moins d'un centimètre de haut).
+const PHRASES_MAJ = ['je lis', 'tu lis', 'il dort', 'il joue', 'je joue', 'elle rit', 'il a faim', 'il pleut', 'il neige', 'papa lit', 'papa rit', 'tu as faim', 'il a un ami', 'maman lit'].map((t) => t.toUpperCase());
+const PAL_PHRASES_MAJ = [
+  { id: 'mp_p1', title: 'Mes premières phrases en capitales', max: 6 },
+  { id: 'mp_p2', title: 'Des phrases courtes', max: 8 },
+];
+const SECTIONS_MAJ_TEXTES = [
+  ...MOTS_MAJ.map(({ id, title, mots }) => ({ id, title, mots: parDifficulteMaj(mots) })),
+  ...PAL_PHRASES_MAJ.map((p) => ({ id: p.id, title: p.title, phrases: parDifficulteMaj(PHRASES_MAJ.filter((t) => PAL_PHRASES_MAJ.find((q) => nbLettres(t) <= q.max) === p)) })),
+];
+const mkTexteMaj = (sec, text, phrase) => {
+  const id = `${phrase ? 'mp' : 'mm'}_${text.replace(/ /g, '_')}`;
+  const n = needsOf(text).length;
+  SKILLS[id] = {
+    id, kind: 'word', level: 1, glyph: text, word: text, section: sec.id, phrase, groupe: false, majMot: true,
+    title: phrase ? `La phrase « ${text} »` : `Le mot « ${text} »`,
+    label: text, short: phrase ? `La phrase « ${text} »` : `Le mot « ${text} »`,
+    skillLabel: phrase ? `Écrire la phrase « ${text} » en capitales` : `Écrire le mot « ${text} » en capitales`,
+    needs: needsOf(text).map((L) => `maj_${L}`),
+    strokes: composeText(text, { period: phrase, skills: CAPITALES, gap: ECART_MAJ, space: ESPACE_MAJ }),
+    say: phrase
+      ? { intro: `La phrase « ${text} », en majuscules. J’écris les mots l’un après l’autre, et je pose un point à la fin.`, how: 'Écris chaque mot lettre par lettre, bien droit, puis pose le point final sur la ligne.', bubble: 'Ma phrase en capitales' }
+      : { intro: `Le mot « ${text} », en majuscules. J’écris ${n === 1 ? 'la lettre' : 'les lettres'} une par une, de gauche à droite.`, how: 'Écris les lettres une par une, de gauche à droite, bien droites, en levant le crayon entre les lettres.', bubble: 'Lettre par lettre' },
+    item: null,
+  };
+  return id;
+};
+for (const sec of SECTIONS_MAJ_TEXTES) sec.skills = [...(sec.mots || []).map((t) => mkTexteMaj(sec, t, false)), ...(sec.phrases || []).map((t) => mkTexteMaj(sec, t, true))];
+
 const SEC2 = [
   { id: 'premieres', title: 'Mes premières lettres', skills: ['i', 'o', 'a', 'l', 'e'] },
   { id: 'pointes', title: 'Les petites pointes', skills: ['u', 't', 'n', 'm', 'r'] },
@@ -327,9 +438,9 @@ export const LEVELS = [
     id: 1, name: 'Les petits explorateurs', classe: 'Avant le CP', ages: 'MS · GS', env: 'foret', available: true,
     // `core` : les formes de départ (récompenses, vignette du hibou) ; les majuscules viennent ensuite, par familles
     core: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'],
-    sections: [{ id: 'formes', title: 'Les formes', skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'] }, ...MAJ_SECTIONS],
-    skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles', ...MAJ_SECTIONS.flatMap((x) => x.skills)],
-    blurb: 'Les formes, puis les 26 majuscules',
+    sections: [{ id: 'formes', title: 'Les formes', skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'] }, ...MAJ_SECTIONS, CHIFFRES_SECTION, ...SECTIONS_MAJ_TEXTES],
+    skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles', ...MAJ_SECTIONS.flatMap((x) => x.skills), ...CHIFFRES_SECTION.skills, ...SECTIONS_MAJ_TEXTES.flatMap((x) => x.skills)],
+    blurb: 'Les formes, les majuscules, les chiffres, puis des mots et des phrases',
   },
   {
     id: 2, name: 'Les apprentis écrivains', classe: 'Début du CP', ages: 'CP', env: 'foret', available: true,
@@ -338,7 +449,7 @@ export const LEVELS = [
   },
   {
     id: 3, name: 'Les écrivains en herbe', classe: 'Fin du CP', ages: 'CP', env: 'village', available: true,
-    sections: MOT_SECTIONS, skills: MOT_SECTIONS.flatMap((x) => x.skills), blurb: 'Les sons, les mots et les premières phrases',
+    sections: MOT_SECTIONS, skills: MOT_SECTIONS.flatMap((x) => x.skills), blurb: 'Les sons, les mots et les phrases, du plus simple au plus difficile',
   },
   {
     id: 4, name: 'Les petits auteurs', classe: 'CE1', ages: 'CE1', env: 'bibliotheque', available: false,
