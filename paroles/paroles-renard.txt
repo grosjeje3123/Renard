@@ -1,4 +1,4 @@
-PAROLES DU RENARD — 1668 phrases à enregistrer
+PAROLES DU RENARD — 1716 phrases à enregistrer
 Chaque ligne : identifiant | phrase. Le fichier audio de chaque phrase doit porter son identifiant : <identifiant>.mp3
 
 === CONSIGNE (506) ===
@@ -509,7 +509,7 @@ ce1e50a4 | Une barre en haut, un biais, une barre en bas.
 e43354bf | Une grande boucle en haut, une boucle en bas, et elles se croisent sur la ligne.
 ea343474 | Une pointe, puis la barre
 
-=== FÉLICITATION (318) ===
+=== FÉLICITATION (362) ===
 b70e7308 | Bravo !
 0670fc29 | Encore un essai sans aide pour gagner ton trésor.
 822b2e14 | Encore un essai sans aide pour réussir ce mot.
@@ -544,12 +544,56 @@ de78448e | Et une nouvelle vignette : le mouton !
 b2c76dca | Et une nouvelle vignette : le renard doré !
 cbf7a5c3 | Et une nouvelle vignette : le rouge-gorge !
 a65d02fe | On a bien travaillé !
+18cb129c | On passe à la série suivante, ou on fait un petit dessin pour fêter ça ?
 68b801b7 | On reprendra une autre fois.
+a3a38e6e | Quelle belle aventure !
+831234a0 | Tu as fini la série « À la maison » !
+43a36b84 | Tu as fini la série « Dans l’ordre de la classe (1) » !
+a5d2cc03 | Tu as fini la série « Dans l’ordre de la classe (2) » !
+e51e8982 | Tu as fini la série « Dans l’ordre de la classe (3) » !
+3b276e19 | Tu as fini la série « Dans l’ordre de la classe (4) » !
+0d3e9c6b | Tu as fini la série « Des phrases courtes » !
+73bea109 | Tu as fini la série « Des phrases plus longues » !
+9d0ecb63 | Tu as fini la série « La famille » !
+e9071528 | Tu as fini la série « La nature » !
+d05e997f | Tu as fini la série « Les animaux » !
+87d2da16 | Tu as fini la série « Les chiffres » !
+086a9aa8 | Tu as fini la série « Les couleurs » !
+ed8cb627 | Tu as fini la série « Les croix et les crochets » !
+8b7aae74 | Tu as fini la série « Les formes » !
+8233229f | Tu as fini la série « Les grandes lettres » !
+ec990186 | Tu as fini la série « Les grandes phrases » !
+78dba5e2 | Tu as fini la série « Les grands mots » !
+1bb2a693 | Tu as fini la série « Les lettres qui voyagent » !
+6e2701f6 | Tu as fini la série « Les lettres rondes » !
+b4ea8eca | Tu as fini la série « Les majuscules à bedaine » !
+1c0cefed | Tu as fini la série « Les majuscules en bâtons » !
+457f7c4b | Tu as fini la série « Les majuscules pointues » !
+deb07c1b | Tu as fini la série « Les majuscules rondes » !
+58278935 | Tu as fini la série « Les mots de 4 lettres » !
+d9518d02 | Tu as fini la série « Les mots de 5 lettres » !
+f58869a7 | Tu as fini la série « Les mots de 6 lettres » !
+398fde5c | Tu as fini la série « Les mots de 7 lettres » !
+95d971a9 | Tu as fini la série « Les mots de 8 lettres » !
+e96fda9c | Tu as fini la série « Les petites pointes » !
+8bc3544b | Tu as fini la série « Les sons » !
+fefc5dc0 | Tu as fini la série « Les tout petits mots » !
+f1664485 | Tu as fini la série « Les très grands mots » !
+416e81af | Tu as fini la série « Mes premières lettres » !
+f58575d6 | Tu as fini la série « Mes premières phrases » !
+af3aaf75 | Tu as fini la série « Mes premières phrases en capitales » !
+fcf36fdf | Tu as fini la série « Mes premiers mots » !
+d462e6ca | Tu as fini la série « Mes premiers mots en capitales » !
+116f531a | Tu as fini tout le niveau « Les apprentis écrivains » !
+05270ebf | Tu as fini tout le niveau « Les écrivains en herbe » !
+873443d1 | Tu as fini tout le niveau « Les petits explorateurs » !
 7ae8f28f | Tu as réussi : la bulle !
 e3c7109e | Tu as réussi : la pluie !
 0f154256 | Tu as réussi : la rivière !
 90fa28aa | Tu as réussi : les ponts !
 1a26177b | Tu as réussi : les rubans !
+d66bbd7b | Tu peux faire un petit dessin pour fêter ça, ou choisir ta prochaine aventure !
+59b0269e | Tu peux faire un petit dessin pour fêter ça, ou retourner à la carte !
 1de66269 | Tu sais écrire « ai » !
 4499b52e | Tu sais écrire « aile » !
 5494e45c | Tu sais écrire « ami » !
@@ -1327,11 +1371,14 @@ a378399e | Voici le hérisson !
 85616175 | Voici le renard doré !
 e1e2ad90 | Voici le rouge-gorge !
 
-=== CARTE (283) ===
+=== CARTE (287) ===
 ef87b6a7 | a comme abeille
 86343a8a | b comme ballon
 fbd4ff7d | c comme chat
 1792cb81 | d comme dauphin
+de525e96 | Dans cette aventure, il y a 13 séries.
+37429ba7 | Dans cette aventure, il y a 18 séries.
+ad43ecaf | Dans cette aventure, il y a 5 séries.
 b1902109 | e comme écureuil
 94549e7c | f comme fleur
 a4f77d17 | g comme grenouille
@@ -1601,6 +1648,7 @@ e1c1f212 | n comme nuage
 a26372ed | o comme oiseau
 00cfa5e5 | p comme papillon
 59a42835 | q comme quille
+82fa54a5 | Quand tu as fini une série, on fait la fête !
 5d373b6f | r comme rivière
 e8cbe977 | s comme soleil
 8408eac1 | t comme tortue

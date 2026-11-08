@@ -2,7 +2,7 @@ import { h, icon } from '../dom.js';
 import { forestScene, levelThumb } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { LEVELS } from '../../content/skills.js';
-import { levelProgress, recommend, skillState } from '../../core/progress.js';
+import { levelProgress, recommend, skillState, seriesDuNiveau } from '../../core/progress.js';
 import { sfx } from '../audio.js';
 
 export function levels(root, app) {
@@ -15,6 +15,7 @@ export function levels(root, app) {
 
   const cards = LEVELS.map((lv) => {
     const p = levelProgress(st, lv);
+    const series = seriesDuNiveau(st, lv);
     // beaucoup d'exercices : une feuille par étape (« Les lettres rondes »…) plutôt qu'une par exercice
     const units = lv.sections && lv.skills.length > 12
       ? lv.sections.map((x) => ({ on: x.skills.every((id) => skillState(st, id).mastered) }))
@@ -34,6 +35,7 @@ export function levels(root, app) {
         h('p', { class: 'lc-blurb' }, lv.blurb),
         lv.available ? h('div', { class: 'lc-leaves', html: leaves }) : null,
         lv.available && lv.skills.length > 12 ? h('p', { class: 'lc-count' }, `${p.done} sur ${p.total} acquis`) : null,
+        lv.available && series.total ? h('p', { class: 'lc-series' }, `${series.total} séries${series.done ? ` · ${series.done} terminée${series.done > 1 ? 's' : ''}` : ''}`) : null,
       ),
     );
   });

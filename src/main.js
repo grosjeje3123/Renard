@@ -11,6 +11,7 @@ import { fiche } from './ui/screens/fiche.js';
 import { cahier } from './ui/screens/cahier.js';
 import { dessin } from './ui/screens/dessin.js';
 import { tableau } from './ui/screens/tableau.js';
+import { serie } from './ui/screens/serie.js';
 import { galerie } from './ui/screens/galerie.js';
 import { demarrage } from './ui/screens/demarrage.js';
 import { bienvenue } from './ui/screens/bienvenue.js';
@@ -22,4 +23,4 @@ const style = document.createElement('style');
 style.textContent = FOX_CSS;
 document.head.append(style);
 
-app.start(document.getElementById('app'), { accueil: home, niveaux: levels, carte: map, exercice: exercise, tresors: rewards, album, parents, pause, fiche, cahier, dessin, galerie, tableau, demarrage, bienvenue, options, credits });
+app.start(document.getElementById('app'), { accueil: home, niveaux: levels, carte: map, exercice: exercise, tresors: rewards, album, parents, pause, fiche, cahier, dessin, galerie, tableau, serie, demarrage, bienvenue, options, credits });

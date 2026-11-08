@@ -622,6 +622,75 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   await op.ctx.close();
 }
 
+// 5g. Séries : annonce, numéros, fête de fin de série, série suivante, petit dessin
+{
+  const { LEVELS } = await import(`${process.cwd()}/src/content/skills.js`);
+  const prem = LEVELS[2].sections[0];
+  const finie = (x) => { const t = Date.now(); for (const id of prem.skills) x.skills[id] = { sessions: 2, attempts: 6, phase: 3, mastered: true, masteredAt: t, last: t, history: [{ t, ph: 3, sc: 0.9, st: 3, c: {}, tg: [] }] }; };
+  const base = (x) => { x.settings.accueilFait = true; x.settings.classe = 'cp2'; x.settings.depart = 3; x.settings.voix = false; };
+  const txt = (p, sel) => p.$eval(sel, (e) => e.textContent.replace(/[  ]/g, ' ').trim());
+
+  // première ouverture d'un niveau : le renard annonce le nombre de séries, les pastilles sont numérotées
+  const m = await open((x) => base(x), 'carte-3');
+  const n3 = LEVELS[2].sections.length;
+  check(`séries : la carte dit « Série 1 sur ${n3} »`, (await txt(m.page, '.bar-title p')).startsWith(`Série 1 sur ${n3} ·`), await txt(m.page, '.bar-title p'));
+  check('séries : les pastilles de séries sont numérotées', (await m.page.$$eval('.sec-chip .sc-i', (a) => a.map((e) => e.textContent).join(','))).startsWith('1,2,3,4'));
+  check('séries : le renard annonce le nombre de séries la première fois', (await txt(m.page, '.b-text')).includes(`${n3} séries`), await txt(m.page, '.b-text'));
+  check('séries : l’annonce est notée comme faite', (await m.state()).seen?.['serie-intro-3'] === true);
+  await m.page.evaluate(() => { location.hash = 'niveaux'; }); await m.page.waitForTimeout(500);
+  await m.page.evaluate(() => { location.hash = 'carte-3'; }); await m.page.waitForTimeout(700);
+  check('séries : l’annonce n’est pas répétée', !(await txt(m.page, '.b-text')).includes('séries'), await txt(m.page, '.b-text'));
+  await m.page.evaluate(() => { location.hash = 'niveaux'; }); await m.page.waitForTimeout(500);
+  check('séries : les niveaux annoncent leur nombre de séries', (await m.page.$$eval('.lc-series', (a) => a.map((e) => e.textContent))).join('|') === `${LEVELS[0].sections.length} séries|5 séries|${n3} séries`);
+  check('séries : aucune erreur (carte)', m.errs.length === 0, m.errs.join(' | '));
+  await m.ctx.close();
+
+  // série terminée mais pas encore fêtée : la carte mène à la fête, une seule fois
+  const f = await open((x) => { base(x); finie(x); x.series = { '3:premiers': { t: Date.now(), vu: false } }; x.seen = { 'serie-intro-3': true }; }, 'carte-3');
+  await f.page.waitForTimeout(900);
+  check('séries : la carte ouvre la fête d’une série terminée', (await f.hash()) === '#serie-3-0', await f.hash());
+  check('séries : la fête nomme la série', (await txt(f.page, '.serie-end h2')) === 'Bravo ! Tu as fini la série « Mes premiers mots » !', await txt(f.page, '.serie-end h2'));
+  check('séries : la fête montre les mots appris', (await f.page.$$eval('.se-words li', (a) => a.map((e) => e.textContent.trim()).join(' '))) === 'il la le loi oie aile');
+  check('séries : la fête montre toutes les séries en pastilles, la 1re finie', (await f.page.$$eval('.se-dot', (a) => a.length)) === n3 && (await f.page.$$eval('.se-dot.on', (a) => a.length)) === 1);
+  check('séries : la fête dit 1 série terminée sur N', (await txt(f.page, '.se-left')) === `1 série terminée sur ${n3}`, await txt(f.page, '.se-left'));
+  check('séries : la fête tient dans la fenêtre', await f.page.evaluate(() => { const c = document.querySelector('.serie-end .result-card').getBoundingClientRect(); return c.top >= 0 && c.bottom <= innerHeight; }));
+  check('séries : la fête est notée comme vue', (await f.state()).series['3:premiers'].vu === true);
+  await f.page.waitForTimeout(5200); // la mise en valeur du bouton est finie
+  await f.page.evaluate(() => { location.hash = 'carte-3-0'; }); await f.page.waitForTimeout(700);
+  check('séries : une fois vue, la fête ne revient pas', (await f.hash()) === '#carte-3-0', await f.hash());
+  await f.page.evaluate(() => { location.hash = 'serie-3-0'; }); await f.page.waitForTimeout(900);
+  await f.page.click('.se-next'); await f.page.waitForTimeout(700);
+  check('séries : « Série suivante » ouvre la série 2', (await f.hash()) === '#carte-3-1', await f.hash());
+  check('séries : aucune erreur (fête)', f.errs.length === 0, f.errs.join(' | '));
+  await f.ctx.close();
+
+  // un petit dessin pour fêter ça : le tableau s'ouvre sur la feuille à dessiner, avec le calque suivant
+  const d = await open((x) => { base(x); finie(x); x.series = { '3:premiers': { t: Date.now(), vu: true } }; x.seen = { 'serie-intro-3': true }; }, 'serie-3-0');
+  await d.page.waitForTimeout(500);
+  await d.page.click('.se-draw'); await d.page.waitForTimeout(1200);
+  check('séries : « Un petit dessin » ouvre le tableau', (await d.hash()) === '#tableau', await d.hash());
+  check('séries : le tableau est sur la feuille à dessiner', (await d.page.$eval('.ms-btn[data-view="dessiner"]', (b) => b.classList.contains('on'))) && (await d.page.$eval('.tableau', (r) => r.dataset.view)) === 'dessiner');
+  check('séries : un dessin est proposé (calque à suivre)', !!(await d.page.$('.cal-model')) || (await txt(d.page, '.b-text')).startsWith('Une idée'), await txt(d.page, '.b-text'));
+  check('séries : l’idée du dessin avance dans la suite', (await d.state()).settings.dessinVu !== '');
+  await d.page.evaluate(() => { location.hash = 'accueil'; }); await d.page.waitForTimeout(600);
+  await d.page.evaluate(() => { location.hash = 'tableau'; }); await d.page.waitForTimeout(900);
+  check('séries : l’ouverture sur le dessin ne vaut qu’une fois', (await d.page.$eval('.tableau', (r) => r.dataset.view)) === 'ecrire');
+  check('séries : aucune erreur (dessin)', d.errs.length === 0, d.errs.join(' | '));
+  await d.ctx.close();
+
+  // petit écran de tablette en paysage
+  const c = await open((x) => { base(x); finie(x); x.series = { '3:premiers': { t: Date.now(), vu: false } }; x.seen = { 'serie-intro-3': true }; }, 'serie-3-0', { width: 1024, height: 520 });
+  await c.page.waitForTimeout(600);
+  check('séries : la fête tient dans un paysage court (1024×520)', await c.page.evaluate(() => { const r = document.querySelector('.serie-end .result-card').getBoundingClientRect(), b = document.querySelector('.se-next').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight && b.bottom <= innerHeight; }));
+  await c.ctx.close();
+
+  // une série pas finie ne se fête pas
+  const p = await open((x) => { base(x); x.seen = { 'serie-intro-3': true }; }, 'serie-3-0');
+  await p.page.waitForTimeout(700);
+  check('séries : pas de fête pour une série pas finie', (await p.hash()) === '#carte-3', await p.hash());
+  await p.ctx.close();
+}
+
 await browser.close();
 console.log(fails ? `\n${fails} échec(s)` : '\nTout est OK');
 process.exit(fails ? 1 : 0);

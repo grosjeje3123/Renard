@@ -594,10 +594,11 @@ export function tableau(root, app) {
     if (strokes().length) ending('retour'); else app.go(back());
   }
 
-  // ---- Départ : on commence par écrire
+  // ---- Départ : on commence par écrire (ou par dessiner, après la fête de fin de série : app.tableauView, une seule fois)
   root.dataset.view = view;
   applyText();
-  askText();
+  const ouvrirDessin = app.tableauView === 'dessiner'; app.tableauView = '';
+  if (!ouvrirDessin) askText();
   /** La feuille remplit la place libre : la hauteur du dessin et le nombre de rangées d'écriture suivent l'écran. */
   const setRatio = (want) => {
     wantRatio = want;
@@ -607,6 +608,7 @@ export function tableau(root, app) {
     return geom().H / geom().W;
   };
   fit = fitSheet(boardWrap, boardHost, { locked: () => strokes().length > 0, apply: setRatio });
+  if (ouvrirDessin) setView('dessiner');
 
   return () => { clearTimeout(armed); fit?.destroy(); clearTimeout(evalTimer); stopSpeaking(); endFox?.destroy(); fox.destroy(); };
 }

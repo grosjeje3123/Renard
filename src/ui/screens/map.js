@@ -2,7 +2,8 @@ import { h, icon } from '../dom.js';
 import { forestScene, glyphIcon } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { LEVELS, SKILLS } from '../../content/skills.js';
-import { skillStatus, skillState, isSkillOpen, recommend, levelSections, isConsolidated, reviewDue, lockReason, missingLetters } from '../../core/progress.js';
+import { skillStatus, skillState, isSkillOpen, recommend, levelSections, isConsolidated, reviewDue, lockReason, missingLetters, serieAFeter, serieTerminee } from '../../core/progress.js';
+import { introSeries } from '../../content/series.js';
 import { foxSVG } from '../fox.js';
 import { sfx } from '../audio.js';
 
@@ -26,6 +27,9 @@ export function map(root, app, arg) {
   const st = app.state;
   const [lvArg, secArg] = String(arg || '').split('-');
   const lv = LEVELS.find((l) => String(l.id) === lvArg && l.available) || LEVELS[0];
+  // Une série vient d'être terminée (par exemple avant une pause) : on la fête avant de rouvrir la carte
+  const fete = serieAFeter(st, lv.id);
+  if (fete) { app.go(`serie-${lv.id}-${fete.index}`); return; }
   const rec = recommend(st);
   const foxHost = h('div', { class: 'side-fox' });
   const b = bubble();
@@ -79,17 +83,18 @@ export function map(root, app, arg) {
   }
 
   const ribbon = sections.length > 1
-    ? h('nav', { class: 'sections', 'aria-label': 'Les étapes du niveau' }, sections.map((x, k) => h('button', {
-      class: `sec-chip${k === si ? ' on' : ''}${done(x.skills) === x.skills.length ? ' full' : ''}`, type: 'button', 'data-sec': k, 'aria-current': k === si ? 'true' : null,
+    ? h('nav', { class: 'sections', 'aria-label': `Les ${sections.length} séries du niveau` }, sections.map((x, k) => h('button', {
+      class: `sec-chip${k === si ? ' on' : ''}${serieTerminee(st, x) ? ' full' : ''}`, type: 'button', 'data-sec': k, 'aria-current': k === si ? 'true' : null, style: { '--i': k },
+      'aria-label': `Série ${k + 1} sur ${sections.length} : ${x.title}, ${done(x.skills)} sur ${x.skills.length}`,
       onClick: () => { sfx('pop'); app.go(`carte-${lv.id}-${k}`); },
-    }, h('span', { class: 'sc-t' }, x.title), h('span', { class: 'sc-n' }, `${done(x.skills)}/${x.skills.length}`))))
+    }, h('span', { class: 'sc-i', 'aria-hidden': 'true' }, String(k + 1)), h('span', { class: 'sc-t' }, x.title), h('span', { class: 'sc-n' }, `${done(x.skills)}/${x.skills.length}`))))
     : null;
 
   root.append(
     h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }),
     h('header', { class: 'bar' },
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour aux niveaux', onClick: () => app.go('niveaux'), html: icon('back', 26) }),
-      h('div', { class: 'bar-title' }, h('h2', {}, lv.name), h('p', {}, sections.length > 1 ? `${lv.classe} · ${section.title}` : lv.classe)),
+      h('div', { class: 'bar-title' }, h('h2', {}, lv.name), h('p', {}, sections.length > 1 ? `Série ${si + 1} sur ${sections.length} · ${section.title}` : lv.classe)),
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Mes trésors', onClick: () => app.go('tresors'), html: icon('chest', 26) }),
     ),
     ribbon,
@@ -105,7 +110,13 @@ export function map(root, app, arg) {
   requestAnimationFrame(() => ribbon?.querySelector('.on')?.scrollIntoView({ inline: 'center', block: 'nearest' }));
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
-  speaker.say(rec.skillId && ids.includes(rec.skillId) ? 'Touche le chemin qui brille !' : 'Choisis ton prochain jeu !', { silent: true, icon: 'hand' });
+  // La première fois qu'on ouvre ce niveau, le renard explique qu'il y a plusieurs séries (et qu'on les fête)
+  const introKey = `serie-intro-${lv.id}`;
+  if (sections.length > 1 && !st.seen?.[introKey]) {
+    st.seen = { ...(st.seen || {}), [introKey]: true }; app.save();
+    ribbon?.classList.add('intro');
+    speaker.say(introSeries(sections.length), { icon: 'star' });
+  } else speaker.say(rec.skillId && ids.includes(rec.skillId) ? 'Touche le chemin qui brille !' : 'Choisis ton prochain jeu !', { silent: true, icon: 'hand' });
 
   nodes.forEach((node) => node.addEventListener('click', () => {
     const id = node.dataset.skill;

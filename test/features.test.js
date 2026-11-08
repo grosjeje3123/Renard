@@ -629,6 +629,104 @@ test('progression : la dernière idée de dessin montrée est mémorisée (vide 
   assert.equal(st.settings.dessinVu, '');
 });
 
+// ---- Séries : une série est une partie d'un niveau ; on la fête une fois, puis on propose la suivante
+test('séries : terminée quand tous ses exercices sont acquis, fêtée une seule fois', () => {
+  const st = P.newState();
+  const lv = LEVELS[2];
+  const secs = P.levelSections(st, lv);
+  const prem = secs[0];
+  assert.equal(prem.id, 'premiers');
+  assert.equal(P.serieTerminee(st, prem), false);
+  assert.equal(P.serieAFeter(st), null);
+  const [dernier, ...avant] = [...prem.skills].reverse();
+  for (const id of avant) mastered(st, id, T0);
+  assert.equal(P.serieTerminee(st, prem), false, 'il manque un exercice');
+  const r = mastered(st, dernier, T0 + 1000);
+  assert.ok(r.newlyMastered);
+  assert.equal(P.noterSerie(st, dernier, T0 + 1000), '3:premiers', 'la dernière réussite termine la série');
+  assert.equal(P.noterSerie(st, dernier, T0 + 2000), '', 'pas deux fois');
+  assert.deepEqual(st.series['3:premiers'], { t: T0 + 1000, vu: false });
+  const fete = P.serieAFeter(st, 3);
+  assert.deepEqual([fete.level.id, fete.index, fete.key], [3, 0, '3:premiers']);
+  assert.equal(P.serieAFeter(st, 1), null, 'seulement dans le niveau demandé');
+  assert.equal(P.serieAFeter(st).key, '3:premiers');
+  P.serieVue(st, lv, 0);
+  assert.equal(P.serieAFeter(st), null, 'une fois vue, plus de fête');
+  assert.equal(st.series['3:premiers'].t, T0 + 1000, 'la date de fin est gardée');
+});
+
+test('séries : un exercice d\'une autre série, ou déjà acquis avant, ne déclenche rien', () => {
+  const st = P.newState();
+  const prem = P.levelSections(st, LEVELS[2])[0];
+  for (const id of prem.skills) mastered(st, id, T0); // série terminée sans passer par noterSerie (ancienne sauvegarde)
+  assert.equal(P.noterSerie(st, 'mot_chat', T0), '', 'un exercice non acquis d\'une autre série : rien');
+  assert.deepEqual(st.series, {}, 'pas de fête rétroactive tant qu\'on ne note pas');
+  assert.equal(P.serieAFeter(st), null);
+  // une fausse fête (série plus complète) n'est pas montrée
+  st.series['3:premiers'] = { t: 1, vu: false };
+  st.skills[prem.skills[0]].mastered = false;
+  assert.equal(P.serieAFeter(st), null, 'une série qui n\'est plus finie ne se fête pas');
+});
+
+test('séries : la série suivante est la prochaine où il reste quelque chose à apprendre et à jouer', () => {
+  const st = P.newState();
+  st.settings.demo = true; // tout est ouvert
+  const lv = LEVELS[2];
+  const secs = P.levelSections(st, lv);
+  assert.equal(P.serieSuivante(st, lv, 0), 1);
+  for (const id of secs[1].skills) mastered(st, id, T0);
+  assert.equal(P.serieSuivante(st, lv, 0), 2, 'une série déjà finie est sautée');
+  assert.equal(P.serieSuivante(st, lv, secs.length - 1), null, 'rien après la dernière');
+  // plus rien devant : la fin
+  for (const x of secs.slice(1)) for (const id of x.skills) mastered(st, id, T0);
+  assert.equal(P.serieSuivante(st, lv, 0), null);
+  assert.equal(P.niveauTermine(st, lv), false, 'la première série n\'est pas finie');
+  for (const id of secs[0].skills) mastered(st, id, T0);
+  assert.equal(P.niveauTermine(st, lv), true);
+});
+
+test('séries : à défaut de série jouable, la prochaine série non finie ; les séries sont comptées par niveau', () => {
+  const st = P.newState(); // pas de démonstration : les mots attendent leurs lettres
+  const lv = LEVELS[2];
+  st.settings.depart = 1;
+  assert.equal(P.serieSuivante(st, lv, 0), 1, 'même fermée, la suivante est proposée');
+  assert.deepEqual(P.seriesDuNiveau(st, LEVELS[0]), { total: LEVELS[0].sections.length, done: 0 });
+  assert.deepEqual(P.seriesDuNiveau(st, LEVELS[3]), { total: 0, done: 0 }, 'un niveau sans séries n\'en annonce pas');
+  assert.ok(P.seriesDuNiveau(st, LEVELS[0]).total >= 10 && P.seriesDuNiveau(st, LEVELS[1]).total === 5 && P.seriesDuNiveau(st, LEVELS[2]).total >= 10);
+  const prem = P.levelSections(st, LEVELS[2])[0];
+  for (const id of prem.skills) mastered(st, id, T0);
+  assert.equal(P.seriesDuNiveau(st, LEVELS[2]).done, 1);
+});
+
+test('séries : l\'état neuf et une ancienne sauvegarde ont de quoi suivre les séries', async () => {
+  const st = P.newState();
+  assert.deepEqual(st.series, {});
+  assert.deepEqual(st.seen, {});
+  const vieux = { ...P.newState(), v: P.STATE_VERSION };
+  delete vieux.series; delete vieux.seen;
+  const h = P.hydrate(vieux);
+  assert.deepEqual(h.series, {});
+  assert.deepEqual(h.seen, {});
+  assert.equal(P.serieAFeter(h), null);
+  // la sauvegarde par code garde les séries fêtées
+  h.series['1:formes'] = { t: 5, vu: true };
+  assert.deepEqual((await decodeBackup(await encodeBackup(h))).series, { '1:formes': { t: 5, vu: true } });
+});
+
+test('séries : les phrases du renard sont complètes et sans prénom', async () => {
+  const { feteSerie, feteNiveau, introSeries, FETE_SUITE, FETE_SUITE_NIVEAU, FETE_SUITE_CARTE } = await import('../src/content/series.js');
+  assert.equal(feteSerie('Mes premiers mots'), 'Bravo ! Tu as fini la série « Mes premiers mots » !');
+  assert.match(feteNiveau('Les écrivains en herbe'), /tout le niveau « Les écrivains en herbe »/);
+  assert.match(introSeries(18), /18 séries/);
+  for (const t of [FETE_SUITE, FETE_SUITE_NIVEAU, FETE_SUITE_CARTE, introSeries(5)]) assert.match(t, /[.!?]$/);
+  // tous les niveaux ouverts ont des séries aux titres uniques (la fête les nomme)
+  for (const lv of LEVELS.filter((l) => l.available)) {
+    const titres = lv.sections.map((x) => x.title);
+    assert.equal(new Set(titres).size, titres.length, `niveau ${lv.id} : titres de séries uniques`);
+    assert.equal(new Set(lv.sections.map((x) => x.id)).size, lv.sections.length, `niveau ${lv.id} : identifiants de séries uniques`);
+  }
+});
+
 // ---- Galerie du renard : dessins accrochés par l'enfant (réglage parents, désactivé par défaut)
 const trait = (n = 60, c = '#E5392F', w = 0.22) => ({ c, w, pts: Array.from({ length: n }, (_, i) => ({ x: 1 + i * (8 / (n - 1)), y: 3.5 + Math.sin(i / 6) * 0.01 })) });
 const stOn = () => { const st = P.newState(); st.settings.galerie = true; return st; };

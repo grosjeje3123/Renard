@@ -9,7 +9,7 @@ import { recognizerContext } from '../../core/tolerance.js';
 import { epaisseur } from '../../core/epaisseur.js';
 import { recognizer } from '../../engine/recognizer.js';
 import { buildFeedback } from '../../engine/feedback.js';
-import { recordSession, awardStickers, isSkillOpen, skillState, startPhaseFor, breakDue, beginSleep, blocked } from '../../core/progress.js';
+import { recordSession, awardStickers, isSkillOpen, skillState, startPhaseFor, breakDue, beginSleep, blocked, noterSerie, serieAFeter, levelSections } from '../../core/progress.js';
 import { STICKER_BY_ID } from '../../content/stickers.js';
 import { stickerSVG } from '../animals.js';
 import { dist, polyLength } from '../../engine/geometry.js';
@@ -189,6 +189,7 @@ export function exercise(root, app, skillId) {
     const summary = session.summary();
     const r = recordSession(st, skillId, session);
     const won = awardStickers(st); // vignettes méritées (réussites, persévérance, étapes), rien n'est tiré au sort
+    if (r.newlyMastered) noterSerie(st, skillId); // la série de cet exercice est-elle terminée ? On la fête sur l'écran suivant
     if (r.item && ITEMS[r.item].type === 'accessoire' && !st.equipped.includes(r.item)) st.equipped.push(r.item);
     if (st.settings.pauseMode === 'douce' && breakDue(st)) beginSleep(st); // le renard s'endort quelques minutes
     app.save();
@@ -203,7 +204,10 @@ export function exercise(root, app, skillId) {
     const resFoxHost = h('div', { class: 'res-fox' });
     const starsRow = h('div', { class: 'res-stars', 'aria-label': 'Tes essais' }, summary.stars.map((n) => h('span', { class: `rs s${n}`, html: icon(n >= 2 ? 'star' : 'starO', 26) })));
     const again = blocked(st) ? null : h('button', { class: 'btn-sec', type: 'button', onClick: () => app.go(`exercice-${skillId}`) }, 'Refaire');
-    const next = h('button', { class: 'btn-big sm', type: 'button', onClick: () => app.go(pause ? 'pause' : `carte-${level.id}`), html: `${icon(pause ? 'moon' : 'arrowR', 28)}<span>${pause ? 'Pause' : 'Suite'}</span>` });
+    const fete = pause ? null : serieAFeter(st, level.id); // une série vient d'être terminée : « Suite » mène à la fête, puis à la série suivante
+    const feteTitre = fete ? levelSections(st, level)[fete.index].title : '';
+    const next = h('button', { class: 'btn-big sm', type: 'button', onClick: () => app.go(pause ? 'pause' : fete ? `serie-${level.id}-${fete.index}` : `carte-${level.id}`), html: `${icon(pause ? 'moon' : fete ? 'star' : 'arrowR', 28)}<span>${pause ? 'Pause' : fete ? 'On fête ça !' : 'Suite'}</span>` });
+    const serieFinie = fete ? h('p', { class: 'res-serie', html: `${icon('star', 22)}<span>La série « ${feteTitre} » est terminée !</span>` }) : null;
     const paper = mastered
       ? h('button', { class: 'res-paper', type: 'button', onClick: () => app.go(`cahier-${skillId}`), html: `${icon('pencil', 26)}<span><strong>Essaie sur ton cahier !</strong><small>Du vrai papier, avec ton crayon.</small></span>` })
       : null;
@@ -220,7 +224,7 @@ export function exercise(root, app, skillId) {
         h('button', { class: 'btn-sec sm', type: 'button', onClick: () => app.go('album') }, 'Voir mon album'))
       : null;
     const overlay = h('div', { class: 'result', role: 'dialog', 'aria-label': 'Résultat' },
-      h('div', { class: `result-card${reward || stickers ? ' rich' : ''}` }, resFoxHost, h('h2', {}, title), starsRow, consolidated, reward || stickers ? h('div', { class: 'res-gifts' }, reward, stickers) : null, paper,
+      h('div', { class: `result-card${reward || stickers ? ' rich' : ''}` }, resFoxHost, h('h2', {}, title), starsRow, consolidated, serieFinie, reward || stickers ? h('div', { class: 'res-gifts' }, reward, stickers) : null, paper,
         pause ? h('p', { class: 'res-pause', html: `${icon('moon', 20)}<span>Tu as bien travaillé aujourd’hui. Une pause, ça fait du bien.</span>` }) : null,
         h('div', { class: 'res-actions' }, again, next)));
     root.append(overlay);

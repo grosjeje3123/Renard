@@ -4,10 +4,11 @@
 // Ce qui n'est pas dans la liste (prénom de l'enfant, mot tapé librement…) est lu par la voix du système.
 import fs from 'fs';
 import path from 'path';
-import { SKILLS } from '../src/content/skills.js';
+import { SKILLS, LEVELS } from '../src/content/skills.js';
 import { STICKERS } from '../src/content/stickers.js';
 import { FICHES } from '../src/content/fiches.js';
 import { DESSINS, IDEES_LIBRES } from '../src/content/dessins.js';
+import { feteSerie, feteNiveau, FETE_SUITE, FETE_SUITE_NIVEAU, FETE_SUITE_CARTE, introSeries } from '../src/content/series.js';
 import { LEAD, PRAISE, TIPS } from '../src/engine/feedback.js';
 import { decouper, idPhrase, normaliser } from '../src/core/voixId.js';
 
@@ -35,6 +36,17 @@ add('On a bien travaillé ! On reprendra une autre fois.', 'félicitation');
 add('Bravo ! Encore un essai sans aide pour gagner ton trésor.', 'félicitation');
 add('Bravo ! Encore un essai sans aide pour réussir ce mot.', 'félicitation');
 for (let n = 2; n <= 6; n++) add(`Et ${n} nouvelles vignettes !`, 'félicitation');
+
+// 1b. Séries : la fête de fin de série (un titre par série), la suite proposée, l'annonce du nombre de séries à la première ouverture d'un niveau
+for (const lv of LEVELS) {
+  if (!lv.available || !lv.sections || lv.sections.length < 2) continue;
+  for (const sec of lv.sections) add(feteSerie(sec.title), 'félicitation');
+  add(feteNiveau(lv.name), 'félicitation');
+  add(introSeries(lv.sections.length), 'carte');
+  // l'ordre de la classe choisi par les parents découpe le niveau 2 en paquets de 7 lettres
+  if (lv.id === 2) for (let k = 1; k <= Math.ceil(lv.skills.length / 7); k++) add(feteSerie(`Dans l’ordre de la classe (${k})`), 'félicitation');
+}
+add(FETE_SUITE, 'félicitation'); add(FETE_SUITE_NIVEAU, 'félicitation'); add(FETE_SUITE_CARTE, 'félicitation');
 
 // 2. Vignettes, fiches animaux, album
 for (const st of STICKERS) {

@@ -41,7 +41,8 @@ export function newState() {
     usage: {}, // 'AAAA-MM-JJ' -> secondes d'activité
     rest: { since: 0, at: 0, sleepUntil: 0, overrideDay: '' }, // activité continue depuis la dernière pause
     equipped: [],
-    seen: {},
+    seen: {}, // choses déjà montrées à l'enfant (ex. : 'serie-intro-3' : le renard a expliqué les séries du niveau 3)
+    series: {}, // 'niveau:série' -> { t, vu } : séries terminées (la fête est montrée une fois : `vu`)
     stickers: {}, // id de vignette -> date d'obtention
     fiches: {}, // id de vignette -> nombre de lectures de la fiche animal
     galerie: [], // dessins accrochés par l'enfant (seulement si les parents l'ont activé) : voir core/galerie.js
@@ -225,6 +226,67 @@ export function levelSections(st, level) {
 }
 
 const levelOf = (id) => LEVELS.find((l) => l.skills.includes(id));
+
+// ---- Séries : une série est une partie d'un niveau (« Mes premiers mots », « Les animaux »…). Elle est terminée quand tous ses exercices
+// sont acquis ; on la fête une fois, puis on propose la suivante. Les séries du niveau se lisent dans levelSections().
+export const serieKey = (level, section) => `${level.id}:${section.id}`;
+export const serieTerminee = (st, section) => section.skills.length > 0 && section.skills.every((id) => skillState(st, id).mastered);
+export const niveauTermine = (st, level) => levelSections(st, level).every((x) => serieTerminee(st, x));
+/** Nombre de séries d'un niveau et nombre de séries déjà terminées (un niveau sans séries n'en annonce pas). */
+export function seriesDuNiveau(st, level) {
+  if (!level.sections || level.sections.length < 2) return { total: 0, done: 0 };
+  const secs = levelSections(st, level);
+  return { total: secs.length, done: secs.filter((x) => serieTerminee(st, x)).length };
+}
+
+/**
+ * À appeler après la réussite d'un exercice : si cet exercice vient de terminer sa série, la série est notée « à fêter » (une seule fois)
+ * et sa clé est rendue ; sinon ''. Un exercice déjà acquis avant n'ouvre pas de fête rétroactive.
+ */
+export function noterSerie(st, skillId, now = Date.now()) {
+  const level = levelOf(skillId);
+  if (!level?.sections) return '';
+  const secs = levelSections(st, level);
+  const sec = secs.find((x) => x.skills.includes(skillId));
+  if (!sec || secs.length < 2 || !serieTerminee(st, sec)) return '';
+  st.series = st.series || {};
+  const key = serieKey(level, sec);
+  if (st.series[key]) return '';
+  st.series[key] = { t: now, vu: false };
+  return key;
+}
+
+/** La première série terminée qu'on n'a pas encore fêtée (seulement dans le niveau `levelId`, s'il est donné) : { level, index, key } ou null. */
+export function serieAFeter(st, levelId = null) {
+  for (const level of LEVELS) {
+    if (!level.available || !level.sections || (levelId != null && level.id !== levelId)) continue;
+    const secs = levelSections(st, level);
+    for (let index = 0; index < secs.length; index++) {
+      const key = serieKey(level, secs[index]);
+      if (st.series?.[key] && st.series[key].vu === false && serieTerminee(st, secs[index])) return { level, index, key };
+    }
+  }
+  return null;
+}
+export function serieVue(st, level, index) {
+  const sec = levelSections(st, level)[index];
+  if (!sec) return;
+  st.series = st.series || {};
+  const key = serieKey(level, sec);
+  st.series[key] = { t: st.series[key]?.t || Date.now(), vu: true };
+}
+
+/**
+ * La série à proposer après la série `index` : la première, plus loin, où il reste quelque chose à apprendre et que l'enfant peut déjà jouer ;
+ * à défaut, la première, plus loin, où il reste quelque chose ; null s'il n'y a plus rien devant (fin du niveau).
+ */
+export function serieSuivante(st, level, index) {
+  const secs = levelSections(st, level);
+  const reste = (x) => x.skills.some((id) => !skillState(st, id).mastered);
+  const devant = secs.map((x, i) => ({ x, i })).filter(({ x, i }) => i > index && reste(x));
+  const jouable = devant.find(({ x }) => x.skills.some((id) => !skillState(st, id).mastered && isSkillOpen(st, id)));
+  return (jouable || devant[0])?.i ?? null;
+}
 /** Niveau de départ choisi par les parents (1 à 3) : les niveaux d'avant sont déjà ouverts. */
 export const departLevel = (st) => Math.min(3, Math.max(1, Math.round(st.settings?.depart) || 1));
 const known = (st, id) => skillState(st, id).sessions > 0 || levelOf(id).id < departLevel(st);

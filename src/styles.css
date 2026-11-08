@@ -480,6 +480,8 @@ circle.m-shape{fill:var(--ok);stroke:none}
 .res-paper small{color:var(--muted);font-weight:700;font-size:15px}
 .res-consol{display:flex;gap:8px;align-items:center;color:var(--accent-deep);font-family:var(--f-display);font-weight:600;font-size:20px}
 .res-consol .ico{color:#F5B921}
+.res-serie{display:flex;gap:8px;align-items:center;justify-content:center;color:var(--accent-deep);font-family:var(--f-display);font-weight:600;font-size:21px;background:var(--ok-soft);border-radius:999px;padding:6px 18px}
+.res-serie .ico{color:#F5B921;flex:none}
 
 /* Carte : dessin libre, exercice consolidé, rappel conseillé */
 .node.free .disc{border-color:var(--guide);border-style:dotted;color:var(--guide)}
@@ -767,3 +769,29 @@ button[disabled]{opacity:.35;cursor:default}
 @media (orientation:landscape) and (max-height:480px){
   .tableau .side .bubble{display:none}
 }
+
+/* ---- Séries : numéros sur la carte, annonce au premier passage, fête de fin de série */
+.sec-chip .sc-i{display:grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:700 15px var(--f-body)}
+.sec-chip.on .sc-i{background:#fff;color:var(--accent-deep)}
+.sec-chip.full:not(.on) .sc-i{background:#F2B632;color:#5A3B00}
+.sections.intro .sec-chip{animation:chip-hop .7s calc(var(--i,0) * .13s + .3s) both}
+@keyframes chip-hop{0%{transform:translateY(0)}35%{transform:translateY(-9px) scale(1.06)}70%{transform:translateY(0) scale(1)}100%{transform:none}}
+.lc-series{margin:2px 0 0;font:700 14px var(--f-body);color:var(--accent-deep)}
+.serie-end .result-card{width:min(640px,100%);gap:8px}
+.serie-end .res-fox{width:min(130px,16vh)}
+.se-kicker{margin:0;font:700 15px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--accent-deep)}
+.serie-end h2{font-size:clamp(24px,3.6vw,34px);text-wrap:balance}
+.se-words{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 8px;justify-content:center;max-width:100%}
+.se-words li{display:inline-flex;align-items:center;gap:6px;background:var(--ok-soft);border-radius:999px;padding:4px 12px 4px 8px;font-family:var(--f-display);font-weight:600;font-size:19px;animation:pop .5s var(--d,0s) cubic-bezier(.3,1.5,.5,1) both}
+.se-words .se-tick{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#fff}
+.se-words .se-more{background:none;font:600 15px var(--f-body);color:var(--muted)}
+.se-dots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:2px}
+.se-dot{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;border:3px solid var(--line);background:var(--card-solid);color:#5A3B00}
+.se-dot.on{background:#F2B632;border-color:#F2B632}
+.se-dot.now{outline:3px solid var(--accent);outline-offset:2px}
+.se-left{margin:0;font:700 17px var(--f-body);color:var(--muted)}
+.serie-end .se-actions{position:static;width:auto;margin:6px 0 0;padding:0;background:none}
+.serie-end .se-next{animation:se-pulse 1.2s 1.8s ease-in-out 3}
+@keyframes se-pulse{0%,100%{transform:none}50%{transform:scale(1.05)}}
+@media (prefers-reduced-motion:reduce){.sections.intro .sec-chip,.serie-end .se-next,.se-words li{animation:none}}
+@media (max-height:720px){.serie-end .res-fox{width:min(88px,13vh)}.serie-end .result-card{padding:12px 24px 14px;gap:5px}.serie-end h2{font-size:24px}.se-words li{font-size:16px;padding:2px 10px 2px 6px}.serie-end .btn-sec{padding:8px 18px;font-size:17px}.serie-end .btn-big.sm{padding:8px 24px;font-size:24px}.se-kicker{font-size:13px}.se-dot{width:20px;height:20px;border-width:2px}}
