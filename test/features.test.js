@@ -51,7 +51,7 @@ test('alphabet : les 26 lettres existent, chacune avec un seul rôle, des phrase
 });
 
 // ---------- Niveau 3 : sons, mots, phrases ----------
-test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tiennent sur le cahier et finissent par leurs points', () => {
+test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tiennent sur le cahier et posent le point du i juste après le i', () => {
   const all = LEVELS[2].skills;
   assert.ok(all.length >= 150, 'beaucoup de contenu');
   assert.ok(LEVELS[2].available);
@@ -72,7 +72,15 @@ test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tienne
     const dots = t.strokes.filter((s) => s.kind === 'dot');
     const expected = sk.glyph.split('').filter((c) => c === 'i' || c === 'j').length + (sk.phrase ? 1 : 0);
     assert.equal(dots.length, expected, `${id} : points du i, du j et point final`);
-    if (!sk.phrase && dots.length) assert.equal(t.strokes.at(-1).kind, 'dot', `${id} : les points viennent à la fin`);
+    // Le point du i vient juste après le i (pendant l'écriture du mot), pas à la fin : il suit un trait de la même lettre, juste dessous.
+    t.strokes.forEach((s, i) => {
+      if (s.kind !== 'dot' || (sk.phrase && i === t.strokes.length - 1)) return; // le point final de la phrase reste à la fin
+      const prev = t.strokes[i - 1];
+      assert.ok(prev && prev.kind !== 'dot', `${id} : le point ${i + 1} suit le trait de sa lettre`);
+      const xs = prev.pts.map((q) => q.x);
+      assert.ok(s.start.x >= Math.min(...xs) - 0.9 && s.start.x <= Math.max(...xs) + 0.9, `${id} : le point ${i + 1} est au-dessus de sa lettre`);
+    });
+    if (sk.phrase) assert.equal(t.strokes.at(-1).kind, 'dot', `${id} : le point final est le dernier trait`);
     if (sk.phrase) {
       const last = dots.at(-1), body = t.strokes.filter((s) => s.kind !== 'dot');
       assert.ok(Math.abs(last.start.y - t.frame.baseline) < 0.01, `${id} : le point final repose sur la ligne`);
@@ -682,11 +690,11 @@ test('tableau libre : le texte est nettoyé (a–z sans accent), le calque tient
   assert.ok(a.strokes.length >= 3 && a.width > 2);
   assert.equal(a.strokes.filter((s) => s.kind === 'dot').length, 1, 'le point du i');
   assert.ok(Math.abs(a.bbox.x0 - T.TABLEAU.margin) < 1e-9, 'calque aligné à gauche');
-  assert.equal(T.page(a.width).W, 20);
+  assert.equal(T.page(a.width).W, 18);
   const long = T.calque('le chat dort');
   assert.ok(T.fits('le chat dort'));
   const pg = T.page(long.width);
-  assert.ok(pg.W > 20 && pg.W >= long.width + 2 * T.TABLEAU.margin, 'la page s\'agrandit');
+  assert.ok(pg.W > 18 && pg.W >= long.width + 2 * T.TABLEAU.margin, 'la page s\'agrandit');
   assert.ok(pg.H >= pg.W * 0.7 - 1e-9 && pg.rows.length >= 3 && pg.rows[0] === T.TABLEAU.rows[0]);
   assert.equal(T.fits('abcdefghijklmnopqrstuvwxyz'), false, 'un texte trop long est refusé');
   assert.equal(T.calque('   ').strokes.length, 0);
@@ -999,4 +1007,22 @@ test('épaisseur : un ancien enregistrement reçoit les réglages par défaut', 
   const st = P.hydrate(JSON.parse(JSON.stringify(old)));
   assert.equal(st.settings.trait, 'auto');
   assert.equal(st.settings.traitAide, true);
+});
+
+// ---------- Le point du i pendant l'écriture, et les étapes du tableau (retour du 8 novembre) ----------
+test('mots : le point du i se pose juste après le i, la numérotation suit l\'écriture', () => {
+  const ordre = (id) => buildTemplate(SKILLS[id]).strokes.map((s) => (s.kind === 'dot' ? '•' : '—')).join('');
+  assert.equal(ordre('mot_il'), '—•—', 'i, son point, puis le l');
+  assert.equal(ordre('mot_lit'), '——•——', 'l, i, son point, puis le t et sa barre');
+  assert.ok(ordre('mot_ami').endsWith('—•'), 'ami se termine par le i et son point');
+  // aucun mot ne garde ses points pour la fin (sauf le dernier i) : chaque point suit un trait
+  for (const id of Object.keys(SKILLS)) {
+    const sk = SKILLS[id];
+    if (sk.kind !== 'word' || sk.capital || sk.majMot || sk.phrase) continue;
+    const o = ordre(id);
+    assert.ok(!o.includes('••'), `${id} : deux points de suite (${o})`);
+    assert.ok(!o.startsWith('•'), `${id} : commence par un point`);
+  }
+  assert.deepEqual(T.calque('il').strokes.map((s) => s.kind === 'dot'), [false, true, false], 'même ordre dans le tableau libre');
+  assert.ok(/juste après le i/.test(SKILLS.mot_il.say.how), 'la consigne le dit');
 });

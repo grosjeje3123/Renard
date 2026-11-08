@@ -9,8 +9,8 @@ import { recognizer } from '../engine/recognizer.js';
 import { recognizerContext } from './tolerance.js';
 
 export const TABLEAU = {
-  W: 20, H: 14,
-  rows: [3.8, 8.2, 12.2], // lignes d'écriture des trois rangées : calque plein, calque en pointillés, écriture seul
+  W: 18, H: 13,
+  rows: [3.6, 7.6, 11.6], // lignes d'écriture des trois rangées (étapes 1, 2, 3) : calque plein, calque en pointillés, écriture seul
   margin: 1.6, // marge à gauche
   maxWidth: 31, // largeur maximale du texte ; la page s'agrandit (et se réduit à l'écran) pour qu'il tienne, comme pour les exercices
   maxLen: 40,
@@ -40,14 +40,14 @@ export function cased(text, mode = 'min') {
 /** La page qui convient à un texte de cette largeur : toujours au rapport 10:7 de l'écran, interligne inchangé. */
 /**
  * La page d'écriture pour un texte de largeur `width`. `ratio` (hauteur / largeur) dit combien de place l'écran offre :
- * par défaut 0,7 (la page d'origine, 3 rangées pour 20 de large) ; si l'écran est plus haut (iPad, portrait), on ajoute
+ * par défaut 0,7 (la page d'origine, 3 rangées pour 18 de large) ; si l'écran est plus haut (iPad, portrait), on ajoute
  * des rangées entières tant que la page reste dans ce rapport (à 0,04 près), plutôt que de laisser du vide autour.
  */
 export function page(width = 0, ratio = 0.7) {
   const W = Math.max(TABLEAU.W, Math.ceil((width + 2 * TABLEAU.margin) / 2) * 2);
   let H = Math.max(TABLEAU.H, Math.ceil(W * 0.7));
   const rows = [...TABLEAU.rows];
-  const step = 4.4, below = 1.8; // espace entre deux rangées ; place sous la dernière ligne de base
+  const step = 4, below = 1.4; // espace entre deux rangées ; place sous la dernière ligne de base
   for (let b = rows.at(-1) + step; b + below <= H; b += step) rows.push(+b.toFixed(2));
   while ((rows.at(-1) + step + below) / W <= ratio + 0.04) {
     rows.push(+(rows.at(-1) + step).toFixed(2));

@@ -114,12 +114,12 @@ test('tableau : les traits se rangent par rangée', () => {
 
 test('tableau : la page s’adapte à la place — rangées entières, jamais de ligne coupée, rapport d’origine par défaut', () => {
   const base = page(0);
-  assert.deepEqual(page(0, 0.7), base, 'sans demande particulière, la page d’origine (3 rangées pour 20 de large)');
+  assert.deepEqual(page(0, 0.7), base, 'sans demande particulière, la page d’origine (3 rangées pour 18 de large)');
   assert.equal(base.rows.length, 3);
   const tall = page(0, 0.92);
-  assert.equal(tall.W, 20);
+  assert.equal(tall.W, 18);
   assert.equal(tall.rows.length, 4, 'un écran plus haut reçoit une rangée de plus');
-  assert.ok(tall.H + 1e-9 >= tall.rows.at(-1) + 1.8, 'la dernière rangée tient dans la page');
+  assert.ok(tall.H + 1e-9 >= tall.rows.at(-1) + 1.4, 'la dernière rangée tient dans la page');
   assert.ok(tall.H / tall.W <= 0.92 + 0.04, 'la page ne dépasse pas le rapport offert');
   // les trois premières rangées (calques) ne bougent pas
   assert.deepEqual(tall.rows.slice(0, 3), base.rows);
@@ -128,7 +128,7 @@ test('tableau : la page s’adapte à la place — rangées entières, jamais de
   assert.ok(long.H >= Math.ceil(long.W * 0.7), 'jamais plus plate que le rapport d’origine');
   for (const r of [0.7, 0.8, 0.92, 1, 1.1]) for (const w of [0, 12, 20, 30]) {
     const p = page(w, r);
-    assert.ok(p.rows.every((b) => b + 1.8 <= p.H + 1e-9), `rangées dans la page (largeur ${w}, rapport ${r})`);
+    assert.ok(p.rows.every((b) => b + 1.4 <= p.H + 1e-9), `rangées dans la page (largeur ${w}, rapport ${r})`);
   }
 });
 

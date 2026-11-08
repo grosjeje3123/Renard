@@ -16,6 +16,7 @@ import { dist, polyLength } from '../../engine/geometry.js';
 import { sfx, speak, stopSpeaking } from '../audio.js';
 
 const PHASE_NAMES = ['Guide', 'Pointillés', 'Tout seul'];
+const PHASE_HELP = ['Étape 1 sur 3 : je suis le guide', 'Étape 2 sur 3 : je suis les pointillés', 'Étape 3 sur 3 : j’écris tout seul'];
 const PHASE_ICONS = [
   '<svg viewBox="0 0 40 24"><path d="M4 18C12 2 20 2 24 12s8 8 12-8" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>',
   '<svg viewBox="0 0 40 24"><path d="M4 18C12 2 20 2 24 12s8 8 12-8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 7"/></svg>',
@@ -44,7 +45,7 @@ export function exercise(root, app, skillId) {
   const boardHost = h('div', { class: 'board-host' });
   const starsPop = h('div', { class: 'stars-pop', 'aria-hidden': 'true' });
   const leavesEl = h('div', { class: 'leaves' });
-  const phaseEls = PHASE_NAMES.map((t, i) => h('li', { class: 'phase' }, h('span', { class: 'ph-ico', html: PHASE_ICONS[i] }), h('span', {}, t)));
+  const phaseEls = PHASE_NAMES.map((t, i) => h('li', { class: 'phase', title: PHASE_HELP[i] }, h('span', { class: 'ph-n', 'aria-hidden': 'true' }, String(i + 1)), h('span', { class: 'ph-ico', html: PHASE_ICONS[i] }), h('span', {}, t)));
   const replayBtn = h('button', { class: 'chip-btn', type: 'button', html: `${icon('replay', 22)}<span>Revoir</span>` });
 
   const cardText = writing || !item ? skill.short : already ? `Gagné : ${item.name}` : `À gagner : ${item.name}`;
@@ -61,7 +62,9 @@ export function exercise(root, app, skillId) {
     h('header', { class: 'bar exo-bar' },
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour à la carte', onClick: () => app.go(`carte-${level.id}`), html: icon('back', 26) }),
       h('div', { class: 'bar-title' }, h('h2', {}, skill.title), h('p', {}, level.name)),
-      h('ul', { class: 'phases', 'aria-label': 'Étapes' }, phaseEls),
+      h('div', { class: 'phases-box' },
+        h('p', { class: 'phases-cap' }, 'Trois étapes'),
+        h('ul', { class: 'phases', 'aria-label': 'Les trois étapes : le guide, les pointillés, puis tout seul' }, phaseEls)),
       leavesEl,
     ),
     h('div', { class: 'exo-main' },
@@ -90,7 +93,7 @@ export function exercise(root, app, skillId) {
 
   function updateUI() {
     applyEpaisseur();
-    phaseEls.forEach((el, i) => { el.classList.toggle('on', i === session.phase); el.classList.toggle('past', i < session.phase); });
+    phaseEls.forEach((el, i) => { el.classList.toggle('on', i === session.phase); el.classList.toggle('past', i < session.phase); if (i === session.phase) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current'); });
     const need = session.totalNeeded;
     leavesEl.innerHTML = Array.from({ length: need }, (_, i) => `<span class="lf ${i < session.totalWins ? 'on' : ''}">${icon(i < session.totalWins ? 'leaf' : 'leafO', 26)}</span>`).join('');
     leavesEl.setAttribute('aria-label', `${session.totalWins} réussites sur ${need}`);

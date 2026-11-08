@@ -60,6 +60,7 @@ export function tableau(root, app) {
   let current = null; // { model, phrase } ou { phrase: '' } pour la feuille blanche
   let calqueMode = 'pointille', grid = false, drawReady = false;
 
+  const ETAPES = [['1', 'Guide'], ['2', 'Pointillés'], ['3', 'Tout seul']]; // les trois rangées d'écriture, une par étape
   const geom = () => (view === 'ecrire' ? pg : DRAW);
   const foxHost = h('div', { class: 'side-fox' });
   const b = bubble();
@@ -150,7 +151,7 @@ export function tableau(root, app) {
 
   // Le choix Écrire / Dessiner
   const modeBtns = [['ecrire', 'Écrire', 'tableau'], ['dessiner', 'Dessiner', 'pencil']].map(([id, label, ic]) => h('button', { class: `ms-btn${id === view ? ' on' : ''}`, type: 'button', 'data-view': id, 'aria-pressed': String(id === view), onClick: () => setView(id), html: `${icon(ic, 22)}<span>${label}</span>` }));
-  const subtitle = h('p', {}, 'Écris ce que tu veux, sans note');
+  const subtitle = h('p', {}, 'Écris en trois étapes : guide, pointillés, tout seul');
 
   const boardHost = h('div', { class: 'board-host' }, svg);
   const boardWrap = h('div', { class: 'board-wrap' }, boardHost);
@@ -206,6 +207,20 @@ export function tableau(root, app) {
     if (!badgesG) return;
     badgesG.replaceChildren();
     if (view !== 'ecrire') return;
+    // Les trois étapes : un rond numéroté (et son nom, s'il y a la place) au bout de chacune des trois premières rangées.
+    // Il devient un rond vert avec une coche quand la rangée est bien écrite.
+    const occupe = calque(text, pg.rows[0], casse).width + TABLEAU.margin;
+    ETAPES.forEach(([n, name], r) => {
+      if (pg.rows[r] == null || rowStates.get(r)?.ok) return;
+      const g = svgEl('g', { class: 'step', transform: `translate(${pg.W - 1.25} ${pg.rows[r] - 1.2})` }, badgesG);
+      const pw = 1 + name.length * 0.34;
+      if (occupe + pw + 2.6 < pg.W) {
+        svgEl('rect', { class: 'step-pill', x: -(0.95 + pw), y: -0.5, width: pw, height: 1, rx: 0.5 }, g);
+        svgEl('text', { class: 'step-name', x: -(0.95 + pw / 2), y: 0 }, g).textContent = name;
+      }
+      svgEl('circle', { class: 'step-dot', r: 0.7 }, g);
+      svgEl('text', { class: 'step-num', x: 0, y: 0 }, g).textContent = n;
+    });
     for (const [r, s] of rowStates) {
       if (!s.ok || pg.rows[r] == null) continue;
       const g = svgEl('g', { class: 'badge', transform: `translate(${pg.W - 1.25} ${pg.rows[r] - 1.2})` }, badgesG);
@@ -308,7 +323,7 @@ export function tableau(root, app) {
     const writing = v === 'ecrire';
     textCard.hidden = !writing; calqueBtn.hidden = !writing;
     modelCard.hidden = writing; gridBtn.hidden = writing;
-    subtitle.textContent = writing ? 'Écris ce que tu veux, sans note' : 'Dessine ce que tu veux, sans note';
+    subtitle.textContent = writing ? 'Écris en trois étapes : guide, pointillés, tout seul' : 'Dessine ce que tu veux, sans note';
     let neuve = false; // l'idée vient d'être annoncée : on ne la répète pas
     if (!writing && !drawReady) { drawReady = true; idea(); neuve = true; }
     buildPage();

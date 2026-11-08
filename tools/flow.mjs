@@ -9,10 +9,10 @@ const browser = await chromium.launch();
 let fails = 0;
 const check = (label, ok, info = '') => { console.log(`${ok ? 'OK  ' : 'ÉCHEC'} ${label}${info ? ' — ' + info : ''}`); if (!ok) fails++; };
 
-async function open(mutate, route = 'accueil') {
+async function open(mutate, route = 'accueil', viewport = { width: 1180, height: 820 }) {
   const st = JSON.parse(JSON.stringify(SEED));
   mutate?.(st);
-  const ctx = await browser.newContext({ viewport: { width: 1180, height: 820 }, hasTouch: true });
+  const ctx = await browser.newContext({ viewport, hasTouch: true });
   await ctx.addInitScript((j) => { if (!localStorage.getItem('renard-v1')) localStorage.setItem('renard-v1', j); }, JSON.stringify(st));
   const page = await ctx.newPage();
   const errs = [];
@@ -564,6 +564,24 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   const dif = await open((x) => { x.settings.accueilFait = true; x.settings.demo = false; x.settings.depart = 3; x.settings.classe = 'cp2'; x.skills.e = { sessions: 2, attempts: 3, phase: 0, mastered: false, masteredAt: null, last: Date.now(), history: [0.2, 0.3, 0.4].map((sc) => ({ t: 1, ph: 0, sc, st: 1, c: {}, tg: [] })) }; }, 'exercice-e');
   check('épaisseur : un exercice difficile démarre plus épais', (await dif.page.evaluate(() => parseFloat(document.querySelector('svg.board').style.getPropertyValue('--e-ink')))) > widths['e/auto']);
   await dif.ctx.close();
+  // Les trois étapes sont expliquées, et le point du i vient pendant l'écriture
+  const ex3 = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'exercice-mot_lit');
+  check('étapes : l\'exercice numérote les trois étapes sous « Trois étapes »', (await ex3.page.$$eval('.phase .ph-n', (n) => n.map((x) => x.textContent).join(''))) === '123' && /trois étapes/i.test(await ex3.page.innerText('.phases-cap')));
+  const nums = await ex3.page.$$eval('.gs', (gs) => gs.map((g) => [g.querySelector('.snum')?.textContent, !g.querySelector('.ink-path') && g.querySelectorAll('path').length === 0].join('')));
+  check('numérotation : lit = l, i, son point, t, barre du t (le point porte le 3)', nums.length === 5 && nums.map((x) => x[0]).join('') === '12345', JSON.stringify(nums));
+  check('étapes : aucune erreur', ex3.errs.length === 0, ex3.errs.join(' | '));
+  await ex3.ctx.close();
+  const tb = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'tableau');
+  check('tableau : trois étapes nommées sur les rangées (Guide, Pointillés, Tout seul)', (await tb.page.$$eval('.step-name', (n) => n.map((x) => x.textContent).join('|'))) === 'Guide|Pointillés|Tout seul' && (await tb.page.$$eval('.step-num', (n) => n.map((x) => x.textContent).join(''))) === '123');
+  check('tableau : le sous-titre explique les trois étapes', /trois étapes/.test(await tb.page.innerText('.bar-title p')));
+  check('tableau : aucune erreur', tb.errs.length === 0, tb.errs.join(' | '));
+  await tb.ctx.close();
+  // Écran de paysage peu haut : la feuille du tableau reste grande et les outils tiennent sans défiler
+  const court = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'tableau', { width: 1024, height: 520 });
+  const dims = await court.page.evaluate(() => { const p = document.querySelector('.board-host').getBoundingClientRect(), s = document.querySelector('.side'); return { h: Math.round(p.height), w: Math.round(p.width), scroll: s.scrollHeight - s.clientHeight }; });
+  check('paysage court : la feuille du tableau fait presque toute la hauteur (≥ 85 %)', dims.h >= 520 * 0.85, JSON.stringify(dims));
+  check('paysage court : les outils tiennent sans défiler', dims.scroll <= 2, JSON.stringify(dims));
+  await court.ctx.close();
   const op = await open((x) => { x.settings.accueilFait = true; }, 'options');
   await op.page.getByRole('radio', { name: 'Fin', exact: true }).click();
   await op.page.waitForTimeout(800);

@@ -199,17 +199,16 @@ export function composeText(text, { period = false, skills = SKILLS, gap = WORD_
   const out = [];
   let cursor = 0;
   text.split(' ').forEach((word, wi) => {
-    const paths = [], dots = [];
     if (wi) cursor += space - gap;
     for (const id of word) {
       const strokes = skills[id].strokes;
       const sk = skills[id];
       const xs = strokes.filter((st) => st.d).flatMap((st) => parsePath(st.d)).map((q) => (sk.upright ? q.x + BOARD.slant * q.y : q.x));
       const dx = cursor - Math.min(...xs);
-      for (const st of strokes) (st.d ? paths : dots).push(st.d ? { d: shiftD(st.d, dx) } : { dot: [st.dot[0] + dx, st.dot[1]] });
+      // Le point du i se pose juste après le i, pendant l'écriture du mot (et non à la fin) : l'ordre des traits, donc la numérotation, suit l'écriture.
+      for (const st of strokes) out.push(st.d ? { d: shiftD(st.d, dx) } : { dot: [st.dot[0] + dx, st.dot[1]] });
       cursor += Math.max(...xs) - Math.min(...xs) + gap;
     }
-    out.push(...paths, ...dots);
   });
   if (period) out.push({ dot: [cursor - gap + 0.55, 0] });
   return out;
@@ -368,10 +367,10 @@ const mkText = (sec, text, kind) => {
     needs: needsOf(text),
     strokes: composeText(text, { period: kind === 'phrase' }),
     say: kind === 'groupe'
-      ? { intro: `Le son « ${text} » s’écrit avec ${text.length} lettres : ${[...text].join(', ')}. Je les écris l’une après l’autre.`, how: `Écris les lettres l’une après l’autre, de gauche à droite${dots ? ', puis pose le point' : ''}.`, bubble: 'Lettre après lettre' }
+      ? { intro: `Le son « ${text} » s’écrit avec ${text.length} lettres : ${[...text].join(', ')}. Je les écris l’une après l’autre.`, how: `Écris les lettres l’une après l’autre, de gauche à droite${dots ? ', et pose le point juste après le i' : ''}.`, bubble: 'Lettre après lettre' }
       : kind === 'phrase'
         ? { intro: `La phrase « ${text} ». J’écris les mots l’un après l’autre, et je pose un point à la fin.`, how: 'Écris chaque mot lettre par lettre, puis pose le point final sur la ligne.', bubble: 'Mot après mot, puis le point' }
-        : { intro: `Le mot « ${text} ». J’écris ${L} une par une, et je lève le crayon entre les lettres.`, how: `Écris les lettres une par une, de gauche à droite${dots ? ', puis pose le point du i à la fin' : ''}.`, bubble: 'Lettre par lettre' },
+        : { intro: `Le mot « ${text} ». J’écris ${L} une par une, et je lève le crayon entre les lettres.`, how: `Écris les lettres une par une, de gauche à droite${dots ? ', et pose le point du i juste après le i' : ''}.`, bubble: 'Lettre par lettre' },
     item: null,
   };
   return id;

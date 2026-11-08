@@ -172,6 +172,13 @@ button:focus-visible,input:focus-visible,.home-fox:focus-visible{outline:4px sol
 .phase .ph-ico svg{width:34px;height:20px;display:block}
 .phase.past{color:var(--ok)}
 .phase.on{background:var(--accent);color:var(--accent-ink);transform:scale(1.04)}
+.phases-box{display:flex;flex-direction:column;align-items:center;gap:2px}
+.phases-cap{margin:0;font:700 13px var(--f-body,inherit);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ph-n{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--line);color:var(--text);font:700 15px var(--f-display);line-height:1}
+.phase.past .ph-n{background:var(--ok);color:#fff}
+.phase.on .ph-n{background:var(--accent-ink);color:var(--accent)}
+.phase+.phase{position:relative}
+.phase+.phase::before{content:"";position:absolute;left:-9px;top:50%;width:10px;height:2px;background:var(--line);transform:translateY(-50%)}
 .leaves{display:flex;gap:1px;background:var(--card);padding:6px 12px;border-radius:999px}
 .exo-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(240px,320px) 1fr;gap:18px;padding:0 0 calc(14px + env(safe-area-inset-bottom,0px));align-items:stretch}
 .exo .side{justify-content:flex-start;gap:12px;overflow:auto;padding:6px 6px 8px}
@@ -338,7 +345,7 @@ circle.m-shape{fill:var(--ok);stroke:none}
   .exo .side{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px}
   .exo .side-fox{width:96px}.exo .side .bubble{flex:1;min-width:220px}
   .exo-card{width:auto}
-  .exo-bar{flex-wrap:wrap}.phases{order:5;width:100%;justify-content:center}
+  .exo-bar{flex-wrap:wrap}.phases-box{order:5;width:100%}.phases{justify-content:center}
   .node{width:96px}.node .disc{width:74px;padding:10px}.nlabel{font-size:15px}
   .track{aspect-ratio:1000/620}
 }
@@ -635,6 +642,10 @@ button[disabled]{opacity:.35;cursor:default}
 .tableau .grid line{stroke:var(--rule);stroke-width:.025;opacity:.5}
 .tableau .cal-model.plein{opacity:.4}
 .tableau .badges{pointer-events:none}
+.tableau .step-dot{fill:var(--accent);stroke:#fff;stroke-width:.09}
+.tableau .step-num{fill:var(--accent-ink);font:700 .8px var(--f-display);text-anchor:middle;dominant-baseline:central}
+.tableau .step-pill{fill:var(--card-solid);stroke:var(--line);stroke-width:.06;opacity:.96}
+.tableau .step-name{fill:var(--text);font:600 .6px var(--f-display);text-anchor:middle;dominant-baseline:central}
 .badge-bg{fill:var(--ok);stroke:#fff;stroke-width:.09}
 .badge-tick{fill:none;stroke:#fff;stroke-width:.2;stroke-linecap:round;stroke-linejoin:round}
 .badge-in{transform-box:fill-box;transform-origin:center;animation:badge-pop .55s cubic-bezier(.3,1.6,.5,1) both}
@@ -728,3 +739,31 @@ button[disabled]{opacity:.35;cursor:default}
 .credits .cr-p{margin:0;font-weight:600;line-height:1.45}
 .credits .cr-version{text-align:center;color:var(--muted);font-weight:700;margin:6px 0 0}
 .options .bk-row{margin-top:2px}
+
+/* Paysage sur un écran peu haut (tablette dont les barres du système prennent de la place, petite tablette, téléphone) :
+   l'en-tête et les outils se serrent pour que la feuille — le cahier, le tableau, le dessin — prenne presque toute la hauteur. */
+@media (orientation:landscape) and (max-height:700px){
+  .exo-bar{padding:6px 0 2px;gap:10px}
+  .exo-bar h2{font-size:26px}
+  .exo-bar .bar-title p{display:none}
+  .exo-bar .round.sm{width:44px;height:44px}
+  .exo-bar .btn-big.sm{padding:6px 18px 6px 14px;font-size:22px;box-shadow:0 4px 0 var(--accent-deep)}
+  .phases-cap{display:none}
+  .exo-main{gap:12px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+  .tableau .exo-main,.dessin .exo-main{grid-template-columns:clamp(216px,22vw,270px) minmax(0,1fr)}
+  .tableau .side-fox{display:none}
+  .tableau .side{gap:6px;padding:2px 2px 6px;justify-content:flex-start;overflow-y:auto}
+  .tableau .side .bubble{padding:16px 8px 8px 10px;gap:6px}
+  .tableau .side .bubble .b-text{font-size:16px!important}
+  .tableau .b-ico{width:30px;height:30px}.tableau .b-say{width:32px;height:32px}
+  .tableau .tb-text{display:none}
+  .tableau .tb-change{padding:5px 12px;font-size:16px}
+  .tableau .cs-btn{min-height:30px;font-size:17px;padding:2px 8px}
+  .tableau .palette{gap:4px;flex-wrap:wrap;justify-content:center}.tableau .swatch{width:28px;height:28px}
+  .tableau .sizes{gap:6px}.tableau .size{width:36px;height:36px}
+  .tableau .side-actions{gap:4px}.tableau .side-actions .chip-btn{padding:4px 8px;font-size:14px;gap:4px}.tableau .side-actions .chip-btn svg{width:18px;height:18px}
+  .tableau .model-thumb{width:min(100%,84px)}
+}
+@media (orientation:landscape) and (max-height:480px){
+  .tableau .side .bubble{display:none}
+}
