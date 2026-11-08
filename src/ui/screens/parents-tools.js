@@ -92,7 +92,7 @@ export function settingsCards(app) {
     row('Où en est l’enfant ?', 'Ouvre d’emblée ce qui précède : avec « Début du CP », les formes du niveau 1 sont déjà ouvertes ; avec « Fin du CP », toutes les lettres le sont et on peut commencer par les sons, les mots et les phrases. Rien n’est marqué comme acquis, et on peut changer à tout moment. La classe exacte (moyenne ou grande section, CP…) se règle dans Options, sur l’écran d’accueil de l’enfant.',
       seg('Niveau de départ', [[1, 'Avant le CP'], [2, 'Début du CP'], [3, 'Fin du CP']], Math.min(3, Math.max(1, set.depart || 1)), (v) => { setDepart(st, v); save(); })),
     row('Main qui écrit', 'Gaucher : l’écran passe en miroir (la main ne cache ni le renard ni les boutons), le modèle disparaît de la zone de la main et la pente des lettres (plus droite, ou penchée en arrière) est acceptée un peu plus largement. Le sens d’écriture reste de gauche à droite.',
-      seg('Main qui écrit', [['droite', 'Droitier'], ['gauche', 'Gaucher']], set.main || 'droite', (v) => { set.main = v; save(); app.render(); })),
+      seg('Main qui écrit', [['gauche', 'Gaucher'], ['droite', 'Droitier']], set.main || 'droite', (v) => { set.main = v; save(); app.render(); })),
     tiltRow,
     row('Réussites par étape', 'Chaque exercice a trois étapes (guide, pointillés, de mémoire). « Une » : on passe à l’étape suivante dès la première réussite, c’est plus rapide. « Deux » : plus d’entraînement, au risque de lasser. De toute façon, l’exercice est revu plus tard, à des jours différents.',
       seg('Réussites par étape', [[1, 'Une'], [2, 'Deux']], set.reps === 2 ? 2 : 1, (v) => { set.reps = v; save(); })),

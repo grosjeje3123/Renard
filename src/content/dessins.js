@@ -155,10 +155,32 @@ export const tierFor = (acquis, demo = false) => (demo || acquis >= 7 ? 3 : acqu
 /** Idées sans modèle : l'enfant invente. */
 export const IDEES_LIBRES = ['ton animal préféré', 'ta famille', 'ton jouet préféré'];
 
+/** Les modèles du plus simple au plus compliqué : par difficulté, puis par nombre de traits. */
+export const DESSINS_TRIES = DESSINS.slice().sort((a, b) => a.tier - b.tier || a.parts.length - b.parts.length);
+
+/** La suite d'idées proposée jusqu'à la difficulté `tier` : les modèles ouverts du plus simple au plus compliqué, puis les idées libres. */
+export const suiteIdees = (tier) => [
+  ...DESSINS_TRIES.filter((m) => m.tier <= tier).map((model) => ({ model, phrase: model.phrase })),
+  ...IDEES_LIBRES.map((phrase) => ({ phrase })),
+];
+
+/**
+ * L'idée qui suit `vu` (la phrase de la dernière idée montrée) dans la suite ; sans idée vue, la plus simple ; au bout, on recommence.
+ * `reprendre` : on garde l'idée `vu` elle-même (on rouvre l'écran là où l'enfant s'était arrêté).
+ */
+export function ideeSuivante(tier, vu = '', { reprendre = false } = {}) {
+  const suite = suiteIdees(tier);
+  const i = suite.findIndex((x) => x.phrase === vu);
+  if (i < 0) return suite[0];
+  return reprendre ? suite[i] : suite[(i + 1) % suite.length];
+}
+
 /** Le modèle en SVG (couleurs conseillées si colors = true, sinon pointillés pâles pour décalquer sur la feuille). */
 export function modelGroup(model, { dotted = false } = {}) {
   const attrs = dotted
-    ? 'fill="none" stroke="#7F8BC0" stroke-opacity=".75" stroke-width=".11" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray=".01 .24"'
+    ? 'fill="none" stroke-opacity=".9" stroke-width=".12" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray=".01 .24"'
     : 'fill="none" stroke-width=".13" stroke-linecap="round" stroke-linejoin="round"';
-  return model.parts.map((p) => `<path d="${partPath(p)}" ${attrs}${dotted ? '' : ` stroke="${TRAITS[p.c]}"`}/>`).join('');
+  // Le calque garde les couleurs de la vignette (le jaune est un peu plus soutenu pour se voir en pointillés sur la feuille crème).
+  return model.parts.map((p) => `<path d="${partPath(p)}" ${attrs} stroke="${dotted ? CALQUE_TONS[p.c] || TRAITS[p.c] : TRAITS[p.c]}"/>`).join('');
 }
+const CALQUE_TONS = { jaune: '#E0A81B' };

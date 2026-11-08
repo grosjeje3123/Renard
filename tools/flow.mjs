@@ -179,7 +179,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
 
 // 5c. Dessin libre : modèles, calque et difficulté progressive
 {
-  const { DESSINS, IDEES_LIBRES } = await import(`${process.cwd()}/src/content/dessins.js`);
+  const { DESSINS, DESSINS_TRIES, IDEES_LIBRES } = await import(`${process.cwd()}/src/content/dessins.js`);
   const ask = (m) => m.ask || `Une idée : dessine ${m.phrase} !`;
   const askOf = new Map(DESSINS.map((d) => [ask(d), d]));
   const libres = new Set(IDEES_LIBRES.map((t) => `Une idée : dessine ${t} !`));
@@ -197,8 +197,21 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   const deb = await seen((st) => { st.skills = {}; st.settings.demo = false; }, 40);
   const bad = deb.out.filter((o) => o.card && (askOf.get(o.text)?.tier ?? 9) > 1);
   check('modèles : un débutant ne voit que des modèles faciles', bad.length === 0, bad.map((b) => b.text).slice(0, 3).join(' | '));
+  // du plus simple au plus compliqué : l'ordre est celui de la liste, sans hasard, puis les idées libres, puis on recommence
+  const facilesAsk = DESSINS_TRIES.filter((m) => m.tier === 1).map(ask);
+  const attendu = [...facilesAsk, ...IDEES_LIBRES.map((t) => `Une idée : dessine ${t} !`)];
+  const vusTxt = deb.out.map((o) => o.text);
+  check('modèles : « Autre idée » suit l’ordre du plus simple au plus compliqué, puis les idées libres', attendu.every((t, i) => vusTxt[i] === t) && vusTxt[attendu.length] === attendu[0], vusTxt.slice(0, 5).join(' | '));
+  check('modèles : au départ, le premier est un des plus simples (le moins de traits)', vusTxt[0] === ask(DESSINS_TRIES[0]) && facilesAsk.length >= 3, vusTxt[0]);
   const withModel = deb.out.filter((o) => o.card);
   check('modèles : la vignette apparaît avec un modèle, pas avec une idée libre', withModel.length > 5 && deb.out.filter((o) => !o.card).every((o) => libres.has(o.text)), `${withModel.length}/40 avec modèle`);
+  // en rouvrant l'écran, on retrouve l'idée où l'enfant s'était arrêté
+  const dernier = deb.out[deb.out.length - 1].text; // l'idée affichée avant le dernier « Autre idée » : on lit l'actuelle
+  const actuelle = await deb.s.page.evaluate(() => document.querySelector('.side .b-text')?.textContent?.replace(/[\u00A0\u202F]/g, ' ').trim());
+  await deb.s.page.evaluate(() => { location.hash = 'carte-1'; }); await deb.s.page.waitForTimeout(500);
+  await deb.s.page.evaluate(() => { location.hash = 'dessin'; }); await deb.s.page.waitForTimeout(700);
+  const reprise = await deb.s.page.evaluate(() => document.querySelector('.side .b-text')?.textContent?.replace(/[\u00A0\u202F]/g, ' ').trim());
+  check('modèles : en rouvrant le dessin, on reprend l’idée où on s’était arrêté', !!actuelle && reprise === actuelle, `${actuelle} / ${reprise} (avant : ${dernier})`);
   check('calque : le modèle est tracé sur la feuille dès le départ', withModel.every((o) => o.calque > 0));
   check('modèles : la difficulté est affichée (★☆☆ Facile)', withModel.every((o) => /^★☆☆ Facile$/.test(o.level)), withModel[0]?.level);
   await deb.s.ctx.close();
@@ -374,6 +387,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     for (const k of ['c', 'h', 'a', 't']) await s.page.click(`.tp-key[aria-label="Lettre ${k}"]`);
     await clickText(s.page, 'C’est parti'); await s.page.waitForTimeout(400);
     check('tableau : le texte choisi s’affiche', (await s.page.innerText('.tb-text')) === 'chat');
+    check('tableau : un autre texte remet la page à blanc', (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) === 0);
     const box = await s.page.$eval('.tableau-board', (e) => { const r = e.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; });
     await s.page.mouse.move(box.x + box.w * 0.2, box.y + box.h * 0.7); await s.page.mouse.down();
     for (const [x, y] of [[0.3, 0.65], [0.4, 0.75], [0.5, 0.7]]) await s.page.mouse.move(box.x + box.w * x, box.y + box.h * y, { steps: 5 });
@@ -408,6 +422,24 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     for (const [x, y] of [[0.5, 0.3], [0.6, 0.4], [0.5, 0.5]]) await s.page.mouse.move(box2.x + box2.w * x, box2.y + box2.h * y, { steps: 5 });
     await s.page.mouse.up();
     check('dessiner : on dessine par-dessus le calque', (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) === 1);
+    // Changer de modèle remet la feuille à blanc ; en garder le même la laisse comme elle est ; le calque a les couleurs de la vignette
+    await clickText(s.page, 'Choisir'); await s.page.waitForTimeout(250);
+    await s.page.click('.mp-card[data-model="soleil"]'); await s.page.waitForTimeout(250);
+    check('dessiner : choisir le même modèle garde le dessin', (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) === 1);
+    await clickText(s.page, 'Choisir'); await s.page.waitForTimeout(250);
+    await s.page.click('.mp-card[data-model="maison"]'); await s.page.waitForTimeout(300);
+    check('dessiner : choisir un autre modèle remet la feuille à blanc', (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) === 0);
+    const tons = await s.page.$$eval('.cal-model.pointille path', (a) => [...new Set(a.map((p) => p.getAttribute('stroke')))]);
+    check('dessiner : le calque en pointillés a les couleurs de la miniature (maison : orange, rouge, brun, bleu)', tons.length === 4 && !tons.includes('#7F8BC0'), tons.join(' '));
+    await s.page.mouse.move(box2.x + box2.w * 0.4, box2.y + box2.h * 0.4); await s.page.mouse.down();
+    for (const [x, y] of [[0.5, 0.3], [0.6, 0.4], [0.5, 0.5]]) await s.page.mouse.move(box2.x + box2.w * x, box2.y + box2.h * y, { steps: 5 });
+    await s.page.mouse.up();
+    check('dessiner : on redessine sur le nouveau modèle', (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) === 1);
+    await clickText(s.page, 'Autre idée'); await s.page.waitForTimeout(300);
+    check('dessiner : « Autre idée » remet aussi la feuille à blanc', (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) === 0 && await s.page.$eval('.done-btn', (b) => b.disabled));
+    await s.page.mouse.move(box2.x + box2.w * 0.4, box2.y + box2.h * 0.4); await s.page.mouse.down();
+    for (const [x, y] of [[0.5, 0.3], [0.6, 0.4], [0.5, 0.5]]) await s.page.mouse.move(box2.x + box2.w * x, box2.y + box2.h * y, { steps: 5 });
+    await s.page.mouse.up();
     await s.page.click('.ms-btn[data-view="ecrire"]'); await s.page.waitForTimeout(300);
     check('écrire : on retrouve la page lignée et son écriture', !!(await s.page.$('.tableau-board .rules')) && (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) >= 1);
     await s.page.click('.ms-btn[data-view="dessiner"]'); await s.page.waitForTimeout(300);
@@ -481,6 +513,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   check('présentation : la deuxième question propose quatre classes', (await s.page.$$('[data-classe]')).length === 4);
   await s.page.click('[data-classe=gs]'); await s.page.waitForTimeout(700);
   check('présentation : la troisième question propose la main', (await s.page.$$('[data-main]')).length === 2);
+  check('présentation : la main gauche est à gauche, la main droite à droite', (await s.page.$$eval('[data-main]', (a) => a.map((x) => x.dataset.main + ':' + Math.round(x.getBoundingClientRect().x)))).map((x) => x.split(':')).every(([m, x], i, all) => i === 0 ? m === 'gauche' : m === 'droite' && +x > +all[0][1]));
   await s.page.click('[data-main=droite]'); await s.page.waitForTimeout(700);
   await s.page.click('.wl-body .btn-big'); await s.page.waitForTimeout(800);
   let st = await s.state();

@@ -17,7 +17,7 @@ import { hang, titleFor, galleryOn, galleryCount, pathD, MAX_DESSINS } from '../
 import { TABLEAU, CASSES, clean, cased, calque, page, fits, suggestions, rowOf, checkRow } from '../../core/tableau.js';
 import { polyLength } from '../../engine/geometry.js';
 import { SKILLS, LEVELS } from '../../content/skills.js';
-import { DESSINS, IDEES_LIBRES, NIVEAUX_DESSIN, tierFor, modelGroup } from '../../content/dessins.js';
+import { DESSINS_TRIES, NIVEAUX_DESSIN, tierFor, modelGroup, ideeSuivante } from '../../content/dessins.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const COLORS = [['brun', '#4A2F22'], ['rouge', '#E5392F'], ['orange', '#F08A24'], ['jaune', '#F4C84A'], ['vert', '#4E9A63'], ['bleu', '#4A8FD6'], ['violet', '#8B6FD6']];
@@ -301,11 +301,12 @@ export function tableau(root, app) {
     showModel(); drawCalque();
     speaker.say(m ? (m.ask || `Une idée : dessine ${m.phrase} !`) : 'Dessine ce que tu veux sur la feuille !', { silent, icon: 'pencil' });
   };
-  /** Idée du moment : un modèle qui s'ouvre avec la progression (facile au départ) ou une idée libre. */
-  const idea = () => {
+  /** Idée du moment : les modèles se suivent du plus simple au plus compliqué (ceux que la progression ouvre), puis une idée libre. */
+  const idea = ({ reprendre = false } = {}) => {
+    if (!reprendre && view === 'dessiner' && strokes().length) clearAll(); // un autre modèle : la feuille repart à blanc
     const tier = tierFor(masteredCount(st), st.settings.demo);
-    const pool = [...DESSINS.filter((m) => m.tier <= tier).map((model) => ({ model, phrase: model.phrase })), ...IDEES_LIBRES.map((phrase) => ({ phrase }))].filter((x) => x.phrase !== current?.phrase);
-    current = pick(pool);
+    current = ideeSuivante(tier, st.settings.dessinVu, { reprendre });
+    st.settings.dessinVu = current.phrase; app.save();
     showModel(); drawCalque();
     speaker.say(current.model?.ask || `Une idée : dessine ${current.phrase} !`, { icon: 'pencil' });
   };
@@ -325,7 +326,7 @@ export function tableau(root, app) {
     modelCard.hidden = writing; gridBtn.hidden = writing;
     subtitle.textContent = writing ? 'Écris en trois étapes : guide, pointillés, tout seul' : 'Dessine ce que tu veux, sans note';
     let neuve = false; // l'idée vient d'être annoncée : on ne la répète pas
-    if (!writing && !drawReady) { drawReady = true; idea(); neuve = true; }
+    if (!writing && !drawReady) { drawReady = true; idea({ reprendre: true }); neuve = true; }
     buildPage();
     fit?.set(geom().H / geom().W);
     refresh();
@@ -444,6 +445,7 @@ export function tableau(root, app) {
       const t = clean(draft).trim();
       if (!t || !fits(t, pc)) return;
       close();
+      if (t !== text && view === 'ecrire' && strokes().length) clearAll(); // un autre texte : la page repart à blanc (changer seulement la casse garde l'écriture)
       if (t !== text || pc !== casse) { text = t; casse = pc; app.tableauCasse = pc; applyText(); speaker.say(`On écrit « ${shown()} » ! Suis la première ligne.`, { icon: 'pencil' }); }
     });
     const cancel = h('button', { class: 'btn-sec sm', type: 'button', onClick: () => { sfx('tap'); close(); } }, 'Annuler');
@@ -460,7 +462,7 @@ export function tableau(root, app) {
     root.append(picker);
   }
   changeBtn.addEventListener('click', () => { sfx('tap'); choose(); });
-  b.addEventListener('dblclick', () => (view === 'ecrire' ? choose() : idea()));
+  b.addEventListener('dblclick', () => { if (view === 'ecrire') choose(); else if (!strokes().length) idea(); }); // raccourci : jamais au milieu d'un dessin
 
   // ---- Choisir un calque de dessin : la feuille blanche, ou l'un des dessins (les plus difficiles s'ouvrent avec la progression)
   let mpick = null;
@@ -469,10 +471,15 @@ export function tableau(root, app) {
     const tier = tierFor(masteredCount(st), st.settings.demo);
     const msg = h('p', { class: 'tp-msg muted', 'aria-live': 'polite' });
     const close = () => { mpick?.remove(); mpick = null; };
-    const choose1 = (m) => { sfx('pop'); close(); useModel(m, { silent: false }); };
+    const choose1 = (m) => {
+      sfx('pop'); close();
+      if (view === 'dessiner' && strokes().length && (m?.id ?? null) !== (current?.model?.id ?? null)) clearAll(); // un autre modèle : la feuille repart à blanc
+      useModel(m, { silent: false });
+      st.settings.dessinVu = m ? m.phrase : st.settings.dessinVu; app.save(); // la suite des idées continue à partir de ce modèle
+    };
     const blank = h('button', { class: 'mp-card blank', type: 'button', onClick: () => choose1(null), 'aria-label': 'Feuille blanche, sans modèle' },
       h('span', { class: 'mp-thumb', html: icon('pencil', 44) }), h('span', { class: 'mp-name' }, 'Feuille blanche'), h('span', { class: 'mp-lvl' }, 'Je dessine ce que je veux'));
-    const cards = DESSINS.slice().sort((a, c) => a.tier - c.tier).map((m) => {
+    const cards = DESSINS_TRIES.map((m) => {
       const locked = m.tier > tier;
       return h('button', { class: `mp-card${locked ? ' locked' : ''}${current?.model?.id === m.id ? ' on' : ''}`, type: 'button', 'data-model': m.id, 'aria-label': `${m.phrase}, ${NIVEAUX_DESSIN[m.tier].toLowerCase()}${locked ? ', pas encore ouvert' : ''}`,
         onClick: () => { if (locked) { sfx('oops'); msg.textContent = 'Ce dessin s’ouvre un peu plus tard, quand tu auras réussi d’autres exercices.'; return; } choose1(m); } },

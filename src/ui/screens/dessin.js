@@ -14,7 +14,7 @@ import { deliverFile } from '../sheets.js';
 import { fitSheet } from '../sheet.js';
 import { dayKey, masteredCount } from '../../core/progress.js';
 import { hang, titleFor, galleryOn, galleryCount, pathD, MAX_DESSINS } from '../../core/galerie.js';
-import { DESSINS, IDEES_LIBRES, NIVEAUX_DESSIN, tierFor, modelGroup } from '../../content/dessins.js';
+import { NIVEAUX_DESSIN, tierFor, modelGroup, ideeSuivante } from '../../content/dessins.js';
 
 const NS = 'http://www.w3.org/2000/svg';
 const COLORS = [['brun', '#4A2F22'], ['rouge', '#E5392F'], ['orange', '#F08A24'], ['jaune', '#F4C84A'], ['vert', '#4E9A63'], ['bleu', '#4A8FD6'], ['violet', '#8B6FD6']];
@@ -88,17 +88,17 @@ export function dessin(root, app) {
     calqueBtn.classList.toggle('on', calque);
     calqueBtn.setAttribute('aria-pressed', String(calque));
   };
-  const idea = () => {
-    // Les modèles s'ouvrent avec la progression (facile au départ) ; les idées libres sont toujours possibles.
+  /** Idée du moment : les modèles se suivent du plus simple au plus compliqué (ceux que la progression ouvre), puis une idée libre. */
+  const idea = ({ reprendre = false } = {}) => {
     const tier = tierFor(masteredCount(app.state), app.state.settings.demo);
-    const pool = [...DESSINS.filter((m) => m.tier <= tier).map((model) => ({ model, phrase: model.phrase })), ...IDEES_LIBRES.map((phrase) => ({ phrase }))].filter((x) => x.phrase !== current?.phrase);
-    current = pick(pool);
+    current = ideeSuivante(tier, app.state.settings.dessinVu, { reprendre });
+    app.state.settings.dessinVu = current.phrase; app.save();
     showModel();
     speaker.say(current.model?.ask || `Une idée : dessine ${current.phrase} !`, { icon: 'pencil' });
   };
-  idea();
-  b.addEventListener('dblclick', idea);
-  nextBtn.addEventListener('click', () => { sfx('tap'); idea(); });
+  idea({ reprendre: true }); // on reprend là où l'enfant s'était arrêté
+  b.addEventListener('dblclick', () => { if (!strokes.length) idea(); }); // raccourci : jamais au milieu d'un dessin
+  nextBtn.addEventListener('click', () => { sfx('tap'); if (strokes.length) { ink.replaceChildren(); strokes.length = 0; hungId = ''; refresh(); } idea(); }); // un autre modèle : la feuille repart à blanc
   calqueBtn.addEventListener('click', () => { sfx('tap'); calque = !calque; showModel(); });
 
   const toBoard = (e) => {

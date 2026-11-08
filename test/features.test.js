@@ -16,7 +16,7 @@ import { Page, A4, toPDF, toSVG, wrapText, textWidth } from '../src/core/pdf.js'
 import * as P from '../src/core/progress.js';
 import { simulate } from './sim.js';
 import { writingSheet, animalSheet } from '../src/ui/sheets.js';
-import { DESSINS, IDEES_LIBRES, TRAITS, NIVEAUX_DESSIN, tierFor, bounds, partPath, modelGroup } from '../src/content/dessins.js';
+import { DESSINS, DESSINS_TRIES, IDEES_LIBRES, TRAITS, NIVEAUX_DESSIN, tierFor, bounds, partPath, modelGroup, suiteIdees, ideeSuivante } from '../src/content/dessins.js';
 import { rankVoices, chooseVoice, voiceLabel, timbres, vitesses } from '../src/core/voices.js';
 import * as G from '../src/core/galerie.js';
 
@@ -595,6 +595,38 @@ test('dessin libre : trois niveaux de difficulté, qui s\'ouvrent avec la progre
   }
   // l'enfant qui débute ne voit que les modèles faciles
   assert.ok(DESSINS.filter((d) => d.tier <= tierFor(0)).every((d) => d.tier === 1));
+});
+
+test('dessin libre : les modèles se suivent du plus simple au plus compliqué, puis les idées libres, puis on recommence', () => {
+  assert.equal(DESSINS_TRIES.length, DESSINS.length);
+  const cle = (m) => m.tier * 100 + m.parts.length;
+  for (let i = 1; i < DESSINS_TRIES.length; i++) assert.ok(cle(DESSINS_TRIES[i - 1]) <= cle(DESSINS_TRIES[i]), `${DESSINS_TRIES[i - 1].id} avant ${DESSINS_TRIES[i].id}`);
+  // le débutant n'a que les modèles faciles, dans l'ordre, puis les idées libres
+  const facile = suiteIdees(1);
+  assert.deepEqual(facile.slice(0, -IDEES_LIBRES.length).map((x) => x.model.id), DESSINS_TRIES.filter((m) => m.tier === 1).map((m) => m.id));
+  assert.deepEqual(facile.slice(-IDEES_LIBRES.length).map((x) => x.phrase), IDEES_LIBRES);
+  assert.ok(facile.slice(-IDEES_LIBRES.length).every((x) => !x.model), 'les idées libres n\'ont pas de modèle');
+  // « Autre idée » : on avance dans l'ordre, sans jamais tirer au hasard, et on boucle
+  let vu = '';
+  const vus = [];
+  for (let i = 0; i < facile.length + 1; i++) { const x = ideeSuivante(1, vu); vus.push(x.phrase); vu = x.phrase; }
+  assert.deepEqual(vus.slice(0, facile.length), facile.map((x) => x.phrase), 'dans l\'ordre');
+  assert.equal(vus[facile.length], facile[0].phrase, 'au bout, on recommence par le plus simple');
+  assert.equal(ideeSuivante(1, '').model.id, DESSINS_TRIES[0].id, 'sans rien de vu : le plus simple');
+  assert.equal(ideeSuivante(1, 'une idée inconnue').phrase, facile[0].phrase, 'idée inconnue : on repart du début');
+  // on rouvre l'écran là où l'enfant s'était arrêté ; quand la progression ouvre un niveau, la suite s'allonge
+  const deuxieme = ideeSuivante(1, '');
+  assert.equal(ideeSuivante(1, deuxieme.phrase, { reprendre: true }).phrase, deuxieme.phrase);
+  const toutes = suiteIdees(3);
+  assert.equal(toutes.length, DESSINS.length + IDEES_LIBRES.length);
+  assert.equal(toutes[0].model.id, DESSINS_TRIES[0].id);
+  assert.equal(toutes[DESSINS.length - 1].model.id, DESSINS_TRIES[DESSINS.length - 1].id, 'le plus compliqué en dernier des modèles');
+  assert.ok(suiteIdees(2).length > suiteIdees(1).length && suiteIdees(3).length > suiteIdees(2).length);
+});
+
+test('progression : la dernière idée de dessin montrée est mémorisée (vide au départ)', () => {
+  const st = newState();
+  assert.equal(st.settings.dessinVu, '');
 });
 
 // ---- Galerie du renard : dessins accrochés par l'enfant (réglage parents, désactivé par défaut)

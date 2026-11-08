@@ -67,7 +67,7 @@ export function bienvenue(root, app) {
   // ---- 3. La main
   function stepMain() {
     mark(2);
-    const mains = [['droite', 'Main droite'], ['gauche', 'Main gauche']];
+    const mains = [['gauche', 'Main gauche'], ['droite', 'Main droite']]; // dans l'ordre où on les voit : la main gauche à gauche, la main droite à droite
     const tiles = mains.map(([id, label]) => h('button', { class: `wl-tile hand ${id}${(set.main || 'droite') === id && revisit ? ' on' : ''}`, type: 'button', 'data-main': id },
       h('span', { class: 'wl-hand', html: icon('hand', 64) }), h('strong', {}, label)));
     tiles.forEach((t, i) => t.addEventListener('click', () => {
