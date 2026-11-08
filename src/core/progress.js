@@ -21,6 +21,7 @@ export function newState() {
       voixTimbre: 'naturel', // 'naturel' | 'renard' (un peu plus aigu)
       avisVoix: false, // l'avis « pas de voix française sur cette tablette » a été lu par un adulte
       trait: 'auto', // épaisseur du trait : 'auto' (plus fin à mesure que le niveau monte) | 'fin' | 'moyen' | 'epais' (voir core/epaisseur.js)
+      serieAuto: true, // après la fête de fin de série, la série suivante s'ouvre toute seule si l'enfant ne touche à rien
       dessinVu: '', // la dernière idée de dessin montrée (les modèles se suivent du plus simple au plus compliqué)
       traitAide: true, // épaissir le trait d'un cran (deux au plus) quand l'enfant a du mal
       reps: 1, // réussites demandées à chaque étape d'un exercice (1 ou 2)

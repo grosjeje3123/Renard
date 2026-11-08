@@ -702,9 +702,12 @@ test('séries : l\'état neuf et une ancienne sauvegarde ont de quoi suivre les 
   const st = P.newState();
   assert.deepEqual(st.series, {});
   assert.deepEqual(st.seen, {});
+  assert.equal(st.settings.serieAuto, true, 'l\'enchaînement automatique est actif au départ');
   const vieux = { ...P.newState(), v: P.STATE_VERSION };
   delete vieux.series; delete vieux.seen;
   const h = P.hydrate(vieux);
+  delete vieux.settings.serieAuto;
+  assert.equal(P.hydrate(vieux).settings.serieAuto, true, 'une ancienne sauvegarde reçoit le réglage par défaut');
   assert.deepEqual(h.series, {});
   assert.deepEqual(h.seen, {});
   assert.equal(P.serieAFeter(h), null);

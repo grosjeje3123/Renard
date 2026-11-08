@@ -99,6 +99,7 @@ export function settingsCards(app) {
     ...traitRows(app, 'set'),
     toggle(app, 'set-sound', 'Sons', 'Petits sons de réussite.', 'sons'),
     toggle(app, 'set-soft', 'Tracé plus souple', 'Plus d’indulgence pour les petites mains.', 'souple'),
+    toggle(app, 'set-serie-auto', 'Enchaîner les séries', 'Après la fête de fin de série, si l’enfant ne touche à rien, la carte de la série suivante s’ouvre toute seule (aucun exercice ne démarre).', 'serieAuto'),
     toggle(app, 'set-demo', 'Mode démonstration', 'Ouvre tous les exercices et raccourcit les séances (1 réussite par étape).', 'demo'));
 
   // Pauses

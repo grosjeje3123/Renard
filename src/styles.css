@@ -795,3 +795,9 @@ button[disabled]{opacity:.35;cursor:default}
 @keyframes se-pulse{0%,100%{transform:none}50%{transform:scale(1.05)}}
 @media (prefers-reduced-motion:reduce){.sections.intro .sec-chip,.serie-end .se-next,.se-words li{animation:none}}
 @media (max-height:720px){.serie-end .res-fox{width:min(88px,13vh)}.serie-end .result-card{padding:12px 24px 14px;gap:5px}.serie-end h2{font-size:24px}.se-words li{font-size:16px;padding:2px 10px 2px 6px}.serie-end .btn-sec{padding:8px 18px;font-size:17px}.serie-end .btn-big.sm{padding:8px 24px;font-size:24px}.se-kicker{font-size:13px}.se-dot{width:20px;height:20px;border-width:2px}}
+
+.serie-end .se-next{position:relative;overflow:hidden}
+.se-count{position:absolute;left:0;bottom:0;height:7px;width:100%;background:#fff9;transform-origin:left;animation:se-fill var(--attente,8s) linear both}
+@keyframes se-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.se-auto{margin:0;font:600 14px var(--f-body);color:var(--muted);max-width:34ch;animation:pop .4s both}
+@media (max-height:720px){.se-auto{font-size:12px}}

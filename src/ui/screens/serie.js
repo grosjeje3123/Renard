@@ -13,6 +13,10 @@ import { sfx, speak, stopSpeaking } from '../audio.js';
 
 /** Les mots d'une série à montrer sous le titre : tous si possible, sinon les premiers et « … ». */
 const MAX_MOTS = 14;
+/** Enchaînement automatique : on attend la fin de la voix, puis ce délai (en ms) sans que l'enfant touche à rien ; une barre se remplit sur le bouton. */
+const ATTENTE = 8000;
+/** Si la voix ne se termine jamais (voix coupée en route…), la barre démarre quand même après ce délai. */
+const SECOURS = 22000;
 
 export function serie(root, app, arg) {
   const st = app.state;
@@ -87,9 +91,32 @@ export function serie(root, app, arg) {
   timers.push(setTimeout(() => burst(90, 1.3), 150), setTimeout(() => burst(60, 1), 1300));
   const suite = fini ? FETE_SUITE_NIVEAU : suivante == null ? FETE_SUITE_CARTE : FETE_SUITE;
   const dit = `${fini ? feteNiveau(lv.name) : feteSerie(section.title)} ${suite}`;
+
+  // Si rien ne bouge (ni doigt ni touche), la carte de la série suivante s'ouvre toute seule : aucun exercice ne démarre.
+  // Le moindre toucher annule l'enchaînement pour de bon ; les parents peuvent le couper (réglage « Enchaîner les séries »).
+  let actif = st.settings.serieAuto !== false && !fini && suivante != null;
+  let enCours = false, attente = 0;
+  const barre = h('span', { class: 'se-count', 'aria-hidden': 'true', style: { '--attente': `${ATTENTE}ms` } });
+  const note = h('p', { class: 'se-auto' }, 'La série suivante arrive… touche l’écran pour rester ici.');
+  const annule = () => { actif = false; enCours = false; clearTimeout(attente); barre.remove(); note.remove(); };
+  const lancer = () => {
+    if (!actif || enCours) return;
+    enCours = true;
+    nextBtn.append(barre); mapBtn.after(note);
+    attente = setTimeout(() => { if (actif) go(versCarte); }, ATTENTE);
+  };
+  const touche = () => annule();
+  const cache = () => { if (document.hidden) annule(); };
+  root.addEventListener('pointerdown', touche, true);
+  root.addEventListener('keydown', touche, true);
+  document.addEventListener('visibilitychange', cache);
+  timers.push(setTimeout(lancer, SECOURS));
   timers.push(setTimeout(() => {
-    speak(dit, { onStart: () => fox.talk(true), onEnd: () => fox.talk(false) });
+    speak(dit, { onStart: () => fox.talk(true), onEnd: () => { fox.talk(false); lancer(); } });
   }, 400));
 
-  return () => { timers.forEach(clearTimeout); stopSpeaking(); fox.destroy(); };
+  return () => {
+    timers.forEach(clearTimeout); clearTimeout(attente); stopSpeaking(); fox.destroy();
+    root.removeEventListener('pointerdown', touche, true); root.removeEventListener('keydown', touche, true); document.removeEventListener('visibilitychange', cache);
+  };
 }

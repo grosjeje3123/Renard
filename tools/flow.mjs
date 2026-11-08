@@ -684,6 +684,26 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   check('séries : la fête tient dans un paysage court (1024×520)', await c.page.evaluate(() => { const r = document.querySelector('.serie-end .result-card').getBoundingClientRect(), b = document.querySelector('.se-next').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight && b.bottom <= innerHeight; }));
   await c.ctx.close();
 
+  // enchaînement automatique : si rien ne bouge la carte de la série suivante s'ouvre ; un toucher l'annule ; les parents peuvent le couper ; pas à la fin d'un niveau
+  {
+    const fete = (mut) => open((x) => { base(x); finie(x); x.series = { '3:premiers': { t: Date.now(), vu: false } }; x.seen = { 'serie-intro-3': true }; mut?.(x); }, 'serie-3-0');
+    const A = await fete(), T = await fete(), O = await fete((x) => { x.settings.serieAuto = false; }), F = await fete((x) => { for (const id of LEVELS[2].skills) x.skills[id] = x.skills[prem.skills[0]]; });
+    await A.page.waitForTimeout(11000);
+    check('enchaînement : une barre se remplit sur « Série suivante » quand rien ne bouge', !!(await A.page.$('.serie-end .se-next .se-count')) && !!(await A.page.$('.se-auto')));
+    check('enchaînement : pas de barre quand les parents l’ont coupé', !(await O.page.$('.se-count')));
+    check('enchaînement : pas de barre à la fin d’un niveau', !(await F.page.$('.se-count')) && (await txt(F.page, '.serie-end h2')).includes('tout le niveau'));
+    await T.page.mouse.click(30, 30);
+    check('enchaînement : un toucher annule la barre', !(await T.page.$('.se-count')) && !(await T.page.$('.se-auto')));
+    await A.page.waitForTimeout(9000);
+    check('enchaînement : si rien ne bouge, la série suivante s’ouvre toute seule', (await A.hash()) === '#carte-3-1', await A.hash());
+    check('enchaînement : aucun exercice ne démarre tout seul', !(await A.hash()).startsWith('#exercice'));
+    check('enchaînement : après un toucher, on reste sur la fête', (await T.hash()) === '#serie-3-0', await T.hash());
+    check('enchaînement : coupé par les parents, on reste sur la fête', (await O.hash()) === '#serie-3-0', await O.hash());
+    check('enchaînement : à la fin d’un niveau, on reste sur la fête', (await F.hash()) === '#serie-3-0', await F.hash());
+    check('enchaînement : aucune erreur', [A, T, O, F].every((z) => z.errs.length === 0), [A, T, O, F].flatMap((z) => z.errs).join(' | '));
+    for (const z of [A, T, O, F]) await z.ctx.close();
+  }
+
   // une série pas finie ne se fête pas
   const p = await open((x) => { base(x); x.seen = { 'serie-intro-3': true }; }, 'serie-3-0');
   await p.page.waitForTimeout(700);
