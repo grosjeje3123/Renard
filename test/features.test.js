@@ -730,6 +730,30 @@ test('séries : les phrases du renard sont complètes et sans prénom', async ()
   }
 });
 
+// ---- Papier : l'adulte qui a regardé le cahier note comment cela s'est passé
+test('papier : « à retravailler » remet l\'exercice dans les « à reprendre » jusqu\'à ce que l\'enfant le rejoue', () => {
+  const st = P.newState();
+  mastered(st, 'i', T0);
+  assert.equal(P.avisPapier(st, 'i', 'facile', T0), false, 'pas d\'avis sans essai sur papier');
+  P.markPaper(st, 'i', T0 + 1000);
+  assert.equal(P.skillStatus(st, 'i'), 'mastered');
+  assert.equal(P.avisPapier(st, 'i', 'n\'importe quoi', T0 + 2000), false, 'avis inconnu refusé');
+  assert.equal(P.avisPapier(st, 'i', 'aide', T0 + 2000), true);
+  assert.equal(P.skillStatus(st, 'i'), 'mastered', '« avec de l\'aide » ne change rien au statut');
+  assert.equal(st.skills.i.paper.avis, 'aide');
+  assert.ok(st.skills.i.paper.seen, 'donner son avis, c\'est avoir regardé');
+  assert.equal(P.avisPapier(st, 'i', 'encore', T0 + 3000), true);
+  assert.equal(P.skillStatus(st, 'i'), 'review', 'à retravailler');
+  assert.equal(P.recommend(st, T0 + 4000).skillId, 'i');
+  assert.equal(P.recommend(st, T0 + 4000).reason, 'review');
+  assert.equal(P.startPhaseFor(st, 'i', T0 + 3 * DAY), 0, 'on repart du guide, pas du rappel express');
+  // l'enfant rejoue l'exercice : l'avis ne pèse plus
+  mastered(st, 'i', T0 + 5000);
+  assert.equal(P.skillStatus(st, 'i'), 'mastered');
+  assert.equal(P.startPhaseFor(st, 'i', T0 + 3 * DAY), 2);
+  assert.equal(st.skills.i.paper.avis, 'encore', 'l\'avis est gardé pour les parents');
+});
+
 // ---- Galerie du renard : dessins accrochés par l'enfant (réglage parents, désactivé par défaut)
 const trait = (n = 60, c = '#E5392F', w = 0.22) => ({ c, w, pts: Array.from({ length: n }, (_, i) => ({ x: 1 + i * (8 / (n - 1)), y: 3.5 + Math.sin(i / 6) * 0.01 })) });
 const stOn = () => { const st = P.newState(); st.settings.galerie = true; return st; };
@@ -1158,4 +1182,151 @@ test('mots : le point du i se pose juste après le i, la numérotation suit l\'�
   }
   assert.deepEqual(T.calque('il').strokes.map((s) => s.kind === 'dot'), [false, true, false], 'même ordre dans le tableau libre');
   assert.ok(/juste après le i/.test(SKILLS.mot_il.say.how), 'la consigne le dit');
+});
+
+// ---------- La dictée : le renard dit, l'enfant écrit sans modèle ----------
+import * as D from '../src/core/dictee.js';
+import * as DC from '../src/content/dictee.js';
+import { decouper } from '../src/core/voixId.js';
+
+test('dictée : sans exercice acquis ni essayé, rien à dicter ; les acquis d\'abord, puis les essais', () => {
+  const st = P.newState();
+  assert.equal(D.dicteePossible(st), false);
+  assert.deepEqual(D.dicteeItems(st), []);
+  tried(st, 'i'); tried(st, 'o');
+  assert.equal(D.dicteePossible(st), true, 'deux exercices essayés suffisent');
+  assert.deepEqual(D.dicteePool(st).sort(), ['i', 'o']);
+  for (const id of ['a', 'maj_I', 'maj_L']) mastered(st, id);
+  assert.deepEqual(D.dicteePool(st).sort(), ['a', 'maj_I', 'maj_L'], 'dès trois acquis, on ne dicte que ce qui est acquis');
+});
+
+test('dictée : jamais de graphisme, de phrase ni de mot trop long ; mélange de lettres et de mots, sans doublon', () => {
+  const st = P.newState();
+  st.settings.demo = true; // tout est ouvert
+  const pool = D.dicteePool(st);
+  assert.ok(pool.length > 50);
+  for (const id of pool) {
+    const s = SKILLS[id];
+    assert.ok(isWriting(s) && !s.phrase, `${id} : ni graphisme ni phrase`);
+    if (s.kind === 'word') assert.ok(nbLettres(s.word) <= 5, `${id} : mot trop long`);
+  }
+  const items = D.dicteeItems(st);
+  assert.equal(items.length, D.DICTEE_N);
+  assert.equal(new Set(items).size, items.length, 'aucun doublon');
+  assert.equal(items.filter((id) => SKILLS[id].kind === 'letter').length, 3);
+  assert.equal(items.filter((id) => SKILLS[id].kind === 'word').length, 2);
+});
+
+test('dictée : ce qui n\'a jamais été dicté passe d\'abord, puis le moins récent ; le résultat est noté sans toucher à la maîtrise', () => {
+  const st = P.newState();
+  for (const id of ['i', 'o', 'a', 'maj_I', 'maj_L', 'maj_T', 'mot_il', 'mot_la', 'mot_le']) mastered(st, id);
+  const avant = JSON.stringify(st.skills);
+  const first = D.dicteeItems(st);
+  first.forEach((id, k) => D.recordDictee(st, id, 3, 1000 + k));
+  assert.equal(JSON.stringify(st.skills), avant, 'une dictée ne change ni les étoiles, ni la maîtrise, ni les séances');
+  assert.equal(st.dictees[first[0]].n, 1);
+  const second = D.dicteeItems(st);
+  const jamais = D.dicteePool(st).filter((id) => !st.dictees[id]);
+  assert.ok(jamais.length > 0 && second.some((id) => jamais.includes(id)), 'les exercices jamais dictés reviennent en premier');
+  D.recordDictee(st, first[0], 1, 5000);
+  assert.deepEqual([st.dictees[first[0]].best, st.dictees[first[0]].last, st.dictees[first[0]].n], [3, 1, 2], 'meilleur résultat conservé, dernier résultat, nombre d\'essais');
+  assert.equal(D.dicteesFaites(st), first.length + 1);
+});
+
+test('dictée : un ancien enregistrement reçoit un carnet de dictées vide', () => {
+  const old = P.newState(); delete old.dictees;
+  const st = P.hydrate(JSON.parse(JSON.stringify(old)));
+  assert.deepEqual(st.dictees, {});
+});
+
+test('dictée : ce que dit le renard — une lettre, un chiffre ou un mot, en phrases que la voix enregistrée sait découper', () => {
+  const st = P.newState(); st.settings.demo = true;
+  for (const id of D.dicteePool(st)) {
+    const s = SKILLS[id], dit = DC.dicteeDit(s), parts = decouper(dit);
+    assert.ok(/^Écris /.test(dit) && /[.]$/.test(dit), `${id} : « ${dit} »`);
+    if (s.kind === 'letter') {
+      assert.equal(parts.length, 1, `${id} : une seule phrase`);
+      const nom = s.chiffre ? DC.NOMS_CHIFFRES[+s.glyph] : DC.NOMS_LETTRES[s.glyph.toLowerCase()];
+      assert.ok(nom && dit.includes(`« ${nom} »`), `${id} : le nom « ${nom} » est dit`);
+    } else {
+      assert.equal(parts.length, 2, `${id} : la consigne, puis le mot seul`);
+      assert.equal(parts[1], `« ${s.word.toLowerCase()} ».`);
+    }
+  }
+  assert.ok(/majuscule/.test(DC.dicteeDit(SKILLS.maj_B)) && /majuscules/.test(DC.dicteeDit(SKILLS.mm_IL)));
+  assert.ok(/le son/.test(DC.dicteeDit(SKILLS.son_ou)));
+  for (const l of 'abcdefghijklmnopqrstuvwxyz') assert.ok(DC.NOMS_LETTRES[l], `nom de la lettre ${l}`);
+  assert.equal(DC.NOMS_CHIFFRES.length, 10);
+});
+
+// ---------- La difficulté qui monte pour l'enfant qui réussit tout ----------
+test('difficulté : trois nouveaux exercices acquis sans un raté, et le suivant commence aux pointillés', () => {
+  const st = P.newState();
+  assert.equal(P.aLAise(st), false);
+  assert.equal(P.startPhaseFor(st, 'a'), 0, 'au départ, tout commence par le guide');
+  mastered(st, 'i', T0); mastered(st, 'o', T0 + DAY); 
+  assert.equal(P.startPhaseFor(st, 'a', T0 + DAY), 0, 'deux ne suffisent pas');
+  mastered(st, 'l', T0 + 2 * DAY);
+  assert.equal(P.aLAise(st), true);
+  assert.deepEqual(st.aisance, ['e', 'e', 'e']);
+  assert.equal(P.startPhaseFor(st, 'a', T0 + 2 * DAY), 1, 'un exercice jamais essayé saute le guide');
+  assert.equal(P.startPhaseFor(st, 'l', T0 + 3 * DAY), 2, 'un exercice acquis la veille reste un rappel « tout seul »');
+  tried(st, 'a', T0 + 3 * DAY);
+  assert.equal(P.startPhaseFor(st, 'a', T0 + 3 * DAY), 0, 'un exercice déjà commencé repart du guide : on ne saute rien sur ce qu\'on connaît à moitié');
+});
+
+test('difficulté : un seul raté, une séance finie fatigué, ou un rappel — et tout redevient comme avant', () => {
+  const st = P.newState();
+  for (const id of ['i', 'o', 'l']) mastered(st, id, T0);
+  assert.equal(P.aLAise(st), true);
+  // un exercice acquis, mais avec un essai raté : plus à l'aise
+  const dur = new Session('a', { demo: true });
+  dur.submit(ev(1)); dur.submit(ev(3)); dur.submit(ev(3)); dur.submit(ev(3));
+  assert.equal(dur.mastered, true);
+  P.recordSession(st, 'a', dur, T0 + DAY);
+  assert.equal(st.aisance.at(-1), 'x');
+  assert.equal(P.aLAise(st), false);
+  assert.equal(P.startPhaseFor(st, 'e', T0 + DAY), 0);
+  // il faut trois acquis sans raté de nouveau
+  mastered(st, 'e', T0 + 2 * DAY); mastered(st, 'u', T0 + 2 * DAY); assert.equal(P.aLAise(st), false);
+  mastered(st, 'c', T0 + 2 * DAY); assert.equal(P.aLAise(st), true);
+  // un rappel réussi (exercice déjà acquis) ne compte pas : seuls les nouveaux exercices parlent
+  const avant = st.aisance.length;
+  mastered(st, 'i', T0 + 9 * DAY);
+  assert.equal(st.aisance.length, avant);
+  // une séance finie fatigué (trois essais ratés de suite, jusqu'à la limite) : pas à l'aise
+  const st2 = P.newState();
+  for (const id of ['i', 'o', 'l']) mastered(st2, id, T0);
+  const fatigue = new Session('a', { demo: true });
+  for (let k = 0; k < 12 && !fatigue.done; k++) fatigue.submit(ev(0));
+  assert.equal(fatigue.mastered, false);
+  P.recordSession(st2, 'a', fatigue, T0 + DAY);
+  assert.equal(P.aLAise(st2), false);
+});
+
+test('difficulté : les parents peuvent la couper, le mode démonstration ne la déclenche pas, une ancienne sauvegarde repart de zéro', () => {
+  const st = P.newState();
+  for (const id of ['i', 'o', 'l']) mastered(st, id, T0);
+  assert.equal(P.startPhaseFor(st, 'a', T0), 1);
+  st.settings.montee = false;
+  assert.equal(P.startPhaseFor(st, 'a', T0), 0, 'réglage coupé');
+  const dem = P.newState(); dem.settings.demo = true;
+  for (const id of ['i', 'o', 'l']) mastered(dem, id, T0);
+  assert.deepEqual(dem.aisance, [], 'la démonstration ne mesure rien');
+  assert.equal(P.aLAise(dem), false);
+  const vieux = P.newState(); delete vieux.aisance; delete vieux.settings.montee;
+  const h = P.hydrate(JSON.parse(JSON.stringify(vieux)));
+  assert.deepEqual(h.aisance, []);
+  assert.equal(h.settings.montee, true, 'actif par défaut');
+  assert.equal(P.aLAise(h), false);
+});
+
+test('lignes du cahier : une seule épaisseur pour toutes les lignes (horizontales et verticales)', async () => {
+  const css = (await import('node:fs')).readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
+  const bloc = css.match(/\.r-thin,\.r-main,\.r-base,\.r-vert\{[^}]*stroke-width:([^;}]+)/);
+  assert.ok(bloc, 'une règle commune fixe l\'épaisseur des quatre sortes de lignes');
+  for (const c of ['r-thin', 'r-main', 'r-base', 'r-vert']) {
+    const own = css.match(new RegExp(`(?:^|\\})\\s*\\.${c}\\{[^}]*stroke-width`, 'm'));
+    assert.equal(own, null, `.${c} ne redéfinit pas l'épaisseur`);
+  }
 });

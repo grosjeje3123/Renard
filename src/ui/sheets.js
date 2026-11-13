@@ -1,8 +1,8 @@
 // Fiches à imprimer : fiche d'écriture (lignes Seyès, modèle, pointillés, lignes libres) et fiche animal.
 // Les tracés viennent des mêmes gabarits que l'écran : l'enfant retrouve sur papier ce qu'il a fait avec le renard.
 import { Page, A4, toPDF } from '../core/pdf.js';
-import { SKILLS } from '../content/skills.js';
-import { STICKER_BY_ID } from '../content/stickers.js';
+import { SKILLS, LEVELS } from '../content/skills.js';
+import { STICKER_BY_ID, STICKERS } from '../content/stickers.js';
 import { factsOf, FICHES } from '../content/fiches.js';
 import { templateOf } from './art.js';
 import { stickerSVG } from './animals.js';
@@ -18,11 +18,11 @@ export const REGLURES = [
   { mm: 2, label: 'Standard · 2 mm', hint: 'Fin de CP, CE1' },
 ];
 
-/** Lignes Seyès : une « ligne d'écriture » = 8 interlignes ; trait fort tous les 4 interlignes, verticales tous les 4. */
+/** Lignes Seyès : une « ligne d'écriture » = 8 interlignes ; une seule épaisseur de trait, plus soutenue tous les 4 interlignes ; verticales tous les 4. */
 function seyes(page, x, y, w, rows, u) {
   const h = rows * 8 * u;
-  for (let i = 0; i <= rows * 8; i++) page.line(x, y + i * u, x + w, y + i * u, { color: i % 4 === 0 ? RULE : RULE_THIN, w: i % 4 === 0 ? 0.3 : 0.14 });
-  for (let vx = x; vx <= x + w + 0.01; vx += 4 * u) page.line(vx, y, vx, y + h, { color: RULE_THIN, w: 0.14 });
+  for (let i = 0; i <= rows * 8; i++) page.line(x, y + i * u, x + w, y + i * u, { color: i % 4 === 0 ? RULE : RULE_THIN, w: 0.2 });
+  for (let vx = x; vx <= x + w + 0.01; vx += 4 * u) page.line(vx, y, vx, y + h, { color: RULE_THIN, w: 0.2 });
   return h;
 }
 /** Ordonnée de la ligne d'écriture (ligne forte sur laquelle posent les lettres) de la rangée r. */
@@ -142,6 +142,69 @@ export function animalSheet(stickerId, { reglure = 3, name = '' } = {}) {
   return page;
 }
 
+// ---------- Cahiers : plusieurs fiches à la suite, précédées d'une page de mode d'emploi ----------
+const SOFT_LINE = '#F0D9AC';
+
+/** Page de garde d'un cahier : la démarche en trois étapes, comment l'utiliser, sommaire. */
+export function coverPage(titre, sousTitre, sommaire, reglure) {
+  const p = new Page();
+  p.text('RENARD · Mon compagnon pour apprendre à écrire', M, 16, { size: 9, bold: true, color: ORANGE });
+  p.text(titre, M, 30, { size: 24, bold: true, color: INK });
+  p.text(sousTitre, M, 38, { size: 11, color: MUTED });
+  let y = 52;
+  p.text('La démarche en trois étapes', M, y, { size: 13, bold: true, color: INK }); y += 6;
+  const etapes = [
+    ['1', 'Le guide', 'L’enfant regarde le modèle orange (point vert = départ, chiffres = ordre des traits) et le suit du doigt, puis au crayon.'],
+    ['2', 'Les pointillés', 'Il repasse sur les points, sans le modèle plein : le geste est à lui, le chemin reste visible.'],
+    ['3', 'Tout seul', 'Il écrit de mémoire, en partant du point vert. C’est l’étape qui compte : on ne la corrige pas, on l’encourage.'],
+  ];
+  for (const [n, t, d] of etapes) {
+    p.circle(M + 4.5, y + 3.2, 4.5, { fill: ORANGE, color: '#FFFFFF', lw: 0.2 });
+    p.text(n, M + 4.5, y + 5, { size: 12, bold: true, color: '#FFFFFF', align: 'center' });
+    p.text(t, M + 12, y + 2.6, { size: 11, bold: true, color: INK });
+    y = p.para(d, M + 12, y + 7.4, A4.w - 2 * M - 12, { size: 9.5, color: MUTED }) + 2.4;
+  }
+  y += 1;
+  p.rect(M, y, A4.w - 2 * M, 33, { fill: SOFT, color: SOFT_LINE, lw: 0.25 });
+  p.text('Comment utiliser ce cahier', M + 4, y + 7, { size: 11, bold: true, color: INK });
+  p.para('Une fiche par exercice, dans l’ordre. Sur chaque fiche, la ligne 1 montre le modèle puis les pointillés ; la ligne 2 est en pointillés ; les lignes suivantes sont libres. Quelques lignes bien tracées valent mieux qu’une page entière : arrêtez-vous dès que l’enfant se fatigue. Quand l’enfant a réussi, cochez « vu par un adulte » en bas de la fiche.', M + 4, y + 12, A4.w - 2 * M - 8, { size: 9.2, color: INK });
+  y += 33 + 8;
+  p.text('Sommaire', M, y, { size: 13, bold: true, color: INK }); y += 6.5;
+  for (const [t, n, first] of sommaire) {
+    if (y > A4.h - 24) break;
+    p.text(t, M + 2, y, { size: 9.5, color: INK });
+    p.text(n > 1 ? `${n} fiches` : `${n} fiche`, A4.w - M - 24, y, { size: 8.5, color: MUTED, align: 'right' });
+    p.text(`p. ${first}`, A4.w - M, y, { size: 9.5, bold: true, color: ORANGE, align: 'right' });
+    y += 5.6;
+  }
+  p.text(`Imprimez en A4, à 100 % (sans « ajuster à la page »). Lignes Seyès de ${String(reglure).replace('.', ',')} mm. Cahier généré par l’application Renard.`, M, A4.h - 10, { size: 7.5, color: MUTED });
+  return p;
+}
+
+/** Les séries (sections) que l'on peut imprimer : celles des trois premiers niveaux. */
+export const cahierSeries = () => LEVELS.filter((l) => l.sections).map((l) => ({ id: l.id, name: l.name, classe: l.classe, series: l.sections.map((s, i) => ({ index: i, title: s.title, n: s.skills.length })) }));
+
+/** Un cahier d'écriture : tout un niveau (`serie` absent) ou une seule série. Retourne { pages: [couverture, fiches…], n, titre }. */
+export function cahierPages(levelId, { serie = null, reglure = 3, name = '', lefty = false } = {}) {
+  const lv = LEVELS.find((l) => l.id === levelId);
+  const secs = serie == null ? lv.sections : [lv.sections[serie]];
+  const fiches = [], sommaire = [];
+  for (const sec of secs) {
+    sommaire.push([sec.title, sec.skills.length, fiches.length + 2]);
+    for (const id of sec.skills) fiches.push(writingSheet(id, { reglure, name, lefty }));
+  }
+  const niveau = `Niveau ${lv.id} · ${lv.name}`;
+  const titre = serie == null ? niveau : secs[0].title;
+  const sous = serie == null ? `${lv.classe} · ${fiches.length} fiches d’écriture` : `${niveau} · ${fiches.length} fiche${fiches.length > 1 ? 's' : ''} d’écriture`;
+  return { pages: [coverPage(titre, sous, sommaire, reglure), ...fiches], n: fiches.length, titre };
+}
+
+/** Le cahier des animaux : une fiche par vignette. */
+export function animauxPages({ reglure = 3, name = '' } = {}) {
+  const fiches = STICKERS.map((s) => animalSheet(s.id, { reglure, name }));
+  return { pages: [coverPage('Les animaux du renard', `${fiches.length} fiches à lire, raconter et dessiner`, [['Les animaux du renard', fiches.length, 2]], reglure), ...fiches], n: fiches.length, titre: 'Les animaux du renard' };
+}
+
 // ---------- Sortie ----------
 /** Rastérise une vignette SVG en pixels RGB (fond blanc), pour l'incorporer au PDF. Navigateur uniquement. */
 export async function rasterize(svg, px) {
@@ -160,6 +223,8 @@ export async function rasterize(svg, px) {
 }
 
 export const sheetPDF = (page, title, raster = rasterize) => toPDF([page], { title, raster });
+/** Plusieurs pages en un seul PDF (cahiers). */
+export const cahierPDF = (pages, title, raster = rasterize) => toPDF(pages, { title, raster });
 
 const b64 = (bytes) => { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s); };
 

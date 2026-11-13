@@ -161,16 +161,18 @@ export async function toPDF(pages, { title = 'Renard', raster = null } = {}) {
     push(`<< /Type /XObject /Subtype /Image /Width ${img.w} /Height ${img.h} /ColorSpace /DeviceRGB /BitsPerComponent 8${flate ? ' /Filter /FlateDecode' : ''} /Length ${data.length} >>\nstream\n`);
     push(data); push('\nendstream\nendobj\n');
   }
-  pages.forEach((page, i) => {
-    const { p, c } = pageIds[i];
+  for (let i = 0; i < pages.length; i++) {
+    const page = pages[i], { p, c } = pageIds[i];
     const stream = content(page, pageImages[i]);
     const xo = [...pageImages[i].values()].map((nm) => `/${nm} ${nm.slice(2)} 0 R`).join(' ');
     startObj(p);
     push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${n2(page.w * PT)} ${n2(page.h * PT)}] /Contents ${c} 0 R /Resources << /Font << /F1 3 0 R /F2 4 0 R >>${xo ? ` /XObject << ${xo} >>` : ''} >> >>\nendobj\n`);
     startObj(c);
-    const body = bin(stream);
-    push(`<< /Length ${body.length} >>\nstream\n`); push(body); push('\nendstream\nendobj\n');
-  });
+    const raw = bin(stream);
+    const z = await deflate(raw); // les lignes Seyès pèsent lourd : le contenu est compressé quand l'appareil sait le faire
+    const body = z || raw;
+    push(`<< /Length ${body.length}${z ? ' /Filter /FlateDecode' : ''} >>\nstream\n`); push(body); push('\nendstream\nendobj\n');
+  }
   const info = next++;
   startObj(info);
   push(`<< /Title <FEFF${[...title].map((ch) => ch.codePointAt(0).toString(16).padStart(4, '0')).join('')}> /Producer (Renard) >>\nendobj\n`);

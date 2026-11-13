@@ -711,6 +711,109 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   await p.ctx.close();
 }
 
+// 5h. Jeux et dictée, difficulté qui monte, avis des parents sur le papier
+{
+  const txt = (page, sel) => page.$eval(sel, (e) => e.textContent.trim()).catch(() => '');
+  const prete = (page) => page.waitForFunction(() => document.querySelector('.dictee-end') || (document.querySelector('.board') && !document.querySelector('.board').classList.contains('locked')), null, { timeout: 30000 }).then(() => true, () => false);
+
+  // l'accueil mène aux jeux ; la dictée est jouable quand l'enfant a déjà écrit quelque chose, grisée sinon
+  const a = await open(null, 'accueil');
+  check('jeux : le bouton « Jeux » est sur l’accueil', (await buttons(a.page, '.home-nav .nav')).some((t) => /Jeux/.test(t)));
+  await clickText(a.page, 'Jeux', '.home-nav button');
+  await a.page.waitForTimeout(500);
+  check('jeux : le bouton ouvre le menu des jeux', (await a.hash()) === '#jeux', await a.hash());
+  check('jeux : la dictée est proposée à un enfant qui a déjà écrit', !!(await a.page.$('.jeu-card[data-jeu="dictee"]:not(.off)')));
+  check('jeux : aucune erreur', a.errs.length === 0, a.errs.join(' | '));
+  await a.ctx.close();
+
+  const v = await open((x) => { x.skills = {}; x.series = {}; }, 'jeux');
+  check('jeux : sans exercice, la dictée est grisée', !!(await v.page.$('.jeu-card[data-jeu="dictee"].off')));
+  await v.page.click('.jeu-card.off', { force: true });
+  await v.page.waitForTimeout(400);
+  check('jeux : toucher une dictée grisée ne l’ouvre pas', (await v.hash()) === '#jeux', await v.hash());
+  await v.page.evaluate(() => { location.hash = '#accueil'; });
+  await v.page.waitForTimeout(300);
+  await v.page.evaluate(() => { location.hash = '#dictee'; });
+  await v.page.waitForTimeout(600);
+  check('dictée : sans exercice à dicter, on revient aux jeux', (await v.hash()) === '#jeux', await v.hash());
+  await v.ctx.close();
+  const m = await open((x) => { x.settings.voix = false; }, 'dictee');
+  await m.page.waitForTimeout(500);
+  check('dictée : sans la voix du renard, on revient aux jeux', (await m.hash()) === '#jeux', await m.hash());
+  check('jeux : sans voix, la carte dit pourquoi', /Remets la voix/.test(await txt(m.page, '.jeu-card .jc-note')));
+  await m.ctx.close();
+
+  // une dictée : consigne dite mais jamais écrite, cahier sans modèle ni point de départ, « Passer » ne note rien
+  const d = await open(null, 'dictee');
+  const avant = JSON.stringify((await d.state()).skills);
+  check('dictée : le cahier est en mode « tout seul »', (await d.page.getAttribute('.board', 'data-phase')) === '2');
+  const nbPoints = await d.page.$$eval('.dc-dot', (a) => a.length);
+  check('dictée : un point par exercice', nbPoints >= 2 && nbPoints <= 5, String(nbPoints));
+  const bulle = await txt(d.page, '.b-text');
+  check('dictée : la bulle ne montre pas la réponse', /Écoute bien/.test(bulle) && !/Écris/.test(bulle), bulle);
+  const depart = await d.page.evaluate(() => [...document.querySelectorAll('.board .gs .start')].every((e) => getComputedStyle(e).display === 'none'));
+  check('dictée : aucun point de départ affiché', depart);
+  check('dictée : le renard a fini de parler, le cahier s’ouvre', await prete(d.page));
+  const modelHidden = await d.page.evaluate(() => !document.querySelector('.board').classList.contains('show-model'));
+  check('dictée : le modèle n’est pas montré avant l’essai', modelHidden);
+  for (let k = 0; k < nbPoints; k++) { await d.page.click('.dc-skip'); await d.page.waitForTimeout(500); if (k < nbPoints - 1) await prete(d.page); }
+  await d.page.waitForSelector('.dictee-end', { timeout: 15000 }).catch(() => {});
+  check('dictée : tout passé, un mot doux et pas de bilan', /autre fois/.test(await txt(d.page, '.dictee-end h2')) && !(await d.page.$('.dc-recap')), await txt(d.page, '.dictee-end h2'));
+  const apres = await d.state();
+  check('dictée : passer ne note rien', JSON.stringify(apres.dictees || {}) === '{}');
+  check('dictée : les exercices acquis ne bougent pas', JSON.stringify(apres.skills) === avant);
+  await clickText(d.page, 'Les jeux');
+  await d.page.waitForTimeout(500);
+  check('dictée : « Les jeux » ramène au menu', (await d.hash()) === '#jeux', await d.hash());
+  check('dictée : aucune erreur', d.errs.length === 0, d.errs.join(' | '));
+  await d.ctx.close();
+
+  // la difficulté qui monte : trois nouveaux exercices acquis sans un raté → le suivant commence aux pointillés
+  const phase = async (mutate) => {
+    const z = await open(mutate, 'exercice-a');
+    await z.page.waitForSelector('.board', { timeout: 15000 });
+    const r = { ph: await z.page.getAttribute('.board', 'data-phase'), feuilles: await z.page.$$eval('.leaves .lf.on', (x) => x.length), errs: z.errs };
+    await z.ctx.close();
+    return r;
+  };
+  const E = await phase((x) => { x.aisance = ['x', 'e', 'e', 'e']; });
+  const N = await phase(null);
+  const X = await phase((x) => { x.aisance = ['e', 'e', 'x']; });
+  const C = await phase((x) => { x.aisance = ['e', 'e', 'e']; x.settings.montee = false; });
+  const Dm = await phase((x) => { x.aisance = ['e', 'e', 'e']; x.settings.demo = true; });
+  check('difficulté : à l’aise, un nouvel exercice commence aux pointillés', E.ph === '1' && E.feuilles === 1, JSON.stringify(E));
+  check('difficulté : sans aisance, il commence par le guide', N.ph === '0' && N.feuilles === 0, JSON.stringify(N));
+  check('difficulté : un seul raté et tout redevient comme avant', X.ph === '0', JSON.stringify(X));
+  check('difficulté : coupée par les parents, on commence par le guide', C.ph === '0', JSON.stringify(C));
+  check('difficulté : en démonstration, on commence par le guide', Dm.ph === '0', JSON.stringify(Dm));
+  check('difficulté : aucune erreur', [E, N, X, C, Dm].every((r) => r.errs.length === 0), [E, N, X, C, Dm].flatMap((r) => r.errs).join(' | '));
+
+  // espace parents : réglage, avis sur le papier, dictées
+  const p = await open(null, 'parents');
+  await p.page.focus('.gate-btn'); await p.page.keyboard.press('Enter'); await p.page.waitForTimeout(500);
+  check('parents : le réglage de la difficulté qui monte existe, actif par défaut', await p.page.$eval('#set-montee', (e) => e.checked === true || e.getAttribute('aria-checked') === 'true').catch(() => false));
+  const nb = await p.page.$$eval('.paper-row .avis-btn', (a) => a.length);
+  check('parents : trois avis possibles sur chaque essai papier', nb >= 3 && nb % 3 === 0, String(nb));
+  await clickText(p.page, 'À retravailler', '.avis-btn');
+  await p.page.waitForTimeout(300);
+  let st = await p.state();
+  check('parents : « À retravailler » est enregistré', st.skills.i.paper.avis === 'encore' && st.skills.i.paper.avisAt > 0, JSON.stringify(st.skills.i.paper));
+  check('parents : le bouton choisi est marqué', await p.page.$eval('.paper-row .avis-btn[data-avis="encore"]', (e) => e.getAttribute('aria-pressed') === 'true'));
+  await clickText(p.page, 'Réussi facilement', '.avis-btn');
+  await p.page.waitForTimeout(300);
+  st = await p.state();
+  check('parents : on peut changer d’avis', st.skills.i.paper.avis === 'facile', st.skills.i.paper.avis);
+  check('parents : sans dictée, la carte l’explique', /Pas encore de dictée/.test(await p.page.innerText('body')));
+  check('parents : aucune erreur', p.errs.length === 0, p.errs.join(' | '));
+  await p.ctx.close();
+  const q = await open((x) => { x.dictees = { i: { n: 2, best: 3, last: 1, t: Date.now() }, o: { n: 1, best: 3, last: 3, t: Date.now() - 1000 } }; }, 'parents');
+  await q.page.focus('.gate-btn'); await q.page.keyboard.press('Enter'); await q.page.waitForTimeout(500);
+  const lignes = await q.page.$$eval('.dict-row', (a) => a.map((e) => e.innerText.replace(/\s+/g, ' ')));
+  check('parents : les dictées sont listées, la plus récente d’abord', lignes.length === 2 && /à revoir/.test(lignes[0]) && !/à revoir/.test(lignes[1]), JSON.stringify(lignes));
+  check('parents : aucune erreur (dictées)', q.errs.length === 0, q.errs.join(' | '));
+  await q.ctx.close();
+}
+
 await browser.close();
 console.log(fails ? `\n${fails} échec(s)` : '\nTout est OK');
 process.exit(fails ? 1 : 0);

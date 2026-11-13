@@ -2,7 +2,7 @@
 import { h, icon } from '../dom.js';
 import { glyphIcon } from '../art.js';
 import { SKILLS, LEVELS } from '../../content/skills.js';
-import { skillState, skillStatus, levelProgress, levelSkills, levelSections, orderedSkills, difficulties, recommend, usageDays, todaySeconds, masteredCount, isSkillOpen, stickerCount, isConsolidated, reviewDue, paperState, confirmPaper } from '../../core/progress.js';
+import { skillState, skillStatus, levelProgress, levelSkills, levelSections, orderedSkills, difficulties, recommend, usageDays, todaySeconds, masteredCount, isSkillOpen, stickerCount, isConsolidated, reviewDue, paperState, confirmPaper, avisPapier, AVIS_PAPIER } from '../../core/progress.js';
 import { sfx } from '../audio.js';
 import { STICKERS } from '../../content/stickers.js';
 import { stickerSVG } from '../animals.js';
@@ -141,13 +141,29 @@ function dashboard(root, app) {
     const p = paperState(st, id);
     const seen = h('span', { class: 'chip st-ok' }, 'Vu par un adulte');
     const btn = h('button', { class: 'btn-sec sm', type: 'button', onClick: () => { confirmPaper(st, id); app.save(); sfx('tap'); btn.replaceWith(seen); } }, 'Marquer comme vu');
-    return h('li', {}, h('span', { class: 'gl', html: glyphIcon(id, { width: 0.34 }) }),
-      h('div', {}, h('strong', {}, SKILLS[id].title), h('small', {}, `${p.n} essai${p.n > 1 ? 's' : ''} sur papier · dernier le ${new Date(p.last).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}`)),
+    // Comment ça s'est passé, d'après l'adulte qui a regardé le cahier (facultatif) ; « à retravailler » remet l'exercice dans les « à reprendre »
+    const avisBtns = AVIS_PAPIER.map(([k, label]) => h('button', {
+      class: `avis-btn${paperState(st, id).avis === k ? ' on' : ''}`, type: 'button', 'data-avis': k, 'aria-pressed': String(paperState(st, id).avis === k),
+      onClick: () => { avisPapier(st, id, k); app.save(); sfx('tap'); avisBtns.forEach((x) => { const on = x.dataset.avis === k; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); seen.isConnected || btn.replaceWith(seen); },
+    }, label));
+    return h('li', { class: 'paper-row' }, h('span', { class: 'gl', html: glyphIcon(id, { width: 0.34 }) }),
+      h('div', {}, h('strong', {}, SKILLS[id].title), h('small', {}, `${p.n} essai${p.n > 1 ? 's' : ''} sur papier · dernier le ${new Date(p.last).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}`),
+        h('div', { class: 'avis', role: 'group', 'aria-label': 'Comment cela s’est passé' }, avisBtns)),
       p.seen ? seen : btn);
   });
   const paperCard = card('Écrire sur papier',
     paperRows.length ? h('ul', { class: 'recs' }, paperRows) : h('p', { class: 'muted' }, 'Pas encore d’essai sur papier. Après un exercice, le renard propose une « mission cahier » : l’enfant écrit sur une vraie feuille, puis déclare « J’ai essayé ».'),
-    h('p', { class: 'muted' }, 'L’application ne peut pas voir le papier : c’est l’enfant qui déclare, et vous pouvez regarder son travail et le marquer comme vu. Le geste sur papier reste le vrai but.'));
+    h('p', { class: 'muted' }, 'L’application ne peut pas voir le papier : c’est l’enfant qui déclare, et vous pouvez regarder son travail, le marquer comme vu et noter comment cela s’est passé. « À retravailler » remet l’exercice dans les « à reprendre » du renard. Le geste sur papier reste le vrai but.'));
+
+  // Dictées : ce que l'enfant a écrit sans modèle (indication pour les adultes ; rien ne change dans les exercices acquis)
+  const dictees = Object.entries(st.dictees || {}).filter(([id]) => SKILLS[id]).sort((a, b) => (b[1].t || 0) - (a[1].t || 0));
+  const dicteeCard = card('Dictées',
+    dictees.length
+      ? h('ul', { class: 'recs dict-list' }, dictees.slice(0, 12).map(([id, d]) => h('li', { class: 'paper-row dict-row', 'data-id': id },
+        h('span', { class: 'gl', html: glyphIcon(id, { width: 0.34 }) }),
+        h('div', {}, h('strong', {}, SKILLS[id].title), h('small', {}, `${d.n} dictée${d.n > 1 ? 's' : ''} · dernier résultat : ${'★'.repeat(d.last)}${'☆'.repeat(3 - d.last)}${d.last < 2 ? ' · à revoir' : ''}`)))))
+      : h('p', { class: 'muted' }, 'Pas encore de dictée. Dans « Jeux », le renard dit une lettre ou un mot et l’enfant l’écrit sans aucun modèle.'),
+    h('p', { class: 'muted' }, 'Une dictée ne change rien aux exercices acquis et ne rapporte ni vignette ni accessoire : c’est un contrôle amical, à regarder comme une indication. Un résultat à revoir veut seulement dire que l’exercice mérite d’être repris, sur la tablette ou sur le papier.'));
 
   root.append(
     h('header', { class: 'bar' },
@@ -165,6 +181,7 @@ function dashboard(root, app) {
       card('Exercices recommandés', recList),
       card('Difficultés rencontrées', diffList),
       paperCard,
+      dicteeCard,
       wide(card('Lettres, sons, mots et phrases',
         ...letterBlocks,
         h('p', { class: 'muted' }, '«\u00A0Acquise\u00A0» : écrite de mémoire, sans aide, avec 2 étoiles ou plus. «\u00A0Consolidée\u00A0» : réussie de nouveau, sans aide, à plusieurs jours d’intervalle, signe que le geste tient dans la durée. Les mots et les phrases se composent de lettres détachées (pas encore de liaisons), en minuscules, sans accents.'))),

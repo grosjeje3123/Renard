@@ -1,4 +1,4 @@
-PAROLES DU RENARD — 1716 phrases à enregistrer
+PAROLES DU RENARD — 1878 phrases à enregistrer
 Chaque ligne : identifiant | phrase. Le fichier audio de chaque phrase doit porter son identifiant : <identifiant>.mp3
 
 === CONSIGNE (506) ===
@@ -912,6 +912,166 @@ f81bcdb3 | Tu y es presque !
 3051089c | Va jusqu’à la ligne du bas.
 73a9b096 | Va tout doucement, sans trembler.
 
+=== DICTÉE (158) ===
+c6e2b359 | « ai ».
+84e790c4 | « aile ».
+85b04590 | « ami ».
+43dd9aaa | « an ».
+a266adf5 | « arbre ».
+727f53d5 | « au ».
+ef114462 | « avion ».
+1b7132e7 | « balle ».
+0f6a2f31 | « blanc ».
+e33471df | « bleu ».
+973bbd72 | « bois ».
+1b8b05bd | « bus ».
+940bb32e | « ch ».
+ab7cbf7d | « chat ».
+6a6ab994 | « chien ».
+af7af9a0 | « cube ».
+cf716ec0 | « dent ».
+efe00994 | « eau ».
+56d4e049 | « eu ».
+b3e287c5 | « fleur ».
+dad984c1 | « fruit ».
+bcf5faf8 | « gare ».
+3a18fc34 | « gn ».
+489a33b4 | « gris ».
+8c997d0d | « herbe ».
+ac5fcf40 | « il ».
+42d9f742 | « in ».
+be3c32ac | « jaune ».
+56a1e936 | « jouet ».
+4d1d1adb | « jour ».
+8fc90a6b | « kiwi ».
+87946e16 | « la ».
+9168c7bd | « lait ».
+e7e2c9e1 | « lapin ».
+21fcff9a | « le ».
+1c485a85 | « lion ».
+5b752e40 | « lit ».
+0da0ac01 | « livre ».
+5efc6e4f | « loi ».
+c667c057 | « loup ».
+e10a7c87 | « lundi ».
+b2e5c98d | « lune ».
+0ee25e85 | « ma ».
+7e366b2c | « main ».
+64b00a59 | « maman ».
+bf0fb376 | « mamie ».
+e8c5d2d7 | « merci ».
+96900691 | « mon ».
+5cb7c29c | « moto ».
+57fee147 | « neige ».
+f375b6be | « nid ».
+7bcfe573 | « noir ».
+30f0254b | « nuit ».
+424b0227 | « oi ».
+a75bc5a2 | « oie ».
+d176aa8c | « on ».
+5cd542cb | « ou ».
+771afbb2 | « oui ».
+579104aa | « ours ».
+6155be9b | « pain ».
+7e836c2f | « papa ».
+696aaa17 | « papi ».
+8cd01cad | « pied ».
+9bf56d2e | « plage ».
+5b704788 | « pluie ».
+84e5de54 | « poire ».
+4b69c6f9 | « pomme ».
+a6fd9951 | « porte ».
+acb2ba25 | « qu ».
+eb6ef3f2 | « rat ».
+ca70452c | « riz ».
+cb4ec581 | « robe ».
+09232fd5 | « roi ».
+c6ac446a | « rose ».
+7e1dd9c9 | « rouge ».
+b008accc | « route ».
+3589791b | « rue ».
+ff8c7528 | « sable ».
+221eda08 | « sac ».
+a09b71d9 | « singe ».
+277faa5b | « table ».
+a62ab7f7 | « tata ».
+590cd5d0 | « tigre ».
+985876d2 | « tu ».
+a3e6b47e | « un ».
+7b4cfe45 | « une ».
+240695e4 | « vache ».
+2abcb33e | « vent ».
+f8697002 | « vert ».
+344f90ef | « wagon ».
+7410c88b | « zoo ».
+25c8b90f | Écris la lettre « a » en majuscule.
+e5d827d1 | Écris la lettre « a ».
+1ec90ed1 | Écris la lettre « ache » en majuscule.
+f2739b3f | Écris la lettre « ache ».
+75982e07 | Écris la lettre « bé » en majuscule.
+e09b4799 | Écris la lettre « bé ».
+d24f1242 | Écris la lettre « cé » en majuscule.
+ace66d3a | Écris la lettre « cé ».
+93d917c1 | Écris la lettre « dé » en majuscule.
+7ae10daf | Écris la lettre « dé ».
+7e2b718a | Écris la lettre « double vé » en majuscule.
+e6305712 | Écris la lettre « double vé ».
+8952e713 | Écris la lettre « e » en majuscule.
+1a0e1bb5 | Écris la lettre « e ».
+767635f4 | Écris la lettre « effe » en majuscule.
+8cbbe808 | Écris la lettre « effe ».
+52064530 | Écris la lettre « elle » en majuscule.
+40291f84 | Écris la lettre « elle ».
+ed18de22 | Écris la lettre « emme » en majuscule.
+b0384f1a | Écris la lettre « emme ».
+02fd57e4 | Écris la lettre « enne » en majuscule.
+064f05b8 | Écris la lettre « enne ».
+72407e64 | Écris la lettre « erre » en majuscule.
+da1ded38 | Écris la lettre « erre ».
+0efbf162 | Écris la lettre « esse » en majuscule.
+3d729d5a | Écris la lettre « esse ».
+dccde72e | Écris la lettre « gé » en majuscule.
+c9c69b46 | Écris la lettre « gé ».
+49b16597 | Écris la lettre « i » en majuscule.
+faf0e9e9 | Écris la lettre « i ».
+08fc77e6 | Écris la lettre « i grec » en majuscule.
+569b300e | Écris la lettre « i grec ».
+8718a1cc | Écris la lettre « ixe » en majuscule.
+90d531b0 | Écris la lettre « ixe ».
+4157034f | Écris la lettre « ji » en majuscule.
+8ce96411 | Écris la lettre « ji ».
+51b22452 | Écris la lettre « ka » en majuscule.
+d1f7664a | Écris la lettre « ka ».
+421990de | Écris la lettre « ku » en majuscule.
+fdbbdfb6 | Écris la lettre « ku ».
+177c0761 | Écris la lettre « o » en majuscule.
+408aa84f | Écris la lettre « o ».
+c22bf925 | Écris la lettre « pé » en majuscule.
+b81bc133 | Écris la lettre « pé ».
+9ec4a071 | Écris la lettre « té » en majuscule.
+18b23adf | Écris la lettre « té ».
+4fe58b23 | Écris la lettre « u » en majuscule.
+da13e0c5 | Écris la lettre « u ».
+d7eef0f3 | Écris la lettre « vé » en majuscule.
+9a363f95 | Écris la lettre « vé ».
+5292867f | Écris la lettre « zède » en majuscule.
+32e5f701 | Écris la lettre « zède ».
+5512eb38 | Écris le chiffre « cinq ».
+bfe80555 | Écris le chiffre « deux ».
+583bc191 | Écris le chiffre « huit ».
+8b1317c9 | Écris le chiffre « neuf ».
+48e2ce01 | Écris le chiffre « quatre ».
+a6bb37af | Écris le chiffre « sept ».
+356ccf5b | Écris le chiffre « six ».
+e9a36cde | Écris le chiffre « trois ».
+eb51a4c2 | Écris le chiffre « un ».
+682c78b1 | Écris le chiffre « zéro ».
+a11af75d | Écris le mot en majuscules.
+e84ab90a | Écris le mot.
+c928c282 | Écris le son.
+49249860 | La dictée est terminée !
+13c75636 | Réussis d’abord quelques exercices.
+
 === TABLEAU (217) ===
 ea748872 | Écris « ai » : suis la première ligne, puis les pointillés, puis écris tout seul !
 c12279f9 | Écris « aile » : suis la première ligne, puis les pointillés, puis écris tout seul !
@@ -1677,7 +1837,7 @@ ec40a893 | On se retrouve tout à l’heure !
 455c7511 | Salut !
 09135c52 | Tu veux apprendre à écrire avec moi ?
 
-=== INTERFACE (56) ===
+=== INTERFACE (60) ===
 80decf28 | À demain !
 3068c24f | Allez, on y va ?
 dfbea7e2 | Apprends une nouvelle chose pour le gagner !
@@ -1689,6 +1849,7 @@ a9851dd2 | Bravo, quelle belle pause !
 46736f00 | Ce niveau arrive bientôt.
 6fb7f50b | Ce trésor t’attend.
 bfe80983 | Chaque nouvelle chose apprise te donne un trésor.
+4349d480 | Choisis !
 bd9d32f9 | Choisis ton prochain jeu !
 ef5d3221 | Choisis un mot plus court.
 d8ced0b4 | Coucou !
@@ -1706,6 +1867,7 @@ e246a882 | La place est libre pour un autre dessin !
 68970947 | Maintenant, le chemin est en pointillés.
 72a2f716 | On a bien travaillé aujourd’hui.
 0be2ee3b | On fait autre chose un petit moment ?
+3a3ea0ea | On saute le guide : suis les pointillés.
 13f6eea9 | On se retrouve !
 51ab6e2d | On va bien s’amuser ensemble.
 12f59805 | Où est-ce qu’on va aujourd’hui ?
@@ -1727,11 +1889,13 @@ b47a0c68 | Ton dessin est accroché dans la forêt.
 5b18036d | Tu as écrit sur du vrai papier, et tu gagnes une vignette !
 f2d9c8b3 | Tu as écrit sur du vrai papier.
 d40deb75 | Tu écris autre chose, ou on retourne à la carte ?
+af0b0056 | Tu écris déjà bien !
 731c9322 | Tu en fais un autre, ou on retourne à la carte ?
 1adefa4b | Tu es en quelle classe ?
 04dfd99f | Tu peux quand même bouger, lire ou écrire sur ton cahier.
 70778d0d | Tu t’en vas ?
 8cd0bd1c | Tu viens écrire avec moi ?
+82bcd537 | Un petit jeu ?
 f13ca08a | Voilà !
 c051ce0d | Voilà tes dessins !
 

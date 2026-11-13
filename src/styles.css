@@ -96,7 +96,7 @@ button:focus-visible,input:focus-visible,.home-fox:focus-visible{outline:4px sol
 .voice-notice{display:flex;flex-direction:column;gap:8px;align-items:flex-start;max-width:30em;margin-top:6px;padding:12px 16px;border-radius:16px;background:var(--card-solid);border:2px solid var(--line);font-weight:600;font-size:15px;line-height:1.3;color:var(--text)}.voice-notice .vn-btns{display:flex;flex-wrap:wrap;gap:8px}
 .tagline{font-family:var(--f-display);font-weight:500;font-size:clamp(20px,2.4vw,28px);margin-top:-8px;color:var(--text)}
 .stage{font-family:var(--f-display);font-size:18px;color:var(--text);background:var(--card);padding:6px 16px;border-radius:999px}
-.home-nav{display:flex;justify-content:center;gap:24px;padding:10px 0 calc(20px + env(safe-area-inset-bottom,0px))}
+.home-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;padding:10px 0 calc(20px + env(safe-area-inset-bottom,0px))}
 
 /* Niveaux */
 .levels-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px;padding:6px 0 20px;overflow:auto}
@@ -195,10 +195,9 @@ button:focus-visible,input:focus-visible,.home-fox:focus-visible{outline:4px sol
 .board.locked{cursor:default}
 .draw-board{touch-action:none;-webkit-user-select:none;user-select:none}
 .paper{fill:var(--paper);stroke:var(--line);stroke-width:.06}
-.r-thin{stroke:var(--rule);stroke-width:calc(.018px * var(--k,1));opacity:.55}
-.r-main{stroke:var(--rule);stroke-width:calc(.035px * var(--k,1));opacity:.85}
-.r-base{stroke:var(--rule);stroke-width:calc(.075px * var(--k,1));opacity:1}
-.r-vert{stroke:var(--rule);stroke-width:calc(.014px * var(--k,1));opacity:.35}
+/* Lignes du cahier : une seule épaisseur pour toutes (horizontales et verticales), comme sur du papier ; seule l'intensité distingue la ligne d'écriture et les grosses lignes */
+.r-thin,.r-main,.r-base,.r-vert{stroke:var(--rule);stroke-width:calc(.022px * var(--k,1))}
+.r-thin{opacity:.5}.r-main{opacity:.8}.r-base{opacity:1}.r-vert{opacity:.4}
 .road{fill:none;stroke:var(--guide);stroke-width:calc(.95px * var(--e-route,1));stroke-linecap:round;stroke-linejoin:round;opacity:.16;transition:stroke-width .5s}
 .dotroad{stroke-width:.06;stroke-dasharray:.14 .12;opacity:.7;fill:#6E7FD022}
 .center{fill:none;stroke:var(--guide);stroke-width:calc(.075px * var(--k,1) * var(--e-aux,1));stroke-linecap:round;stroke-dasharray:.02 .2;opacity:.9}
@@ -801,3 +800,62 @@ button[disabled]{opacity:.35;cursor:default}
 @keyframes se-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .se-auto{margin:0;font:600 14px var(--f-body);color:var(--muted);max-width:34ch;animation:pop .4s both}
 @media (max-height:720px){.se-auto{font-size:12px}}
+
+/* ---- Espace parents : comment s'est passé l'essai sur papier */
+.paper-row .avis{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.avis-btn{font:700 13px var(--f-body);color:var(--text);background:var(--card-solid);border:2px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer}
+.avis-btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* Les jeux et la dictée */
+.jeux-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-content:center}
+.jeu-card{display:flex;align-items:center;gap:16px;text-align:left;background:var(--card-solid);border-radius:28px;padding:18px 22px;border:3px solid var(--card-solid);box-shadow:0 7px 0 var(--line),0 14px 26px #0002;transition:transform .15s}
+.jeu-card:active{transform:translateY(4px)}
+.jeu-card .jc-ico{flex:none;display:grid;place-items:center;width:86px;height:86px;border-radius:26px;background:var(--accent);color:var(--accent-ink)}
+.jeu-card .jc-body{display:flex;flex-direction:column;gap:4px;min-width:0}
+.jeu-card h3{font-size:clamp(22px,2.6vw,28px)}
+.jeu-card p{font-size:clamp(16px,1.8vw,19px);line-height:1.25}
+.jeu-card .jc-note{color:var(--muted);font-size:clamp(14px,1.6vw,17px)}
+.jeu-card.off{filter:saturate(.45)}.jeu-card.off .jc-ico{background:var(--muted)}
+.dc-dots{display:flex;gap:8px;list-style:none;margin:0;padding:6px 12px;background:var(--card);border-radius:999px}
+.dc-dot{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--line);color:var(--muted);font-family:var(--f-display);font-size:17px;font-weight:600}
+.dc-dot.now{background:var(--accent);color:var(--accent-ink)}
+.dc-dot.ok{background:var(--ok-soft);color:var(--ok)}.dc-dot.try{background:var(--line);color:var(--warn)}.dc-dot.skip{opacity:.5}
+.dictee .board .gs .start{display:none}
+.dictee .side-actions .chip-btn:disabled{opacity:.5}
+.dictee-end .result-card{gap:10px}
+.dictee-end .res-actions{position:static;width:auto;margin:4px 0;padding:0;background:none}
+.dc-recap{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.dc-r{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:92px;padding:8px 14px;border-radius:20px;background:var(--bg)}
+.dc-r.skip{opacity:.55}
+.dc-glyph{font-size:34px;font-weight:600;color:var(--accent-deep);line-height:1.1}.dc-glyph.word{font-size:26px}
+.dc-st{display:flex;gap:1px;font-size:18px;color:var(--muted)}
+@media (max-width:820px){.jeux-grid{grid-template-columns:minmax(0,1fr)}.jeu-card .jc-ico{width:68px;height:68px}}
+
+/* ---------- Étape annoncée dans l'exercice, écran « Comment ça marche », écran « Papier » ---------- */
+.phase-banner{position:absolute;left:50%;top:10px;transform:translate(-50%,-14px);display:flex;align-items:center;gap:12px;padding:8px 20px 8px 14px;border-radius:999px;background:var(--accent);color:var(--accent-ink);box-shadow:0 6px 0 var(--accent-deep),0 12px 24px #0003;pointer-events:none;opacity:0;white-space:nowrap;max-width:96%;z-index:4}
+.phase-banner.show{animation:pbanner 2.8s ease both}
+.phase-banner .pb-ico svg{width:46px;height:28px;display:block}
+.phase-banner .pb-txt{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+.phase-banner b{font-family:var(--f-display);font-size:22px;font-weight:600}
+.phase-banner .pb-txt span{font-size:17px;font-weight:700}
+@keyframes pbanner{0%{opacity:0;transform:translate(-50%,-14px)}12%{opacity:1;transform:translate(-50%,0)}80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-8px)}}
+@media (max-width:640px){.phase-banner{padding:6px 14px 6px 10px;gap:8px}.phase-banner b{font-size:18px}.phase-banner .pb-txt span{font-size:14px}.phase-banner .pb-ico svg{width:34px;height:22px}}
+
+.mt-body{flex:1;min-height:0;display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;padding:6px 0 20px;overflow:auto}
+.mt-main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.mt-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.mt-step{display:flex;flex-direction:column;gap:8px;text-align:left;background:var(--card-solid);border:3px solid var(--card-solid);border-radius:26px;padding:14px 16px 16px;box-shadow:0 6px 0 var(--line),0 12px 22px #0002;transition:transform .2s,border-color .2s,box-shadow .2s;min-width:0}
+.mt-step.on{border-color:var(--accent);transform:translateY(-4px) scale(1.015);box-shadow:0 8px 0 var(--accent-deep),0 16px 28px #0003}
+.mt-head{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-size:23px}
+.mt-n{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:700;flex:none}
+.mt-board{width:100%;aspect-ratio:10/7;pointer-events:none}
+.mt-board .board{border-radius:16px;box-shadow:0 4px 0 var(--line)}
+.mt-court{font-weight:800;font-size:19px;color:var(--accent-deep)}
+.mt-text{font-size:16px;line-height:1.35;color:var(--text)}
+.mt-foot{margin:0;font-size:19px;font-weight:700;text-align:center}
+.mt-actions{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap}
+@media (max-width:900px){.mt-body{grid-template-columns:1fr}.mt-body .side{flex-direction:row;align-items:flex-end;justify-content:center}.mt-body .side-fox{width:min(110px,22vw)}.mt-steps{grid-template-columns:1fr}.mt-text{display:none}}
+@media (max-height:640px) and (orientation:landscape){.mt-text{display:none}.mt-court{font-size:17px}.mt-head{font-size:19px}.mt-n{width:30px;height:30px}.mt-foot{font-size:16px}}
+
+.papier .pp-intro h3{font-size:25px}
+.papier .pcard .txt.sel{max-width:100%}

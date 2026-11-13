@@ -9,6 +9,9 @@ import { STICKERS } from '../src/content/stickers.js';
 import { FICHES } from '../src/content/fiches.js';
 import { DESSINS, IDEES_LIBRES } from '../src/content/dessins.js';
 import { feteSerie, feteNiveau, FETE_SUITE, FETE_SUITE_NIVEAU, FETE_SUITE_CARTE, introSeries } from '../src/content/series.js';
+import { dicteeDit, DICTEE_FIN, DICTEE_PAS_ENCORE } from '../src/content/dictee.js';
+import { dicteePool } from '../src/core/dictee.js';
+import { newState } from '../src/core/progress.js';
 import { LEAD, PRAISE, TIPS } from '../src/engine/feedback.js';
 import { decouper, idPhrase, normaliser } from '../src/core/voixId.js';
 
@@ -47,6 +50,13 @@ for (const lv of LEVELS) {
   if (lv.id === 2) for (let k = 1; k <= Math.ceil(lv.skills.length / 7); k++) add(feteSerie(`Dans l’ordre de la classe (${k})`), 'félicitation');
 }
 add(FETE_SUITE, 'félicitation'); add(FETE_SUITE_NIVEAU, 'félicitation'); add(FETE_SUITE_CARTE, 'félicitation');
+
+// 1c. Dictée : ce que le renard dit pour chaque lettre, chiffre, mot ou son qu'on peut dicter (une phrase de consigne, puis le mot seul)
+{
+  const demo = newState(); demo.settings.demo = true; // tout est ouvert : on liste tout ce qui peut être dicté un jour
+  for (const id of dicteePool(demo)) add(dicteeDit(SKILLS[id]), 'dictée');
+  add(DICTEE_FIN, 'dictée'); add(DICTEE_PAS_ENCORE, 'dictée');
+}
 
 // 2. Vignettes, fiches animaux, album
 for (const st of STICKERS) {
@@ -98,7 +108,7 @@ for (const f of [...walk('src/ui'), ...walk('src/engine')]) {
 
 // Sortie
 const lignes = [...map.entries()].map(([id, { texte, origine }]) => ({ id, origine, texte, lecture: texte.replace(/[«»]/g, '').replace(/\s+/g, ' ').trim() }));
-const ordre = ['consigne', 'félicitation', 'retour', 'tableau', 'dessin', 'animal', 'carte', 'accueil', 'interface'];
+const ordre = ['consigne', 'félicitation', 'retour', 'dictée', 'tableau', 'dessin', 'animal', 'carte', 'accueil', 'interface'];
 lignes.sort((a, b) => ordre.indexOf(a.origine) - ordre.indexOf(b.origine) || a.texte.localeCompare(b.texte, 'fr'));
 fs.mkdirSync('paroles', { recursive: true });
 const csv = (v) => `"${String(v).replace(/"/g, '""')}"`;

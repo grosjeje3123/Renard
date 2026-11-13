@@ -58,7 +58,7 @@ export function home(root, app) {
         voiceNotice,
       ),
     ),
-    h('nav', { class: 'home-nav', 'aria-label': 'Menu' }, navBtn('map', 'Niveaux', 'niveaux'), navBtn('chest', 'Trésors', 'tresors'), navBtn('album', 'Album', 'album'), navBtn('tableau', 'Tableau', 'tableau'), galleryOn(st) ? navBtn('frame', 'Galerie', 'galerie') : null, lockBtn),
+    h('nav', { class: 'home-nav', 'aria-label': 'Menu' }, navBtn('map', 'Niveaux', 'niveaux'), navBtn('chest', 'Trésors', 'tresors'), navBtn('album', 'Album', 'album'), navBtn('tableau', 'Tableau', 'tableau'), navBtn('dice', 'Jeux', 'jeux'), navBtn('page', 'Papier', 'papier'), navBtn('help', 'Démarche', 'methode'), galleryOn(st) ? navBtn('frame', 'Galerie', 'galerie') : null, lockBtn),
   );
 
   const fox = app.makeFox(foxHost);
@@ -77,7 +77,8 @@ export function home(root, app) {
   if (block) fox.setMood('sleep');
   else fox.setMood('wave', 2800); // le renard salue à l’arrivée
 
-  playBtn.addEventListener('click', () => { sfx('pop'); app.go(resting ? 'pause' : `exercice-${rec.skillId}`); });
+  // La toute première fois, on montre d'abord les trois étapes (guide, pointillés, tout seul), puis on enchaîne sur l'exercice.
+  playBtn.addEventListener('click', () => { sfx('pop'); app.go(resting ? 'pause' : !st.settings.methodeVue && !st.settings.demo ? `methode-${rec.skillId}` : `exercice-${rec.skillId}`); });
   stayBtn?.addEventListener('click', () => { sfx('tap'); takeBreak(st); app.save(); app.go(`exercice-${rec.skillId}`); }); // pause refusée : on repart pour un tour
   voiceBtn.addEventListener('click', () => {
     st.settings.voix = !st.settings.voix;

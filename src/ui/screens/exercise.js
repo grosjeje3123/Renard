@@ -17,6 +17,7 @@ import { sfx, speak, stopSpeaking } from '../audio.js';
 
 const PHASE_NAMES = ['Guide', 'Pointillés', 'Tout seul'];
 const PHASE_HELP = ['Étape 1 sur 3 : je suis le guide', 'Étape 2 sur 3 : je suis les pointillés', 'Étape 3 sur 3 : j’écris tout seul'];
+const PHASE_BANNER = ['Le guide : je suis le chemin', 'Les pointillés : je suis les points', 'Tout seul : j’écris de mémoire'];
 const PHASE_ICONS = [
   '<svg viewBox="0 0 40 24"><path d="M4 18C12 2 20 2 24 12s8 8 12-8" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>',
   '<svg viewBox="0 0 40 24"><path d="M4 18C12 2 20 2 24 12s8 8 12-8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 7"/></svg>',
@@ -44,6 +45,7 @@ export function exercise(root, app, skillId) {
   const b = bubble();
   const boardHost = h('div', { class: 'board-host' });
   const starsPop = h('div', { class: 'stars-pop', 'aria-hidden': 'true' });
+  const banner = h('div', { class: 'phase-banner', role: 'status' }); // « Étape 2 sur 3 : les pointillés », affiché un instant à chaque changement d'étape
   const leavesEl = h('div', { class: 'leaves' });
   const phaseEls = PHASE_NAMES.map((t, i) => h('li', { class: 'phase', title: PHASE_HELP[i] }, h('span', { class: 'ph-n', 'aria-hidden': 'true' }, String(i + 1)), h('span', { class: 'ph-ico', html: PHASE_ICONS[i] }), h('span', {}, t)));
   const replayBtn = h('button', { class: 'chip-btn', type: 'button', html: `${icon('replay', 22)}<span>Revoir</span>` });
@@ -69,7 +71,7 @@ export function exercise(root, app, skillId) {
     ),
     h('div', { class: 'exo-main' },
       h('aside', { class: 'side' }, foxHost, b, h('div', { class: 'side-actions' }, replayBtn), card, modelChip),
-      h('div', { class: 'board-wrap' }, boardHost, starsPop),
+      h('div', { class: 'board-wrap' }, boardHost, starsPop, banner),
     ),
   );
 
@@ -101,6 +103,16 @@ export function exercise(root, app, skillId) {
     modelChip.hidden = session.phase >= 2 && !session.helped; // de mémoire : pas de modèle, sauf si l'enfant l'a redemandé
   }
 
+  // Annonce claire de l'étape : à l'arrivée, puis chaque fois qu'on avance (ou qu'on revient en arrière). Ne se répète pas pour un simple nouvel essai.
+  let annonce = -1;
+  function announce() {
+    if (annonce === session.phase) return;
+    annonce = session.phase;
+    const p = session.phase;
+    banner.innerHTML = `<span class="pb-ico" aria-hidden="true">${PHASE_ICONS[p]}</span><span class="pb-txt"><b>Étape ${p + 1} sur 3</b><span>${PHASE_BANNER[p]}</span></span>`;
+    banner.classList.remove('show'); void banner.offsetWidth; banner.classList.add('show');
+  }
+
   function beginTry() {
     if (!alive) return;
     strokeIdx = 0; strokeEvals = []; retries = 0;
@@ -108,6 +120,7 @@ export function exercise(root, app, skillId) {
     board.setProgress(0, 0);
     updateUI();
     board.enable(true);
+    announce();
     busy = false;
   }
 
@@ -160,7 +173,7 @@ export function exercise(root, app, skillId) {
     updateUI();
     if (res.action === 'done') return endSession();
     if (res.action === 'phase') {
-      await say(session.phase === 1 ? 'Bravo ! Maintenant, le chemin est en pointillés.' : 'Plus de guide ! Écris de mémoire, tu sais le faire.', { mood: 'joy', ms: 2600, icon: 'star' });
+      await say(session.phase === 1 ? 'Bravo ! Étape 2 : suis les pointillés.' : 'Bravo ! Étape 3 : plus de guide, écris tout seul, de mémoire.', { mood: 'joy', ms: 2600, icon: 'star' });
     } else if (res.action === 'back') {
       await say('Regardons encore une fois, je te montre.', { mood: 'encourage', icon: 'eye' });
       board.clearInk(); board.setProgress(0, 0);
@@ -249,7 +262,7 @@ export function exercise(root, app, skillId) {
     await Promise.all([say(startPhase === 2 ? 'On se retrouve ! Regarde le geste une fois, puis écris de mémoire.' : skill.say.intro, { mood: 'neutral', icon: 'eye', ms: 1500 }), sleep(900).then(() => board.playDemo())]);
     if (!alive) return;
     beginTry();
-    say('À toi !', { mood: 'encourage', icon: 'hand', ms: 1500 });
+    say(startPhase === 1 ? 'Tu écris déjà bien ! On saute le guide. Étape 2 : suis les pointillés.' : startPhase === 2 ? 'À toi ! Étape 3 : écris de mémoire.' : 'À toi ! Étape 1 : suis le guide.', { mood: 'encourage', icon: 'hand', ms: 1800 });
   })();
 
   return () => { alive = false; board.destroy(); fox.destroy(); cleanupExtras.forEach((f) => f()); stopSpeaking(); };

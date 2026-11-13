@@ -22,6 +22,7 @@ export function newState() {
       avisVoix: false, // l'avis « pas de voix française sur cette tablette » a été lu par un adulte
       trait: 'auto', // épaisseur du trait : 'auto' (plus fin à mesure que le niveau monte) | 'fin' | 'moyen' | 'epais' (voir core/epaisseur.js)
       serieAuto: true, // après la fête de fin de série, la série suivante s'ouvre toute seule si l'enfant ne touche à rien
+      montee: true, // la difficulté monte : après trois nouveaux exercices acquis sans le moindre raté, le suivant commence aux pointillés (voir `aLAise`)
       dessinVu: '', // la dernière idée de dessin montrée (les modèles se suivent du plus simple au plus compliqué)
       traitAide: true, // épaissir le trait d'un cran (deux au plus) quand l'enfant a du mal
       reps: 1, // réussites demandées à chaque étape d'un exercice (1 ou 2)
@@ -37,12 +38,15 @@ export function newState() {
       depart: 1, // niveau de départ : 1 (avant le CP), 2 (début du CP), 3 (fin du CP) ; les niveaux d'avant sont ouverts
       classe: '', // classe choisie à la première ouverture : 'ms' | 'gs' | 'cp1' | 'cp2' ('' = pas encore dite) ; elle règle `depart` (la grande section ouvre aussi les majuscules d'emblée)
       accueilFait: false, // la présentation du premier lancement (prénom, classe, main) a été faite ou passée
+      methodeVue: false, // l'écran « Comment ça marche » (les trois étapes) a été montré avant le premier exercice lancé depuis l'accueil
     },
     skills: {},
     usage: {}, // 'AAAA-MM-JJ' -> secondes d'activité
     rest: { since: 0, at: 0, sleepUntil: 0, overrideDay: '' }, // activité continue depuis la dernière pause
     equipped: [],
     seen: {}, // choses déjà montrées à l'enfant (ex. : 'serie-intro-3' : le renard a expliqué les séries du niveau 3)
+    aisance: [], // issue des derniers nouveaux exercices : 'e' (acquis sans un seul raté) ou 'x' (avec difficulté, ou séance finie fatigué) ; les six derniers
+    dictees: {}, // id d'exercice -> { n, best, last, t } : résultats des dictées (voir core/dictee.js)
     series: {}, // 'niveau:série' -> { t, vu } : séries terminées (la fête est montrée une fois : `vu`)
     stickers: {}, // id de vignette -> date d'obtention
     fiches: {}, // id de vignette -> nombre de lectures de la fiche animal
@@ -115,6 +119,11 @@ export function recordSession(st, skillId, session, now = Date.now()) {
   }
   if (s.history.length > 40) s.history = s.history.slice(-40);
   const newlyMastered = session.mastered && !wasMastered;
+  // Aisance : seuls comptent les nouveaux exercices (pas les rappels) ; en mode démonstration tout est trop facile pour dire quelque chose
+  if (!wasMastered && !st.settings.demo) {
+    const sansRate = session.mastered && session.log.every((l) => l.stars >= 2);
+    st.aisance = [...(st.aisance || []), sansRate ? 'e' : 'x'].slice(-6);
+  }
   if (newlyMastered) { s.mastered = true; s.masteredAt = now; }
   // Consolidation : réussir de mémoire, sans aide, à des jours espacés (au moins 2 jours d'écart, deux fois).
   let consolidated = false;
@@ -137,10 +146,23 @@ export function reviewDue(st, id, now = Date.now()) {
   const s = st.skills[id];
   return !!s && s.mastered && !s.consolidatedAt && daysBetween(lastEvent(s), now) >= 2;
 }
-/** Un exercice déjà acquis un autre jour recommence directement « tout seul » (rappel express). */
+/**
+ * La difficulté monte pour l'enfant qui réussit tout : trois nouveaux exercices de suite acquis sans le moindre raté.
+ * Ce n'est ni un score ni un niveau : le prochain exercice jamais essayé saute seulement l'étape du guide (la démonstration reste montrée).
+ * Un seul raté (exercice acquis avec difficulté, ou séance finie fatigué) et tout redevient comme avant. Les parents peuvent le couper.
+ */
+export const AISANCE_N = 3;
+export const aLAise = (st) => st.settings.montee !== false && !st.settings.demo && (st.aisance || []).length >= AISANCE_N && (st.aisance || []).slice(-AISANCE_N).every((x) => x === 'e');
+/**
+ * Par quelle étape commence l'exercice : 0 (le guide), 1 (les pointillés : enfant à l'aise, exercice jamais essayé)
+ * ou 2 (tout seul : un exercice déjà acquis un autre jour, rappel express).
+ */
 export function startPhaseFor(st, id, now = Date.now()) {
   const s = st.skills[id];
-  return s?.mastered && s.masteredAt && daysBetween(s.masteredAt, now) >= 1 ? 2 : 0;
+  if (s && paperEncore(s)) return 0; // à retravailler : on repart du guide
+  if (s?.mastered && s.masteredAt && daysBetween(s.masteredAt, now) >= 1) return 2;
+  if (!s?.sessions && aLAise(st)) return 1;
+  return 0;
 }
 
 // ---------- Cahier (papier) : le transfert est une compétence à part, déclarée par l'enfant ----------
@@ -159,6 +181,18 @@ export function confirmPaper(st, id, now = Date.now()) {
   s.paper = { ...s.paper, seen: now };
   return true;
 }
+/**
+ * Comment l'essai sur papier s'est passé, d'après l'adulte qui a regardé le cahier (facultatif) : l'appli ne voit rien du papier.
+ * « encore » ramène l'exercice dans les « à reprendre » jusqu'à ce que l'enfant le rejoue ; les deux autres n'ont qu'un rôle d'information.
+ */
+export const AVIS_PAPIER = [['facile', 'Réussi facilement'], ['aide', 'Avec de l’aide'], ['encore', 'À retravailler']];
+export function avisPapier(st, id, avis, now = Date.now()) {
+  const s = st.skills[id];
+  if (!s?.paper?.n || !AVIS_PAPIER.some(([k]) => k === avis)) return false;
+  s.paper = { ...s.paper, avis, avisAt: now, seen: s.paper.seen || now }; // donner son avis, c'est avoir regardé
+  return true;
+}
+const paperEncore = (s) => s.paper?.avis === 'encore' && (s.paper.avisAt || 0) > (s.last || 0);
 export const paperCount = (st) => Object.values(st.skills).filter((s) => s.paper?.n > 0).length;
 
 const roundCrit = (c) => Object.fromEntries(Object.entries(c).map(([k, v]) => [k, Math.round(v * 100) / 100]));
@@ -197,6 +231,7 @@ export function overrideLimit(st, now = Date.now()) { rest(st).overrideDay = day
 export function skillStatus(st, id) {
   const s = st.skills[id];
   if (!s || s.sessions === 0) return 'new';
+  if (paperEncore(s)) return 'review'; // un adulte a vu le cahier : « à retravailler » (jusqu'à ce que l'enfant rejoue l'exercice)
   if (s.mastered) return 'mastered';
   const recent = s.history.slice(-6);
   if (recent.length >= 5 && avg(recent.map((h) => h.sc)) < 0.5) return 'review';

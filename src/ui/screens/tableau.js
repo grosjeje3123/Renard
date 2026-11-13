@@ -507,8 +507,8 @@ export function tableau(root, app) {
     clone.querySelectorAll('.r-thin,.r-main,.r-base,.r-vert').forEach((l) => {
       const c = l.getAttribute('class');
       l.setAttribute('stroke', '#8FA0D6');
-      l.setAttribute('stroke-width', c === 'r-base' ? 0.09 : c === 'r-main' ? 0.05 : 0.025);
-      l.setAttribute('opacity', c === 'r-vert' ? 0.3 : c === 'r-thin' ? 0.55 : 0.9);
+      l.setAttribute('stroke-width', 0.03); // une seule épaisseur, comme à l'écran
+      l.setAttribute('opacity', c === 'r-vert' ? 0.4 : c === 'r-thin' ? 0.5 : c === 'r-main' ? 0.8 : 1);
     });
     const img = new Image();
     const loaded = new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
