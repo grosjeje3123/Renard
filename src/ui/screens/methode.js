@@ -6,6 +6,8 @@ import { forestScene, templateOf } from '../art.js';
 import { Board } from '../board.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { sfx } from '../audio.js';
+import { reglesList } from './parents-tools.js';
+import { REGLES_NOTE } from '../../content/regles.js';
 
 /** L'exemple montré : un geste simple et net, qui a un point de départ, un sens et un chemin. */
 const EXEMPLE = 'vagues';
@@ -52,7 +54,11 @@ export function methode(root, app, arg) {
       h('div', { class: 'mt-main' },
         h('div', { class: 'mt-steps' }, steps.map((s) => s.card)),
         h('p', { class: 'mt-foot' }, 'Trois étapes réussies, et l’exercice est gagné ! Si c’est difficile, le renard revient en arrière et montre le geste : il n’y a jamais de punition.'),
-        h('div', { class: 'mt-actions' }, again, go))),
+        h('div', { class: 'mt-actions' }, again, go),
+        h('details', { class: 'mt-adultes', open: '' },
+          h('summary', {}, 'Pour les adultes : ce que le renard regarde'),
+          reglesList(),
+          h('p', { class: 'muted' }, REGLES_NOTE)))),
   );
 
   // Trois cahiers, un par étape : la même lettre, avec de moins en moins d'aide (c'est le vrai plateau, avec ses vraies règles d'affichage).

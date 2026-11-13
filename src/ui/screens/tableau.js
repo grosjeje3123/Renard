@@ -5,6 +5,7 @@
 // Dessiner : des calques de dessins simples (traits pleins pâles, pointillés ou cachés), une grille facultative, ou la feuille blanche.
 // Rien n'est conservé par défaut : la fin est explicite (garder en image avec un adulte, ou accrocher dans la galerie si les parents
 // l'ont activée), et la flèche de retour demande avant de perdre un travail en cours.
+import { notePen, isPalm } from '../stylet.js';
 import { h, icon, pick } from '../dom.js';
 import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
@@ -40,7 +41,7 @@ export function tableau(root, app) {
   root.classList.add('exo', 'dessin', 'tableau');
   const st = app.state;
   let view = 'ecrire'; // 'ecrire' | 'dessiner'
-  let color = COLORS[0][1], sizeIdx = 1, active = null, penSeen = false, armed = 0, evalTimer = 0;
+  let color = COLORS[0][1], sizeIdx = 1, active = null, armed = 0, evalTimer = 0;
   // chaque feuille garde ses traits ; `hung` : l'identifiant du travail déjà accroché dans la galerie (pour le mettre à jour)
   const sheets = { ecrire: { strokes: [], hung: '' }, dessiner: { strokes: [], hung: '' } };
   const strokes = () => sheets[view].strokes;
@@ -344,8 +345,8 @@ export function tableau(root, app) {
   const scale = () => Math.max(1, pg.W / 14);
   svg.addEventListener('pointerdown', (e) => {
     if (active || overlay) return;
-    if (e.pointerType === 'pen') penSeen = true;
-    if (penSeen && e.pointerType === 'touch') return; // paume ignorée quand un stylet est utilisé
+    notePen(e);
+    if (isPalm(e)) return; // paume ignorée quand on écrit au stylet
     e.preventDefault();
     const p = toBoard(e);
     if (!p) return;

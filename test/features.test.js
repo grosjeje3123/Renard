@@ -1330,3 +1330,54 @@ test('lignes du cahier : une seule épaisseur pour toutes les lignes (horizontal
     assert.equal(own, null, `.${c} ne redéfinit pas l'épaisseur`);
   }
 });
+
+test('défi « tout seul » : après six nouveaux exercices sans raté, le suivant commence tout seul ; au premier raté, pointillés', () => {
+  const st = P.newState();
+  st.aisance = ['e', 'e', 'e', 'e', 'e'];
+  assert.equal(P.startPhaseFor(st, 'i'), 1, 'cinq : on saute seulement le guide');
+  st.aisance = ['e', 'e', 'e', 'e', 'e', 'e'];
+  assert.equal(P.startPhaseFor(st, 'i'), 2, 'six : défi tout seul');
+  st.settings.montee = false;
+  assert.equal(P.startPhaseFor(st, 'i'), 0, 'réglage coupé : on garde le guide');
+  const s = new Session('i', { startPhase: 2, defi: true });
+  const r = s.submit({ stars: 1, score: 0.3, criteria: {}, tags: [] });
+  assert.equal(r.action, 'back'); assert.equal(r.defi, true); assert.equal(s.phase, 1);
+  assert.equal(s.submit({ stars: 3, score: 0.9, criteria: {}, tags: [] }).action, 'phase', 'une réussite en pointillés ramène à tout seul');
+  assert.equal(s.submit({ stars: 3, score: 0.9, criteria: {}, tags: [] }).action, 'done');
+  assert.equal(s.mastered, true);
+  const s2 = new Session('i', { startPhase: 2, defi: true });
+  assert.equal(s2.submit({ stars: 3, score: 0.9, criteria: {}, tags: [] }).action, 'done', 'défi réussi du premier coup : acquis');
+  const rappel = new Session('i', { startPhase: 2 });
+  assert.equal(rappel.submit({ stars: 1, score: 0.3, criteria: {}, tags: [] }).action, 'again', 'un rappel express garde la règle des trois ratés');
+});
+
+test('cahier de vacances : une dizaine de pages par niveau, au plus trois modèles par page, jeux et règles inclus', async () => {
+  const { cahierPages } = await import('../src/ui/sheets.js');
+  for (const id of [1, 2, 3]) {
+    const c = cahierPages(id, { name: 'Léa' });
+    assert.ok(c.pages.length >= 9 && c.pages.length <= 12, `niveau ${id} : ${c.pages.length} pages`);
+    assert.ok(c.n >= 6, `niveau ${id} : ${c.n} exercices d'écriture`);
+    const texts = c.pages.map((p) => p.ops.filter((o) => o.t === 'text').map((o) => o.str).join(' '));
+    assert.match(texts[0], /Mon cahier de vacances/);
+    assert.match(texts[1], /Le départ/);
+    assert.match(texts.join(' '), /labyrinthe/i);
+    assert.match(texts.join(' '), /lettres cachées/i);
+    assert.match(texts.join(' '), /Relie les points/);
+    for (const t of texts) assert.doesNotMatch(t, /^\d$/, 'pas de numéro de trait isolé');
+  }
+});
+
+test('stylet : la paume est ignorée pendant qu’on écrit au stylet, le doigt remarche ensuite', async () => {
+  globalThis.performance ??= { now: () => Date.now() };
+  const { notePen, isPalm } = await import('../src/ui/stylet.js');
+  assert.equal(isPalm({ pointerType: 'touch', width: 12, height: 12 }), false, 'un doigt seul écrit');
+  assert.equal(isPalm({ pointerType: 'touch', width: 80, height: 70 }), true, 'une paume large est ignorée');
+  notePen({ pointerType: 'pen' });
+  assert.equal(isPalm({ pointerType: 'touch', width: 12, height: 12 }), true, 'pendant le stylet, le toucher est ignoré');
+  assert.equal(isPalm({ pointerType: 'pen' }), false);
+});
+
+test('les six règles de la reconnaissance sont expliquées aux adultes', async () => {
+  const { REGLES } = await import('../src/content/regles.js');
+  assert.deepEqual(REGLES.map((r) => r.k), ['start', 'direction', 'shape', 'size', 'lines', 'flow']);
+});

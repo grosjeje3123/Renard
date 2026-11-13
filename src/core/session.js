@@ -11,7 +11,8 @@ export class Session {
    * startPhase : un exercice déjà acquis un autre jour recommence directement « tout seul » (rappel express).
    * reps : réussites demandées à chaque étape (1 par défaut, 2 pour s'entraîner davantage).
    */
-  constructor(skillId, { demo = false, startPhase = 0, reps = 1 } = {}) {
+  constructor(skillId, { demo = false, startPhase = 0, reps = 1, defi = false } = {}) {
+    this.defi = defi && startPhase === 2; // défi « tout seul » d'emblée : au premier raté, on passe aux pointillés
     this.skillId = skillId;
     const n = demo ? 1 : reps === 2 ? 2 : 1;
     this.need = [n, n, n];
@@ -54,6 +55,10 @@ export class Session {
         return { action: 'phase' };
       }
     } else {
+      if (this.defi && this.phase === 2) {
+        this.defi = false; this.fails = 0; this.phase = 1; this.wins[2] = 0; this.wins[1] = Math.max(0, this.need[1] - 1);
+        return this.#maybeTired({ action: 'back', rewatch: true, defi: true });
+      }
       this.fails++;
       if (this.fails >= 3) {
         this.fails = 0;

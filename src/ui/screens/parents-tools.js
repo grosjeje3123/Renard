@@ -1,4 +1,5 @@
 // Espace parents, partie « outils » : réglages (main, pauses), ordre des lettres, fiches à imprimer, sauvegarde.
+import { REGLES, REGLES_NOTE } from '../../content/regles.js';
 import { h, icon } from '../dom.js';
 import { glyphIcon } from '../art.js';
 import { SKILLS, LEVELS } from '../../content/skills.js';
@@ -13,6 +14,10 @@ import { drawings, drawingSVG, clearGallery, MAX_DESSINS } from '../../core/gale
 import { writingSheet, animalSheet, sheetPDF, deliverPDF, shareText, isNative, partageFichiers, REGLURES } from '../sheets.js';
 
 export const card = (title, ...kids) => h('section', { class: 'pcard' }, h('h3', {}, title), ...kids);
+
+/** Les règles de la reconnaissance, pour les adultes : ce que le renard regarde quand l'enfant écrit. */
+export const reglesList = () => h('dl', { class: 'regles' }, REGLES.flatMap((r) => [h('dt', {}, r.titre), h('dd', {}, r.texte)]));
+export const reglesCard = () => card('Ce que le renard regarde', h('p', { class: 'muted' }, 'À chaque essai, le tracé est comparé au modèle, sur la tablette même, selon six règles :'), reglesList(), h('p', { class: 'muted' }, REGLES_NOTE));
 export const row = (label, hint, control, cls = '') => h('div', { class: `setrow stack ${cls}`.trim() }, h('span', {}, h('strong', {}, label), hint ? h('small', {}, hint) : null), control);
 
 /** Boutons à choix unique (plus faciles à toucher qu'une liste déroulante). */
@@ -100,7 +105,7 @@ export function settingsCards(app) {
     toggle(app, 'set-sound', 'Sons', 'Petits sons de réussite.', 'sons'),
     toggle(app, 'set-soft', 'Tracé plus souple', 'Plus d’indulgence pour les petites mains.', 'souple'),
     toggle(app, 'set-serie-auto', 'Enchaîner les séries', 'Après la fête de fin de série, si l’enfant ne touche à rien, la carte de la série suivante s’ouvre toute seule (aucun exercice ne démarre).', 'serieAuto'),
-    toggle(app, 'set-montee', 'La difficulté monte quand l’enfant réussit tout', 'Après trois nouveaux exercices acquis de suite sans le moindre raté, le renard saute l’étape du guide pour le suivant (la démonstration est toujours montrée). Au premier raté, tout redevient comme avant. Les rappels et la tolérance du tracé ne changent pas.', 'montee'),
+    toggle(app, 'set-montee', 'La difficulté monte quand l’enfant réussit tout', 'Après trois nouveaux exercices acquis de suite sans le moindre raté, le renard saute l’étape du guide pour le suivant. Après six, il lance un défi : écrire tout seul du premier coup (au premier raté, on passe aux pointillés). La démonstration est toujours montrée ; au premier raté, tout redevient comme avant. Les rappels et la tolérance du tracé ne changent pas.', 'montee'),
     toggle(app, 'set-demo', 'Mode démonstration', 'Ouvre tous les exercices et raccourcit les séances (1 réussite par étape).', 'demo'));
 
   // Pauses

@@ -6,7 +6,7 @@ import { skillState, skillStatus, levelProgress, levelSkills, levelSections, ord
 import { sfx } from '../audio.js';
 import { STICKERS } from '../../content/stickers.js';
 import { stickerSVG } from '../animals.js';
-import { card, settingsCards, orderCard, sheetsCard, backupCard } from './parents-tools.js';
+import { card, settingsCards, orderCard, sheetsCard, backupCard, reglesCard } from './parents-tools.js';
 
 const STATUS = { new: ['À découvrir', 'st-new'], progress: ['En cours', 'st-prog'], review: ['À reprendre', 'st-rev'], mastered: ['Acquis', 'st-ok'], due: ['Rappel conseillé', 'st-due'], cons: ['Consolidé', 'st-cons'] };
 /** Statut affiché : « acquis » se précise en « rappel conseillé » puis « consolidé » (réussi de mémoire à des jours espacés). */
@@ -177,6 +177,7 @@ function dashboard(root, app) {
           h('div', {}, h('b', {}, `${done}/${total}`), h('span', {}, 'compétences acquises'))),
         h('div', { class: 'chart-wrap', html: usageChart(st) }),
         h('p', { class: 'muted' }, st.settings.pauseMin ? `Seul le temps d’activité compte. Le renard propose une pause après ${st.settings.pauseMin} minutes d’activité continue (réglable plus bas).` : 'Seul le temps d’activité compte. Les pauses sont désactivées (réglable plus bas).'))),
+      reglesCard(),
       card('Progression par niveau', ...levelBars),
       card('Exercices recommandés', recList),
       card('Difficultés rencontrées', diffList),

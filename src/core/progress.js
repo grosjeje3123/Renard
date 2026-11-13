@@ -152,15 +152,19 @@ export function reviewDue(st, id, now = Date.now()) {
  * Un seul raté (exercice acquis avec difficulté, ou séance finie fatigué) et tout redevient comme avant. Les parents peuvent le couper.
  */
 export const AISANCE_N = 3;
+/** Encore plus à l'aise : six nouveaux exercices de suite sans un raté. Le suivant commence par un défi « tout seul ». */
+export const AISANCE_DEFI = 6;
+export const tresALAise = (st) => aLAise(st) && (st.aisance || []).length >= AISANCE_DEFI && (st.aisance || []).slice(-AISANCE_DEFI).every((x) => x === 'e');
 export const aLAise = (st) => st.settings.montee !== false && !st.settings.demo && (st.aisance || []).length >= AISANCE_N && (st.aisance || []).slice(-AISANCE_N).every((x) => x === 'e');
 /**
  * Par quelle étape commence l'exercice : 0 (le guide), 1 (les pointillés : enfant à l'aise, exercice jamais essayé)
- * ou 2 (tout seul : un exercice déjà acquis un autre jour, rappel express).
+ * ou 2 (tout seul : un exercice déjà acquis un autre jour, rappel express ; ou défi pour l'enfant très à l'aise).
  */
 export function startPhaseFor(st, id, now = Date.now()) {
   const s = st.skills[id];
   if (s && paperEncore(s)) return 0; // à retravailler : on repart du guide
   if (s?.mastered && s.masteredAt && daysBetween(s.masteredAt, now) >= 1) return 2;
+  if (!s?.sessions && tresALAise(st)) return 2; // défi : tout seul du premier coup (au premier raté, on passe aux pointillés)
   if (!s?.sessions && aLAise(st)) return 1;
   return 0;
 }

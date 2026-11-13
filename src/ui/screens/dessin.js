@@ -6,6 +6,7 @@
 // (activé au départ), le même dessin en pointillés pâles sur la feuille, à suivre du doigt ou du stylet. Rien n'est jugé.
 // La fin est explicite : « J'ai fini ! » ouvre un écran de félicitations (continuer, nouveau dessin, garder, retour),
 // et la flèche de retour demande confirmation tant qu'un dessin est en cours.
+import { notePen, isPalm } from '../stylet.js';
 import { h, icon, pick } from '../dom.js';
 import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
@@ -24,7 +25,7 @@ const SHEET_W = 10, SHEET_H0 = 7; // feuille de 10 unités de large ; sa hauteur
 
 export function dessin(root, app) {
   root.classList.add('exo', 'dessin');
-  let color = COLORS[1][1], size = SIZES[1][1], active = null, penSeen = false, armed = 0, hungId = '', sheetH = SHEET_H0, fit = null;
+  let color = COLORS[1][1], size = SIZES[1][1], active = null, armed = 0, hungId = '', sheetH = SHEET_H0, fit = null;
   const strokes = [];
 
   const foxHost = h('div', { class: 'side-fox' });
@@ -109,8 +110,8 @@ export function dessin(root, app) {
   };
   svg.addEventListener('pointerdown', (e) => {
     if (active) return;
-    if (e.pointerType === 'pen') penSeen = true;
-    if (penSeen && e.pointerType === 'touch') return; // paume ignorée quand un stylet est utilisé
+    notePen(e);
+    if (isPalm(e)) return; // paume ignorée quand on écrit au stylet
     e.preventDefault();
     const p = toBoard(e);
     if (!p) return;

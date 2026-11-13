@@ -1,4 +1,4 @@
-PAROLES DU RENARD — 1878 phrases à enregistrer
+PAROLES DU RENARD — 1893 phrases à enregistrer
 Chaque ligne : identifiant | phrase. Le fichier audio de chaque phrase doit porter son identifiant : <identifiant>.mp3
 
 === CONSIGNE (506) ===
@@ -1837,8 +1837,9 @@ ec40a893 | On se retrouve tout à l’heure !
 455c7511 | Salut !
 09135c52 | Tu veux apprendre à écrire avec moi ?
 
-=== INTERFACE (60) ===
+=== INTERFACE (75) ===
 80decf28 | À demain !
+f4ce2ab4 | À toi !
 3068c24f | Allez, on y va ?
 dfbea7e2 | Apprends une nouvelle chose pour le gagner !
 ca8225ee | Avec ces lettres, le texte est trop long pour la page.
@@ -1853,28 +1854,41 @@ bfe80983 | Chaque nouvelle chose apprise te donne un trésor.
 bd9d32f9 | Choisis ton prochain jeu !
 ef5d3221 | Choisis un mot plus court.
 d8ced0b4 | Coucou !
+35d95862 | Défi : regarde le geste, puis écris-le tout seul du premier coup.
 a73bf90d | Dessine, puis accroche ton dessin dans la forêt !
-f6c1f369 | Écris de mémoire, tu sais le faire.
 dbc47243 | Essaie d’abord l’exercice d’avant, et celui-ci s’ouvrira !
 e4c9a6c1 | Essaie encore ce trait, doucement.
 d8a72758 | Et toi, comment tu t’appelles ?
 a986df80 | Et tu écris avec quelle main ?
+580483fe | Étape 1 : le guide.
+96dc5ae0 | Étape 1 : suis le guide.
+c0b82ce5 | Étape 2 : les pointillés.
+bb3dc581 | Étape 2 : suis les pointillés.
+d91d7ff6 | Étape 3 : écris de mémoire.
+3262bd9a | Étape 3 : plus de guide, écris tout seul, de mémoire.
+3996647d | Étape 3 : tout seul !
 6329499c | Hihi, ça chatouille !
 fb0d1b32 | Il dort encore !
 0238102b | J’adore écrire avec toi !
+43b0551d | J’écris de mémoire, comme un grand.
 d62b89f5 | Je fais une petite sieste.
+9d2f1c8b | Je suis le chemin avec mon doigt.
+42b844b7 | Je suis les points.
 e246a882 | La place est libre pour un autre dessin !
-68970947 | Maintenant, le chemin est en pointillés.
 72a2f716 | On a bien travaillé aujourd’hui.
 0be2ee3b | On fait autre chose un petit moment ?
-3a3ea0ea | On saute le guide : suis les pointillés.
+75da7e9e | On s’entraîne d’abord avec les pointillés.
+5fff8727 | On saute le guide.
 13f6eea9 | On se retrouve !
 51ab6e2d | On va bien s’amuser ensemble.
 12f59805 | Où est-ce qu’on va aujourd’hui ?
 479a03d3 | Pendant ce temps, tu peux bouger, lire ou écrire sur ton cahier !
-9be0ab27 | Plus de guide !
+40026ea6 | Pour chaque exercice, on fait trois étapes.
+b6f2bc7b | Presque !
+4cec2cc5 | Quand tu as réussi les trois étapes, l’exercice est gagné !
 062ade36 | Quel beau dessin !
 26d8a843 | Quelle belle écriture !
+ba0d7ad2 | Regarde !
 69d6c9cd | Regarde le geste une fois, puis écris de mémoire.
 997926aa | Regarde tout ce que tu as gagné en apprenant !
 b26ff757 | Regarde, je te montre encore une fois.
@@ -1890,6 +1904,7 @@ b47a0c68 | Ton dessin est accroché dans la forêt.
 f2d9c8b3 | Tu as écrit sur du vrai papier.
 d40deb75 | Tu écris autre chose, ou on retourne à la carte ?
 af0b0056 | Tu écris déjà bien !
+3c44f1a5 | Tu écris si bien !
 731c9322 | Tu en fais un autre, ou on retourne à la carte ?
 1adefa4b | Tu es en quelle classe ?
 04dfd99f | Tu peux quand même bouger, lire ou écrire sur ton cahier.

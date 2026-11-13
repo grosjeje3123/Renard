@@ -1,5 +1,6 @@
 // Le cahier à écrire : dessin des lignes Seyes, du guide, démonstration animée,
 // capture du geste (doigt ou stylet) et petits effets. Ne connaît ni la pédagogie ni le score.
+import { notePen, isPalm } from './stylet.js';
 import { BOARD } from '../core/board.js';
 import { strokeToSvgPath } from '../core/template.js';
 import { dist, polyLength, pointAt } from '../engine/geometry.js';
@@ -37,7 +38,6 @@ export class Board {
     this.tpl = template;
     this.hooks = hooks;
     this.enabled = false;
-    this.penSeen = false;
     this.active = null; // { id, points, el, pointerType, lifts }
     this.hold = null; // { stroke, timer }
     this.demoToken = 0;
@@ -149,9 +149,12 @@ export class Board {
   }
 
   down(e) {
-    if (!this.enabled || this.active) return;
-    if (e.pointerType === 'pen') this.penSeen = true;
-    if (this.penSeen && e.pointerType === 'touch') return; // paume ignorée quand un stylet est utilisé
+    if (!this.enabled) return;
+    notePen(e);
+    if (isPalm(e)) return; // paume posée pendant qu'on écrit au stylet
+    // la paume a touché l'écran juste avant le stylet : son trait est effacé, le stylet prend la main
+    if (this.active && e.pointerType === 'pen' && this.active.pointerType === 'touch') { this.removeInk(this.active.el); this.active = null; }
+    if (this.active) return;
     e.preventDefault();
     const p = this.toBoard(e);
     if (!p) return;
@@ -177,6 +180,7 @@ export class Board {
   }
 
   move(e) {
+    notePen(e);
     const a = this.active;
     if (!a || e.pointerId !== a.id) return;
     const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];

@@ -15,7 +15,7 @@ import { stickerSVG } from '../animals.js';
 import { dist, polyLength } from '../../engine/geometry.js';
 import { sfx, speak, stopSpeaking } from '../audio.js';
 
-const PHASE_NAMES = ['Guide', 'Pointillés', 'Tout seul'];
+const PHASE_NAMES = ['Le guide', 'Pointillés', 'Tout seul'];
 const PHASE_HELP = ['Étape 1 sur 3 : je suis le guide', 'Étape 2 sur 3 : je suis les pointillés', 'Étape 3 sur 3 : j’écris tout seul'];
 const PHASE_BANNER = ['Le guide : je suis le chemin', 'Les pointillés : je suis les points', 'Tout seul : j’écris de mémoire'];
 const PHASE_ICONS = [
@@ -33,7 +33,8 @@ export function exercise(root, app, skillId) {
   const st = app.state;
   const tpl = templateOf(skillId);
   const startPhase = st.settings.demo ? 0 : startPhaseFor(st, skillId); // déjà acquis un autre jour : rappel « tout seul »
-  const session = new Session(skillId, { demo: st.settings.demo, startPhase, reps: st.settings.reps });
+  const defi = startPhase === 2 && !skillState(st, skillId).sessions; // enfant très à l'aise : défi « tout seul » sur un exercice nouveau
+  const session = new Session(skillId, { demo: st.settings.demo, startPhase, reps: st.settings.reps, defi });
   const level = LEVELS.find((l) => l.skills.includes(skillId));
   const item = skill.item ? ITEMS[skill.item] : null;
   const writing = isWriting(skill);
@@ -46,8 +47,22 @@ export function exercise(root, app, skillId) {
   const boardHost = h('div', { class: 'board-host' });
   const starsPop = h('div', { class: 'stars-pop', 'aria-hidden': 'true' });
   const banner = h('div', { class: 'phase-banner', role: 'status' }); // « Étape 2 sur 3 : les pointillés », affiché un instant à chaque changement d'étape
-  const leavesEl = h('div', { class: 'leaves' });
-  const phaseEls = PHASE_NAMES.map((t, i) => h('li', { class: 'phase', title: PHASE_HELP[i] }, h('span', { class: 'ph-n', 'aria-hidden': 'true' }, String(i + 1)), h('span', { class: 'ph-ico', html: PHASE_ICONS[i] }), h('span', {}, t)));
+  // Avancement bien visible : trois grandes étapes (fait = vert coché, en cours = orange, à venir = blanc), avec sous chacune
+  // les réussites demandées (une ou deux pastilles), et au-dessus du cahier la place de l'exercice dans sa série.
+  const marksEls = [];
+  const phaseEls = PHASE_NAMES.map((t, i) => {
+    const marks = h('span', { class: 'ph-marks', 'aria-hidden': 'true' });
+    marksEls.push(marks);
+    return h('li', { class: 'phase', title: PHASE_HELP[i] },
+      h('span', { class: 'ph-n', 'aria-hidden': 'true' }, String(i + 1)),
+      h('span', { class: 'ph-ico', html: PHASE_ICONS[i] }),
+      h('span', { class: 'ph-txt' }, h('span', { class: 'ph-name' }, t), marks));
+  });
+  const secs = levelSections(app.state, level);
+  const sec = secs.find((x) => x.skills.includes(skillId));
+  const serieEl = sec && sec.skills.length > 1 ? h('div', { class: 'serie-track', 'aria-label': `Exercice ${sec.skills.indexOf(skillId) + 1} sur ${sec.skills.length} de la série` },
+    h('span', { class: 'st-lbl' }, `${sec.title ? sec.title + ' · ' : ''}${sec.skills.indexOf(skillId) + 1} / ${sec.skills.length}`),
+    h('span', { class: 'st-dots', 'aria-hidden': 'true' }, sec.skills.map((id) => h('span', { class: `st-dot${id === skillId ? ' cur' : skillState(app.state, id).mastered ? ' ok' : ''}` })))) : null;
   const replayBtn = h('button', { class: 'chip-btn', type: 'button', html: `${icon('replay', 22)}<span>Revoir</span>` });
 
   const cardText = writing || !item ? skill.short : already ? `Gagné : ${item.name}` : `À gagner : ${item.name}`;
@@ -63,11 +78,9 @@ export function exercise(root, app, skillId) {
     h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }),
     h('header', { class: 'bar exo-bar' },
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour à la carte', onClick: () => app.go(`carte-${level.id}`), html: icon('back', 26) }),
-      h('div', { class: 'bar-title' }, h('h2', {}, skill.title), h('p', {}, level.name)),
+      h('div', { class: 'bar-title' }, h('h2', {}, skill.title), serieEl || h('p', {}, level.name)),
       h('div', { class: 'phases-box' },
-        h('p', { class: 'phases-cap' }, 'Trois étapes'),
         h('ul', { class: 'phases', 'aria-label': 'Les trois étapes : le guide, les pointillés, puis tout seul' }, phaseEls)),
-      leavesEl,
     ),
     h('div', { class: 'exo-main' },
       h('aside', { class: 'side' }, foxHost, b, h('div', { class: 'side-actions' }, replayBtn), card, modelChip),
@@ -96,9 +109,11 @@ export function exercise(root, app, skillId) {
   function updateUI() {
     applyEpaisseur();
     phaseEls.forEach((el, i) => { el.classList.toggle('on', i === session.phase); el.classList.toggle('past', i < session.phase); if (i === session.phase) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current'); });
-    const need = session.totalNeeded;
-    leavesEl.innerHTML = Array.from({ length: need }, (_, i) => `<span class="lf ${i < session.totalWins ? 'on' : ''}">${icon(i < session.totalWins ? 'leaf' : 'leafO', 26)}</span>`).join('');
-    leavesEl.setAttribute('aria-label', `${session.totalWins} réussites sur ${need}`);
+    marksEls.forEach((m, i) => {
+      const done = i < session.phase ? session.need[i] : i === session.phase ? session.wins[i] : 0;
+      m.innerHTML = session.need[i] > 1 ? Array.from({ length: session.need[i] }, (_, k) => `<i class="${k < done ? 'on' : ''}"></i>`).join('') : '';
+    });
+    phaseEls.forEach((el, i) => { el.querySelector('.ph-n').innerHTML = i < session.phase ? icon('check', 20) : String(i + 1); });
     board.setPhase(session.phase);
     modelChip.hidden = session.phase >= 2 && !session.helped; // de mémoire : pas de modèle, sauf si l'enfant l'a redemandé
   }
@@ -175,7 +190,7 @@ export function exercise(root, app, skillId) {
     if (res.action === 'phase') {
       await say(session.phase === 1 ? 'Bravo ! Étape 2 : suis les pointillés.' : 'Bravo ! Étape 3 : plus de guide, écris tout seul, de mémoire.', { mood: 'joy', ms: 2600, icon: 'star' });
     } else if (res.action === 'back') {
-      await say('Regardons encore une fois, je te montre.', { mood: 'encourage', icon: 'eye' });
+      await say(res.defi ? 'Presque ! On s’entraîne d’abord avec les pointillés.' : 'Regardons encore une fois, je te montre.', { mood: 'encourage', icon: 'eye' });
       board.clearInk(); board.setProgress(0, 0);
       await board.playDemo();
     } else if (res.rewatch) {
@@ -259,7 +274,7 @@ export function exercise(root, app, skillId) {
     updateUI();
     board.enable(false);
     await sleep(350);
-    await Promise.all([say(startPhase === 2 ? 'On se retrouve ! Regarde le geste une fois, puis écris de mémoire.' : skill.say.intro, { mood: 'neutral', icon: 'eye', ms: 1500 }), sleep(900).then(() => board.playDemo())]);
+    await Promise.all([say(defi ? 'Tu écris si bien ! Défi : regarde le geste, puis écris-le tout seul du premier coup.' : startPhase === 2 ? 'On se retrouve ! Regarde le geste une fois, puis écris de mémoire.' : skill.say.intro, { mood: 'neutral', icon: 'eye', ms: 1500 }), sleep(900).then(() => board.playDemo())]);
     if (!alive) return;
     beginTry();
     say(startPhase === 1 ? 'Tu écris déjà bien ! On saute le guide. Étape 2 : suis les pointillés.' : startPhase === 2 ? 'À toi ! Étape 3 : écris de mémoire.' : 'À toi ! Étape 1 : suis le guide.', { mood: 'encourage', icon: 'hand', ms: 1800 });

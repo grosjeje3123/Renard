@@ -599,7 +599,10 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   await dif.ctx.close();
   // Les trois étapes sont expliquées, et le point du i vient pendant l'écriture
   const ex3 = await open((x) => { x.settings.demo = true; x.settings.accueilFait = true; }, 'exercice-mot_lit');
-  check('étapes : l\'exercice numérote les trois étapes sous « Trois étapes »', (await ex3.page.$$eval('.phase .ph-n', (n) => n.map((x) => x.textContent).join(''))) === '123' && /trois étapes/i.test(await ex3.page.innerText('.phases-cap')));
+  check('étapes : l\'exercice numérote les trois étapes, bien visibles', (await ex3.page.$$eval('.phase .ph-n', (n) => n.map((x) => x.textContent).join(''))) === '123' && /trois étapes/i.test(await ex3.page.getAttribute('.phases', 'aria-label')));
+  await ex3.page.waitForSelector('.phase-banner.show', { timeout: 30000 });
+  check('étapes : l\'étape en cours est annoncée sur le cahier', /Étape 1 sur 3/.test(await ex3.page.innerText('.phase-banner')));
+  check('avancement : la place dans la série est affichée', /\d+ \/ \d+/.test(await ex3.page.innerText('.serie-track')) && (await ex3.page.$$('.st-dot.cur')).length === 1);
   const nums = await ex3.page.$$eval('.gs', (gs) => gs.map((g) => [g.querySelector('.snum')?.textContent, !g.querySelector('.ink-path') && g.querySelectorAll('path').length === 0].join('')));
   check('numérotation : lit = l, i, son point, t, barre du t (le point porte le 3)', nums.length === 5 && nums.map((x) => x[0]).join('') === '12345', JSON.stringify(nums));
   check('étapes : aucune erreur', ex3.errs.length === 0, ex3.errs.join(' | '));
@@ -772,7 +775,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   const phase = async (mutate) => {
     const z = await open(mutate, 'exercice-a');
     await z.page.waitForSelector('.board', { timeout: 15000 });
-    const r = { ph: await z.page.getAttribute('.board', 'data-phase'), feuilles: await z.page.$$eval('.leaves .lf.on', (x) => x.length), errs: z.errs };
+    const r = { ph: await z.page.getAttribute('.board', 'data-phase'), feuilles: await z.page.$$eval('.phase.past', (x) => x.length), errs: z.errs };
     await z.ctx.close();
     return r;
   };
@@ -781,12 +784,36 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   const X = await phase((x) => { x.aisance = ['e', 'e', 'x']; });
   const C = await phase((x) => { x.aisance = ['e', 'e', 'e']; x.settings.montee = false; });
   const Dm = await phase((x) => { x.aisance = ['e', 'e', 'e']; x.settings.demo = true; });
+  const Df = await phase((x) => { x.aisance = ['e', 'e', 'e', 'e', 'e', 'e']; });
+  check('difficulté : très à l’aise, défi « tout seul » d’emblée', Df.ph === '2' && Df.feuilles === 2, JSON.stringify(Df));
   check('difficulté : à l’aise, un nouvel exercice commence aux pointillés', E.ph === '1' && E.feuilles === 1, JSON.stringify(E));
   check('difficulté : sans aisance, il commence par le guide', N.ph === '0' && N.feuilles === 0, JSON.stringify(N));
   check('difficulté : un seul raté et tout redevient comme avant', X.ph === '0', JSON.stringify(X));
   check('difficulté : coupée par les parents, on commence par le guide', C.ph === '0', JSON.stringify(C));
   check('difficulté : en démonstration, on commence par le guide', Dm.ph === '0', JSON.stringify(Dm));
   check('difficulté : aucune erreur', [E, N, X, C, Dm].every((r) => r.errs.length === 0), [E, N, X, C, Dm].flatMap((r) => r.errs).join(' | '));
+
+  // « Comment ça marche » avant le premier exercice lancé avec Jouer ; puis plus jamais. Papier : le cahier de vacances se prépare.
+  const mt = await open((x) => { x.settings.accueilFait = true; x.settings.methodeVue = false; x.settings.demo = false; });
+  await mt.page.click('.home-panel .btn-big');
+  await mt.page.waitForTimeout(800);
+  check('démarche : « Jouer » montre d’abord les trois étapes', (await mt.hash()).startsWith('#methode-'), await mt.hash());
+  check('démarche : trois petits cahiers (guide, pointillés, tout seul)', JSON.stringify(await mt.page.$$eval('.mt-board svg.board', (b) => b.map((x) => x.getAttribute('data-phase')))) === '["0","1","2"]');
+  check('démarche : les règles de la reconnaissance pour les adultes', (await mt.page.$$('.mt-adultes .regles dt')).length === 6);
+  await mt.page.click('.mt-actions .btn-big');
+  await mt.page.waitForTimeout(800);
+  check('démarche : « C’est parti » enchaîne sur l’exercice', (await mt.hash()).startsWith('#exercice-'), await mt.hash());
+  await mt.page.evaluate(() => { location.hash = 'accueil'; });
+  await mt.page.waitForTimeout(800);
+  await mt.page.click('.home-panel .btn-big');
+  await mt.page.waitForTimeout(800);
+  check('démarche : la deuxième fois, « Jouer » va droit à l’exercice', (await mt.hash()).startsWith('#exercice-'), await mt.hash());
+  await mt.page.evaluate(() => { location.hash = 'papier'; });
+  await mt.page.waitForSelector('.papier .pcard');
+  const [dlv] = await Promise.all([mt.page.waitForEvent('download', { timeout: 60000 }).catch(() => null), mt.page.click('.papier .pcard:nth-of-type(2) .btn-sec')]);
+  check('papier : le cahier de vacances se prépare sans passer par l’espace parents', !!dlv && /cahier-de-vacances/.test(dlv.suggestedFilename()), dlv?.suggestedFilename());
+  check('démarche et papier : aucune erreur', mt.errs.length === 0, mt.errs.join(' | '));
+  await mt.ctx.close();
 
   // espace parents : réglage, avis sur le papier, dictées
   const p = await open(null, 'parents');
