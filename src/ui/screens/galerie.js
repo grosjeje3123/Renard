@@ -13,7 +13,7 @@ export function galerie(root, app) {
   const st = app.state;
   root.classList.add('galerie');
   const bar = h('header', { class: 'bar' },
-    h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour à l’accueil', onClick: () => { sfx('tap'); app.go('accueil'); }, html: icon('back', 26) }),
+    h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour aux jeux', onClick: () => { sfx('tap'); app.go('jeux'); }, html: icon('back', 26) }),
     h('div', { class: 'bar-title' }, h('h2', {}, 'Ma galerie'), h('p', {}, 'Tes dessins accrochés dans la forêt')));
   root.append(h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }), bar);
 

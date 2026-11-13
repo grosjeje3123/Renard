@@ -6,7 +6,7 @@ import { skillState, skillStatus, levelProgress, levelSkills, levelSections, ord
 import { sfx } from '../audio.js';
 import { STICKERS } from '../../content/stickers.js';
 import { stickerSVG } from '../animals.js';
-import { card, settingsCards, orderCard, sheetsCard, backupCard, reglesCard } from './parents-tools.js';
+import { card, settingsCards, orderCard, backupCard, reglesCard } from './parents-tools.js';
 
 const STATUS = { new: ['À découvrir', 'st-new'], progress: ['En cours', 'st-prog'], review: ['À reprendre', 'st-rev'], mastered: ['Acquis', 'st-ok'], due: ['Rappel conseillé', 'st-due'], cons: ['Consolidé', 'st-cons'] };
 /** Statut affiché : « acquis » se précise en « rappel conseillé » puis « consolidé » (réussi de mémoire à des jours espacés). */
@@ -195,7 +195,8 @@ function dashboard(root, app) {
         h('p', { class: 'muted' }, 'Les vignettes récompensent la réussite (trois étoiles ou exercice acquis), la persévérance (recommencer après un essai difficile), les étapes franchies et l’écriture sur papier. Pas de tirage au sort, pas de série à maintenir, rien pour le temps passé : une vignette gagnée reste acquise.')),
       ...settingsCards(app),
       orderCard(app),
-      sheetsCard(app),
+      card('Cahiers à imprimer', h('p', { class: 'muted' }, 'Trois cahiers de vacances tout prêts (un par niveau, 11 pages) : les mêmes modèles que sur l’écran, en grand, avec des jeux autour du renard.'),
+        h('button', { class: 'btn-sec', type: 'button', onClick: () => { app.papierFrom = 'parents'; app.go('papier'); }, html: `${icon('page', 22)}<span>Voir les cahiers</span>` })),
       backupCard(app),
       card('Données de l’enfant', h('p', { class: 'muted' }, 'Effacer supprime la progression, les vignettes, les dessins de la galerie et les réglages de cet appareil. Pensez à créer un code de sauvegarde avant.'), resetBtn),
       card('Vie privée',

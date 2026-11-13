@@ -39,7 +39,11 @@ for (const r of ['niveaux', 'carte-1', 'carte-3', 'exercice-lignes', 'tresors', 
 }
 const b = await page.$('.gate-btn'); const bb = await b.boundingBox();
 await page.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await page.mouse.down(); await page.waitForTimeout(2400); await page.mouse.up(); await page.waitForTimeout(700);
-await page.evaluate(() => [...document.querySelectorAll('.pcard button')].find((x) => /(Télécharger|Imprimer ou enregistrer) le PDF/.test(x.textContent)).click());
+await page.evaluate(() => [...document.querySelectorAll('.pcard button')].find((x) => /Voir les cahiers/.test(x.textContent)).click());
+await page.waitForTimeout(800);
+await page.click('.pp-cahier'); // cahier tout prêt, embarqué dans l'application
+await page.waitForTimeout(800);
+await page.evaluate(() => { location.hash = 'parents'; });
 await page.waitForTimeout(800);
 await page.evaluate(() => [...document.querySelectorAll('button')].find((x) => /Créer le code/.test(x.textContent)).click());
 await page.waitForTimeout(500);

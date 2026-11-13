@@ -15,6 +15,7 @@ import { serie } from './ui/screens/serie.js';
 import { jeux } from './ui/screens/jeux.js';
 import { dictee } from './ui/screens/dictee.js';
 import { methode } from './ui/screens/methode.js';
+import { collection } from './ui/screens/collection.js';
 import { papier } from './ui/screens/papier.js';
 import { galerie } from './ui/screens/galerie.js';
 import { demarrage } from './ui/screens/demarrage.js';
@@ -27,4 +28,4 @@ const style = document.createElement('style');
 style.textContent = FOX_CSS;
 document.head.append(style);
 
-app.start(document.getElementById('app'), { accueil: home, niveaux: levels, carte: map, exercice: exercise, tresors: rewards, album, parents, pause, fiche, cahier, dessin, galerie, tableau, serie, jeux, dictee, methode, papier, demarrage, bienvenue, options, credits });
+app.start(document.getElementById('app'), { accueil: home, niveaux: levels, carte: map, exercice: exercise, tresors: rewards, album, parents, pause, fiche, cahier, dessin, galerie, tableau, serie, jeux, dictee, methode, papier, collection, demarrage, bienvenue, options, credits });

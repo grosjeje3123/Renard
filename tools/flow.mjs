@@ -259,8 +259,8 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     const s = await open(null, 'dessin');
     await draw(s); await clickText(s.page, 'J’ai fini'); await s.page.waitForTimeout(250);
     check('galerie fermée : pas de bouton « Accrocher » à la fin du dessin', !(await buttons(s.page, '.dessin-end button')).some((t) => /Accrocher/.test(t)));
-    await s.page.evaluate(() => { location.hash = 'accueil'; }); await s.page.waitForTimeout(700);
-    check('galerie fermée : pas de bouton Galerie dans le menu', !(await buttons(s.page, '.home-nav button')).some((t) => /Galerie/.test(t)));
+    await s.page.evaluate(() => { location.hash = 'jeux'; }); await s.page.waitForTimeout(700);
+    check('galerie fermée : pas de carte Galerie dans les jeux', !(await s.page.$('.jeu-card[data-jeu="galerie"]')));
     await s.page.evaluate(() => { location.hash = 'galerie'; }); await s.page.waitForTimeout(700);
     check('galerie fermée : l’écran explique qu’un adulte peut l’ouvrir', /pas ouverte/.test(await s.page.innerText('.galerie')));
     check('galerie fermée : rien dans l’état enregistré', !((await s.state()).galerie?.length));
@@ -310,8 +310,8 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     check('galerie : retirer demande d’abord confirmation', (await s.state()).galerie.length === 1 && /Sûr/.test(await s.page.innerText('.gal-zoom')));
     await clickText(s.page, 'Sûr'); await s.page.waitForTimeout(600);
     check('galerie : après confirmation, le dessin est retiré et la galerie est vide', (await s.state()).galerie.length === 0 && /vide/.test(await s.page.innerText('.mur-vide')));
-    await s.page.evaluate(() => { location.hash = 'accueil'; }); await s.page.waitForTimeout(700);
-    check('galerie ouverte : le menu propose « Galerie »', (await buttons(s.page, '.home-nav button')).some((t) => /Galerie/.test(t)));
+    await s.page.evaluate(() => { location.hash = 'jeux'; }); await s.page.waitForTimeout(700);
+    check('galerie ouverte : les jeux proposent « Ma galerie »', !!(await s.page.$('.jeu-card[data-jeu="galerie"]')));
     check('galerie : aucune erreur', s.errs.length === 0, s.errs.join(' | '));
     await s.ctx.close();
   }
@@ -454,8 +454,9 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   // première ouverture : le Tableau (écrire et dessiner avec calques) est dans le menu dès le départ, sans rien à débloquer
   {
     const s = await open((st) => { st.skills = {}; st.settings.depart = 1; });
-    check('première ouverture : le menu propose le Tableau', (await buttons(s.page, '.home-nav button')).some((t) => /Tableau/.test(t)));
-    await s.page.click('.home-nav button:has-text("Tableau")'); await s.page.waitForTimeout(800);
+    await s.page.click('.home-nav button:has-text("Jeux")'); await s.page.waitForTimeout(600);
+    check('première ouverture : les jeux proposent le Tableau', !!(await s.page.$('.jeu-card[data-jeu="tableau"]:not(.off)')));
+    await s.page.click('.jeu-card[data-jeu="tableau"]'); await s.page.waitForTimeout(800);
     check('première ouverture : le Tableau s’ouvre', (await s.hash()) === '#tableau' && !!(await s.page.$('.tableau-board')));
     check('première ouverture : aucune erreur', s.errs.length === 0, s.errs.join(' | '));
     await s.ctx.close();
@@ -465,8 +466,8 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     const s = await open((st) => { st.settings.depart = 3; }, 'carte-3-0');
     const nbOuverts = await s.page.$$eval('.node:not(.locked):not(.free)', (a) => a.length);
     check('classe « fin du CP » : tous les mots du début sont ouverts sans avoir essayé de lettres', nbOuverts === 6, String(nbOuverts));
-    await s.page.evaluate(() => { location.hash = 'accueil'; }); await s.page.waitForTimeout(700);
-    check('classe « fin du CP » : le menu propose le Tableau', (await buttons(s.page, '.home-nav button')).some((t) => /Tableau/.test(t)));
+    await s.page.evaluate(() => { location.hash = 'jeux'; }); await s.page.waitForTimeout(700);
+    check('classe « fin du CP » : les jeux proposent le Tableau', !!(await s.page.$('.jeu-card[data-jeu="tableau"]')));
     await s.ctx.close();
   }
   // parents : réglages
@@ -523,7 +524,10 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   let st = await s.state();
   check('présentation : la limite du jour choisie est enregistrée', st.settings.pauseMode === 'limite' && st.settings.limiteMin === 30, JSON.stringify({ m: st.settings.pauseMode, l: st.settings.limiteMin }));
   check('présentation : prénom nettoyé, classe et main enregistrés', st.name === 'Léa-Rose' && st.settings.classe === 'gs' && st.settings.depart === 1 && st.settings.main === 'droite' && st.settings.accueilFait === true, JSON.stringify({ n: st.name, c: st.settings.classe, d: st.settings.depart }));
+  check('premier lancement : la démarche en trois étapes est montrée tout de suite', (await s.hash()) === '#methode', await s.hash());
+  await s.page.click('.mt-actions .btn-big'); await s.page.waitForTimeout(700);
   check('présentation : on arrive à l’accueil', (await s.hash()) === '#accueil');
+  check('accueil : regroupé (niveaux, trésors, jeux, démarche, parents)', (await s.page.$$eval('.home-nav .lbl', (l) => l.map((x) => x.textContent).join(','))) === 'Niveaux,Trésors,Jeux,Démarche,Parents', await s.page.$$eval('.home-nav .lbl', (l) => l.map((x) => x.textContent).join(',')));
   const opt = await s.page.evaluate(() => { const b = document.querySelector('.top-right [aria-label=Options]'); if (!b) return null; const r = b.getBoundingClientRect(); return { right: r.right, top: r.top, w: innerWidth }; });
   check('accueil : le bouton Options est en haut à droite', !!opt && opt.right > opt.w - 160 && opt.top < 40, JSON.stringify(opt));
   // Options
@@ -557,7 +561,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   await p.ctx.close();
   // Grande section : la carte du niveau 1 ouvre d'emblée la première majuscule
   const g = await open((x) => { x.skills = {}; x.settings.classe = 'gs'; x.settings.depart = 1; x.settings.accueilFait = true; }, 'carte-1-1');
-  const ouverts = await g.page.$$eval('.node:not(.locked)', (a) => a.map((n) => n.textContent.trim()));
+  const ouverts = await g.page.$$eval('.node:not(.locked)', (a) => a.map((n) => n.querySelector('.nlabel')?.textContent.trim() || ''));
   check('grande section : la première majuscule est ouverte', ouverts.length >= 1 && ouverts.some((t) => /(^|\s)I$/.test(t)), ouverts.join(','));
   const ex = await open((x) => { x.skills = {}; x.settings.classe = 'gs'; x.settings.depart = 1; x.settings.accueilFait = true; }, 'exercice-maj_I');
   check('majuscule : l’exercice « I » s’ouvre', (await ex.hash()) === '#exercice-maj_I' && /Le I majuscule/.test(await ex.page.innerText('.exo-bar')));
@@ -748,7 +752,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   const m = await open((x) => { x.settings.voix = false; }, 'dictee');
   await m.page.waitForTimeout(500);
   check('dictée : sans la voix du renard, on revient aux jeux', (await m.hash()) === '#jeux', await m.hash());
-  check('jeux : sans voix, la carte dit pourquoi', /Remets la voix/.test(await txt(m.page, '.jeu-card .jc-note')));
+  check('jeux : sans voix, la carte dit pourquoi', /Remets la voix/.test(await txt(m.page, '.jeu-card[data-jeu="dictee"] .jc-note')));
   await m.ctx.close();
 
   // une dictée : consigne dite mais jamais écrite, cahier sans modèle ni point de départ, « Passer » ne note rien

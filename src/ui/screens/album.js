@@ -46,7 +46,7 @@ export function album(root, app) {
   root.append(
     h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }),
     h('header', { class: 'bar' },
-      h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour à l’accueil', onClick: () => app.go('accueil'), html: icon('back', 26) }),
+      h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour', onClick: () => app.go(app.collectionFrom || 'collection'), html: icon('back', 26) }),
       h('div', { class: 'bar-title' }, h('h2', {}, 'Mon album'), h('p', {}, 'Des vignettes d’animaux de la campagne, chacune avec une petite histoire. Elles se gagnent en avançant.')),
       h('span', { class: 'count-pill', 'aria-label': `${n} vignettes sur ${STICKERS.length}` }, `${n} / ${STICKERS.length}`)),
     h('div', { class: 'album-body' },
@@ -56,7 +56,7 @@ export function album(root, app) {
 
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
-  const intro = n === 0 ? 'Chaque réussite te donne une vignette d’animal. On les colle ici !'
+  const intro = n === 0 ? 'Quand tu avances bien, tu gagnes des vignettes d’animaux. On les colle ici !'
     : n === STICKERS.length ? 'Tu as toutes les vignettes ! Quelle belle collection !'
     : `Tu as ${n} vignette${n > 1 ? 's' : ''} sur ${STICKERS.length}. Touche une vignette pour la regarder.`;
   speaker.say(intro, { once: 'album', icon: 'star' });

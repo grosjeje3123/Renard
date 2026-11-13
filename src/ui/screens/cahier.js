@@ -53,7 +53,7 @@ export function cahier(root, app, id) {
 
   go.addEventListener('click', () => {
     markPaper(st, id);
-    const won = awardStickers(st);
+    const won = awardStickers(st, Date.now(), (s) => s.rule === 'paper'); // ici, seulement les vignettes du cahier
     app.save();
     sfx('win');
     fox.setMood('joy', 4000);

@@ -10,6 +10,7 @@ export const STATE_VERSION = 1;
 
 export function newState() {
   return {
+    cadeaux: { attente: [], dernier: -1, objets: [] }, // récompenses remises une à une (voir distribuer)
     v: STATE_VERSION,
     name: '',
     created: Date.now(),
@@ -98,7 +99,9 @@ export function hydrate(s) {
   // vignettes renommées (animaux de la campagne) : celles déjà collées restent collées
   const stickers = { ...(s.stickers || {}) };
   for (const [old, nu] of [['dauphin', 'poule'], ['ours', 'blaireau']]) if (stickers[old]) { stickers[nu] ||= stickers[old]; delete stickers[old]; }
-  return { ...base, ...s, stickers, galerie, settings: { ...base.settings, ...(s.settings || {}) }, rest: { ...base.rest, ...(s.rest || {}) } };
+  // récompenses remises une à une (v1.9) : une ancienne sauvegarde garde tous les objets déjà gagnés
+  const cadeaux = s.cadeaux && Array.isArray(s.cadeaux.attente) ? s.cadeaux : { attente: [], dernier: -1, objets: Object.values(ITEMS).filter((it) => s.skills?.[it.skill]?.mastered).map((it) => it.id) };
+  return { ...base, ...s, stickers, galerie, cadeaux, settings: { ...base.settings, ...(s.settings || {}) }, rest: { ...base.rest, ...(s.rest || {}) } };
 }
 
 const blank = () => ({ sessions: 0, attempts: 0, phase: 0, mastered: false, masteredAt: null, last: null, history: [] });
@@ -438,7 +441,9 @@ export function foxStage(st) {
   return { ...stage, index: idx, mastered: n };
 }
 
-export const unlockedItems = (st) => Object.values(ITEMS).filter((it) => skillState(st, it.skill).mastered).map((it) => it.id);
+/** Les objets mérités (leur exercice est acquis) ; ceux réellement remis sont dans st.cadeaux.objets (voir distribuer). */
+export const itemsMerites = (st) => Object.values(ITEMS).filter((it) => skillState(st, it.skill).mastered).map((it) => it.id);
+export const unlockedItems = (st) => (st.cadeaux ? st.cadeaux.objets.slice() : itemsMerites(st));
 
 // ---------- Vignettes d'animaux ----------
 // Évaluées à partir de l'état seul (historique des essais, compétences acquises) : le résultat ne dépend
@@ -471,12 +476,12 @@ function stickerEarned(st, sticker) {
   }
 }
 
-/** Colle les vignettes méritées et retourne les nouvelles (dans l'ordre de l'album). Rien ne se retire jamais. */
-export function awardStickers(st, now = Date.now()) {
+/** Colle les vignettes méritées (toutes, ou celles que `seulement` retient) et retourne les nouvelles. Rien ne se retire jamais. */
+export function awardStickers(st, now = Date.now(), seulement = null) {
   st.stickers = st.stickers || {};
   const won = [];
   for (const sticker of STICKERS) {
-    if (st.stickers[sticker.id] || !stickerEarned(st, sticker)) continue;
+    if (st.stickers[sticker.id] || (seulement && !seulement(sticker)) || !stickerEarned(st, sticker)) continue;
     st.stickers[sticker.id] = now;
     won.push(sticker.id);
   }
@@ -484,6 +489,28 @@ export function awardStickers(st, now = Date.now()) {
 }
 
 export const stickerCount = (st) => Object.keys(st.stickers || {}).length;
+
+/** Il faut au moins deux nouveaux exercices acquis entre deux récompenses (la toute première arrive tout de suite). */
+export const ECART_CADEAU = 2;
+/**
+ * Une récompense à la fois, et pas trop vite. Ce que l'enfant a mérité (l'objet d'un exercice, une vignette d'animal) entre dans une
+ * file d'attente ; une seule récompense est remise, et seulement quand un exercice vient d'être acquis et que l'écart est respecté.
+ * Rien ne se perd : tout finit par arriver, dans l'ordre où ça a été mérité. Retourne { t: 'item' | 'stk', id } ou null.
+ */
+export function distribuer(st, newlyMastered, now = Date.now()) {
+  st.stickers = st.stickers || {};
+  const c = st.cadeaux;
+  const enAttente = (t, id) => c.attente.some((x) => x.t === t && x.id === id);
+  for (const id of itemsMerites(st)) if (!c.objets.includes(id) && !enAttente('item', id)) c.attente.push({ t: 'item', id });
+  for (const s of STICKERS) if (s.rule !== 'paper' && !st.stickers[s.id] && !enAttente('stk', s.id) && stickerEarned(st, s)) c.attente.push({ t: 'stk', id: s.id });
+  if (!newlyMastered || !c.attente.length) return null;
+  const n = masteredCount(st);
+  if (c.dernier >= 0 && n - c.dernier < ECART_CADEAU) return null;
+  const g = c.attente.shift();
+  c.dernier = n;
+  if (g.t === 'item') c.objets.push(g.id); else st.stickers[g.id] = now;
+  return g;
+}
 
 const CRIT_LABEL = {
   start: ['le point de départ', 'Rappelez le point vert : c’est là que le geste commence.'],

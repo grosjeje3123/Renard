@@ -1400,3 +1400,17 @@ test('dictée surprise : proposée seulement si la voix est là, hors démonstra
   st.settings.dicteeSurprise = false; assert.equal(surpriseOk(st), false);
   st.settings.dicteeSurprise = true; st.settings.voix = false; assert.equal(surpriseOk(st), false);
 });
+
+test('récompenses : une seule à la fois, et au moins deux exercices acquis entre deux (rien ne se perd)', () => {
+  const st = P.newState();
+  const acquerir = (id) => { st.skills[id] = { sessions: 1, attempts: 3, phase: 3, mastered: true, masteredAt: 1, last: 1, history: [{ st: 3, c: {} }] }; return P.distribuer(st, true); };
+  const g1 = acquerir('lignes');
+  assert.ok(g1, 'la toute première récompense arrive tout de suite');
+  assert.equal(acquerir('ronds'), null, 'pas deux de suite');
+  const g3 = acquerir('ponts');
+  assert.ok(g3 && JSON.stringify(g3) !== JSON.stringify(g1), 'deux exercices plus tard, la suivante');
+  assert.ok(st.cadeaux.attente.length > 0, 'les autres attendent leur tour');
+  assert.equal(P.distribuer(st, false), null, 'jamais sans un exercice acquis');
+  const ancien = P.hydrate({ skills: { lignes: { sessions: 1, attempts: 3, phase: 3, mastered: true, history: [] } } });
+  assert.deepEqual(ancien.cadeaux.objets, ['echarpe'], 'une ancienne sauvegarde garde ses objets');
+});

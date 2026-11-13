@@ -3,8 +3,7 @@ import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { recommend, foxStage, breakDue, blocked, takeBreak } from '../../core/progress.js';
 import { SKILLS } from '../../content/skills.js';
-import { sfx, frenchVoices, onVoicesChanged } from '../audio.js';
-import { galleryOn } from '../../core/galerie.js';
+import { sfx, frenchVoices, onVoicesChanged, hasClips } from '../audio.js';
 
 export function home(root, app) {
   const st = app.state;
@@ -37,7 +36,7 @@ export function home(root, app) {
       h('button', { class: 'btn-sec sm', type: 'button', onClick: () => { st.settings.avisVoix = true; app.save(); voiceNotice.hidden = true; } }, 'Compris')));
   const checkVoice = () => {
     if (!voiceNotice.isConnected) { off(); return; }
-    voiceNotice.hidden = !(st.settings.voix && !st.settings.avisVoix && frenchVoices().length === 0);
+    voiceNotice.hidden = !(st.settings.voix && !st.settings.avisVoix && frenchVoices().length === 0 && !hasClips()); // avec les voix enregistrées, le renard parle de toute façon
   };
   const off = onVoicesChanged(checkVoice);
   setTimeout(checkVoice, 2500); // la liste des voix arrive après le démarrage
@@ -58,7 +57,7 @@ export function home(root, app) {
         voiceNotice,
       ),
     ),
-    h('nav', { class: 'home-nav', 'aria-label': 'Menu' }, navBtn('map', 'Niveaux', 'niveaux'), navBtn('chest', 'Trésors', 'tresors'), navBtn('album', 'Album', 'album'), navBtn('tableau', 'Tableau', 'tableau'), navBtn('dice', 'Jeux', 'jeux'), navBtn('page', 'Papier', 'papier'), navBtn('help', 'Démarche', 'methode'), galleryOn(st) ? navBtn('frame', 'Galerie', 'galerie') : null, lockBtn),
+    h('nav', { class: 'home-nav', 'aria-label': 'Menu' }, navBtn('map', 'Niveaux', 'niveaux'), navBtn('chest', 'Trésors', 'collection'), navBtn('dice', 'Jeux', 'jeux'), navBtn('help', 'Démarche', 'methode'), lockBtn),
   );
 
   const fox = app.makeFox(foxHost);

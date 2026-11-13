@@ -11,6 +11,7 @@ import { recognizer } from '../../engine/recognizer.js';
 import { buildFeedback } from '../../engine/feedback.js';
 import { surpriseOk } from '../../core/dictee.js';
 import { masteredCount } from '../../core/progress.js';
+import { distribuer } from '../../core/progress.js';
 import { recordSession, awardStickers, isSkillOpen, skillState, startPhaseFor, breakDue, beginSleep, blocked, noterSerie, serieAFeter, levelSections } from '../../core/progress.js';
 import { STICKER_BY_ID } from '../../content/stickers.js';
 import { stickerSVG } from '../animals.js';
@@ -73,7 +74,8 @@ export function exercise(root, app, skillId) {
     skill.capital ? null : h('span', { class: 'ec-art ec-glyph', html: glyphIcon(skillId, { stroke: 'var(--accent-deep)', width: 0.3 }) }),
     h('span', { class: 'ec-text' },
       writing ? h('span', { class: `ec-letter${skill.kind === 'word' ? ' word' : ''}${skill.phrase ? ' phrase' : ''}` }, skill.glyph) : null,
-      h('span', {}, cardText)));
+      h('span', {}, cardText)),
+    writing ? h('span', { class: 'ec-ear', 'aria-hidden': 'true', html: icon('speaker', 22) }) : null);
   // Modèle à côté du cahier (côté opposé à la main qui écrit) : on le voit même quand la main cache le guide.
   const modelChip = h('div', { class: 'model-chip', 'aria-label': 'Le modèle', html: glyphIcon(skillId, { stroke: 'var(--text)', width: 0.2, pad: 0.4 }) });
 
@@ -122,12 +124,18 @@ export function exercise(root, app, skillId) {
   }
 
   // Annonce claire de l'étape : à l'arrivée, puis chaque fois qu'on avance (ou qu'on revient en arrière). Ne se répète pas pour un simple nouvel essai.
-  let annonce = -1;
+  let annonce = -1, premiere = true;
   function announce() {
     if (annonce === session.phase) return;
     annonce = session.phase;
     const p = session.phase;
-    banner.innerHTML = `<span class="pb-ico" aria-hidden="true">${PHASE_ICONS[p]}</span><span class="pb-txt"><b>Étape ${p + 1} sur 3</b><span>${PHASE_BANNER[p]}</span></span>`;
+    // Montée de difficulté : on le dit en grand (et à voix haute, voir plus bas), c'est une fierté pour l'enfant.
+    const saut = premiere && (startPhase === 1 || defi);
+    premiere = false;
+    banner.classList.toggle('bravo', saut);
+    banner.innerHTML = saut
+      ? `<span class="pb-ico" aria-hidden="true">${icon('star', 34)}</span><span class="pb-txt"><b>Tu écris déjà bien !</b><span>${defi ? 'Défi : tout seul du premier coup' : 'Directement les pointillés'}</span></span>`
+      : `<span class="pb-ico" aria-hidden="true">${PHASE_ICONS[p]}</span><span class="pb-txt"><b>Étape ${p + 1} sur 3</b><span>${PHASE_BANNER[p]}</span></span>`;
     banner.classList.remove('show'); void banner.offsetWidth; banner.classList.add('show');
   }
 
@@ -219,9 +227,11 @@ export function exercise(root, app, skillId) {
   async function endSession() {
     const summary = session.summary();
     const r = recordSession(st, skillId, session);
-    const won = awardStickers(st); // vignettes méritées (réussites, persévérance, étapes), rien n'est tiré au sort
+    const cadeau = distribuer(st, r.newlyMastered); // une seule récompense à la fois, et pas à chaque exercice (rien ne se perd)
+    const won = cadeau?.t === 'stk' ? [cadeau.id] : [];
+    const gagne = cadeau?.t === 'item' ? ITEMS[cadeau.id] : null;
     if (r.newlyMastered) noterSerie(st, skillId); // la série de cet exercice est-elle terminée ? On la fête sur l'écran suivant
-    if (r.item && ITEMS[r.item].type === 'accessoire' && !st.equipped.includes(r.item)) st.equipped.push(r.item);
+    if (gagne && gagne.type === 'accessoire' && !st.equipped.includes(gagne.id)) st.equipped.push(gagne.id);
     if (st.settings.pauseMode === 'douce' && breakDue(st)) beginSleep(st); // le renard s'endort quelques minutes
     app.save();
     board.enable(false);
@@ -229,7 +239,7 @@ export function exercise(root, app, skillId) {
     const tired = session.ended === 'tired';
     const title = mastered
       ? (skill.kind === 'letter' ? `Bravo ! Tu sais écrire le ${skill.glyph} !` : skill.phrase ? `Bravo ! Tu sais écrire la phrase « ${skill.glyph} » !` : skill.kind === 'word' ? `Bravo ! Tu sais écrire « ${skill.glyph} » !` : `Bravo ! Tu as réussi : ${skill.title.toLowerCase()} !`)
-      : tired ? 'On a bien travaillé ! On reprendra une autre fois.' : item ? 'Bravo ! Encore un essai sans aide pour gagner ton trésor.' : 'Bravo ! Encore un essai sans aide pour réussir ce mot.';
+      : tired ? 'On a bien travaillé ! On reprendra une autre fois.' : skill.kind === 'word' ? 'Bravo ! Encore un essai sans aide pour réussir ce mot.' : 'Bravo ! Encore un essai sans aide pour réussir.';
     const pause = breakDue(st) || !!blocked(st);
 
     const resFoxHost = h('div', { class: 'res-fox' });
@@ -247,8 +257,8 @@ export function exercise(root, app, skillId) {
       ? h('button', { class: 'res-paper res-dictee', type: 'button', onClick: () => { app.dicteeApres = `carte-${level.id}`; app.go('dictee-surprise'); }, html: `${icon('dice', 26)}<span><strong>Une petite dictée surprise ?</strong><small>Trois choses à écrire de mémoire.</small></span>` })
       : null;
     const consolidated = r.consolidated ? h('p', { class: 'res-consol', html: `${icon('star', 22)}<span>Tu t’en souviens, même après plusieurs jours !</span>` }) : null;
-    const reward = r.newlyMastered && item
-      ? h('div', { class: 'res-reward' }, h('div', { class: 'rr-art', html: itemSVG(skill.item) }), h('p', {}, `Tu gagnes : ${item.name}`), item.type === 'accessoire' ? h('small', {}, 'Le renard le porte déjà !') : h('small', {}, 'Il t’attend dans ton coin de forêt.'))
+    const reward = gagne
+      ? h('div', { class: 'res-reward' }, h('div', { class: 'rr-art', html: itemSVG(gagne.id) }), h('p', {}, `Tu gagnes : ${gagne.name}`), gagne.type === 'accessoire' ? h('small', {}, 'Le renard le porte déjà !') : h('small', {}, 'Il t’attend dans ton coin de forêt.'))
       : null;
     const wSize = won.length === 1 ? 104 : won.length === 2 ? 92 : 76;
     const stickers = won.length
@@ -268,8 +278,10 @@ export function exercise(root, app, skillId) {
     sfx(mastered ? 'win' : 'ok');
     if (r.newlyMastered) setTimeout(() => alive && sfx('unlock'), 700);
     won.forEach((_, i) => setTimeout(() => alive && sfx('sticker'), (1 + i * 0.6) * 1000 + 520));
-    const stickerLine = !won.length ? '' : won.length === 1 ? ` Et une nouvelle vignette : ${STICKER_BY_ID[won[0]].name.charAt(0).toLowerCase()}${STICKER_BY_ID[won[0]].name.slice(1)} !` : ` Et ${won.length} nouvelles vignettes !`;
-    speak(title + stickerLine, { onStart: () => rf.talk(true), onEnd: () => rf.talk(false) });
+    // Le titre, puis la récompense, puis l'anecdote de l'animal : tout est lu à voix haute (les enfants ne lisent pas encore).
+    const sk1 = won.length ? STICKER_BY_ID[won[0]] : null;
+    const giftLine = sk1 ? ` Une nouvelle vignette : ${sk1.name.charAt(0).toLowerCase()}${sk1.name.slice(1)} ! ${sk1.fact}` : gagne ? ` Tu gagnes : ${gagne.name.charAt(0).toLowerCase()}${gagne.name.slice(1)} !` : '';
+    speak(title + giftLine, { onStart: () => rf.talk(true), onEnd: () => rf.talk(false) });
     cleanupExtras.push(() => rf.destroy());
   }
 

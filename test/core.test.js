@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Session } from '../src/core/session.js';
+import { distribuer } from '../src/core/progress.js';
 import { newState, recordSession, skillStatus, recommend, isSkillOpen, foxStage, difficulties, unlockedItems, awardStickers, stickerCount, persisted, markPaper } from '../src/core/progress.js';
 import { STICKERS } from '../src/content/stickers.js';
 import { ANIMALS } from '../src/ui/animals.js';
@@ -60,6 +61,8 @@ test('progression : maîtrise, déblocage, recommandation et stade du renard', (
   assert.ok(res.newlyMastered && res.item === 'echarpe');
   assert.equal(skillStatus(st, 'lignes'), 'mastered');
   assert.equal(isSkillOpen(st, 'ronds'), true);
+  assert.deepEqual(unlockedItems(st), [], 'mérité, mais remis par distribuer');
+  assert.deepEqual(distribuer(st, true), { t: 'item', id: 'echarpe' });
   assert.deepEqual(unlockedItems(st), ['echarpe']);
   assert.equal(recommend(st).skillId, 'ronds');
   assert.equal(foxStage(st).index, 0);

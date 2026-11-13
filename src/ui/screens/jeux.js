@@ -1,14 +1,30 @@
 // Les jeux : de petits défis qui vérifient ce que l'enfant sait déjà, sans rien changer à ses acquis (ni note, ni minuteur, ni perdant).
-// Pour l'instant : la dictée. Adresse : #jeux.
+// L'accueil les regroupe : le tableau libre, le dessin, la dictée (et la galerie si les parents l'ont activée). Adresse : #jeux.
 import { h, icon } from '../dom.js';
 import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { dicteePossible, dicteesFaites } from '../../core/dictee.js';
 import { DICTEE_PAS_ENCORE, DICTEE_SANS_VOIX } from '../../content/dictee.js';
 import { sfx } from '../audio.js';
+import { galleryOn } from '../../core/galerie.js';
 
 /** La liste des jeux : pour chacun, s'il est jouable maintenant et, sinon, ce qu'il faut pour le débloquer. */
 export const JEUX = [
+  {
+    id: 'tableau', route: 'tableau', ico: 'tableau', titre: 'Le tableau',
+    texte: 'Écris ce que tu veux : ton prénom, un mot… ou dessine.',
+    etat: () => ({ ok: true, note: 'Pour le plaisir, sans note' }),
+  },
+  {
+    id: 'dessin', route: 'dessin', ico: 'pencil', titre: 'Le dessin',
+    texte: 'Des modèles à suivre, des animaux pour les grands, ou la feuille blanche.',
+    etat: () => ({ ok: true, note: 'Pour le plaisir, sans note' }),
+  },
+  {
+    id: 'galerie', route: 'galerie', ico: 'frame', titre: 'Ma galerie', cache: (st) => !galleryOn(st),
+    texte: 'Les dessins accrochés dans la forêt.',
+    etat: () => ({ ok: true, note: '' }),
+  },
   {
     id: 'dictee', route: 'dictee', ico: 'speaker', titre: 'La dictée',
     texte: 'Le renard dit une lettre ou un mot. Écoute, puis écris !',
@@ -27,11 +43,11 @@ export function jeux(root, app) {
   const b = bubble();
   root.classList.add('levels', 'jeux');
 
-  const cards = JEUX.map((j) => {
+  const cards = JEUX.filter((j) => !j.cache?.(st)).map((j) => {
     const e = j.etat(st);
     return h('button', {
       class: `jeu-card${e.ok ? '' : ' off'}`, type: 'button', 'data-jeu': j.id, 'aria-disabled': e.ok ? 'false' : 'true',
-      onClick: () => { if (e.ok) { sfx('pop'); app.go(j.route); } else { sfx('oops'); speaker.say(e.note, { mood: 'encourage' }); } },
+      onClick: () => { if (e.ok) { sfx('pop'); app.tableauFrom = 'jeux'; app.dessinFrom = 'jeux'; app.go(j.route); } else { sfx('oops'); speaker.say(e.note, { mood: 'encourage' }); } },
     },
       h('span', { class: 'jc-ico', html: icon(j.ico, 54) }),
       h('span', { class: 'jc-body' }, h('h3', {}, j.titre), h('p', {}, j.texte), h('p', { class: 'jc-note' }, e.note)));
@@ -50,6 +66,6 @@ export function jeux(root, app) {
   );
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
-  speaker.say('Un petit jeu ? Choisis !', { once: 'jeux' });
+  speaker.say('Écrire, dessiner, ou une petite dictée ? Choisis !', { once: 'jeux' });
   return () => fox.destroy();
 }

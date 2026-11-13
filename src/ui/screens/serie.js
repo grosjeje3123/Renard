@@ -65,6 +65,8 @@ export function serie(root, app, arg) {
     },
     html: `${icon('pencil', 24)}<span>Un petit dessin pour fêter ça</span>`,
   });
+  // Continuer sur papier : le cahier de vacances du niveau, avec un adulte (l'écran Papier est fait pour lui).
+  const papierBtn = h('button', { class: 'btn-sec sm se-papier', type: 'button', onClick: () => { app.papierFrom = nextRoute; go('papier'); }, html: `${icon('page', 20)}<span>Continuer sur papier</span>` });
   const dicteeBtn = surpriseOk(st) ? h('button', { class: 'btn-sec sm se-dictee', type: 'button', onClick: () => { app.dicteeApres = nextRoute; go('dictee-surprise'); }, html: `${icon('dice', 20)}<span>Une petite dictée surprise</span>` }) : null;
   const mapBtn = h('button', { class: 'btn-sec sm se-map', type: 'button', onClick: () => go(`carte-${lv.id}-${index}`), html: `${icon('map', 20)}<span>Voir la carte</span>` });
 
@@ -79,7 +81,7 @@ export function serie(root, app, arg) {
     h('div', { class: 'se-dots', role: 'img', 'aria-label': resteTxt }, dots),
     h('p', { class: 'se-left' }, resteTxt),
     h('div', { class: 'res-actions se-actions' }, drawBtn, nextBtn),
-    h('div', { class: 'se-more-actions' }, dicteeBtn, mapBtn),
+    h('div', { class: 'se-more-actions' }, dicteeBtn, papierBtn, mapBtn),
   );
   const overlay = h('div', { class: 'result serie-end', role: 'dialog', 'aria-label': 'Série terminée' }, card);
   root.append(h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }), overlay);

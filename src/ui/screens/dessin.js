@@ -214,7 +214,7 @@ export function dessin(root, app) {
     }
     const keepOn = h('button', { class: 'btn-sec', type: 'button', onClick: () => { sfx('tap'); closeEnd(); } }, done ? 'Continuer à dessiner' : 'Je reste');
     const fresh = h('button', { class: 'btn-sec', type: 'button', onClick: () => { sfx('pop'); closeEnd(); clearAll(); } }, 'Nouveau dessin');
-    const home = h('button', { class: 'btn-big sm', type: 'button', onClick: () => { sfx('tap'); app.go('carte-1'); }, html: `${icon('map', 28)}<span>Retour à la carte</span>` });
+    const home = h('button', { class: 'btn-big sm', type: 'button', onClick: () => { sfx('tap'); app.go(app.dessinFrom || 'carte-1'); }, html: `${icon(app.dessinFrom === 'jeux' ? 'dice' : 'map', 28)}<span>${app.dessinFrom === 'jeux' ? 'Retour aux jeux' : 'Retour à la carte'}</span>` });
     overlay = h('div', { class: 'result dessin-end', role: 'dialog', 'aria-label': done ? 'Dessin terminé' : 'Quitter le dessin' },
       h('div', { class: 'result-card' }, host,
         h('h2', {}, done ? 'Quel beau dessin !' : 'Tu t’en vas ?'),
@@ -232,7 +232,7 @@ export function dessin(root, app) {
   }
   doneBtn.addEventListener('click', () => { if (strokes.length) { sfx('pop'); ending('fini'); } });
   /** La flèche de retour : directe si la feuille est vide, sinon on demande avant de perdre le dessin. */
-  function leave() { sfx('tap'); if (strokes.length) ending('retour'); else app.go('carte-1'); }
+  function leave() { sfx('tap'); if (strokes.length) ending('retour'); else app.go(app.dessinFrom || 'carte-1'); }
 
   return () => { clearTimeout(armed); stopSpeaking(); fit?.destroy(); endFox?.destroy(); fox.destroy(); };
 }

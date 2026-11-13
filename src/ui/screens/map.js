@@ -58,22 +58,31 @@ export function map(root, app, arg) {
   }, '');
 
   const wide = (id) => SKILLS[id].phrase;
+  // Le prochain exercice à faire dans cette série : celui que recommande le renard s'il y est, sinon le premier ouvert pas encore acquis.
+  const recIci = ids.includes(rec.skillId) && isSkillOpen(st, rec.skillId) ? rec.skillId : ids.find((id) => isSkillOpen(st, id) && !isMastered(st, id)) || null;
   const nodes = ids.map((id, i) => {
     const sk = SKILLS[id], status = skillStatus(st, id), open = isSkillOpen(st, id);
-    const isRec = rec.skillId === id && open;
+    const isRec = id === recIci;
     return h('button', {
       class: `node ${status}${open ? '' : ' locked'}${isRec ? ' rec' : ''}`, type: 'button', 'data-skill': id,
-      style: { left: pos[i].x + '%', top: pos[i].y + '%' },
+      style: { left: pos[i].x + '%', top: pos[i].y + '%', '--p': String(status === 'progress' ? Math.max(1, skillState(st, id).phase || 0) / 3 : 0) },
       'aria-label': `${sk.title} : ${open ? STATUS_TXT[status] + (status === 'mastered' && isConsolidated(st, id) ? ', consolidé' : '') : 'pas encore ouvert'}`,
     },
       isRec ? h('div', { class: 'node-fox', html: foxSVG({}) }) : null,
+      isRec ? h('span', { class: 'node-go', 'aria-hidden': 'true' }, 'À toi !') : null,
       h('span', { class: 'disc', html: wide(id) ? icon('book', 40) : glyphIcon(id, { width: 0.3 }) }),
       status === 'mastered' ? h('span', { class: `badge ${isConsolidated(st, id) ? 'gold' : 'ok'}`, html: icon(isConsolidated(st, id) ? 'star' : 'check', 22) }) : null,
       status === 'mastered' && reviewDue(st, id) ? h('span', { class: 'badge rev', 'aria-label': 'À revoir', html: icon('replay', 18) }) : null,
       !open ? h('span', { class: 'badge lock', html: icon('lock', 20) }) : null,
       h('span', { class: 'nlabel' }, sk.label || sk.title),
+      open && status === 'progress' ? h('span', { class: 'nstep' }, `étape ${Math.min(3, (skillState(st, id).phase || 0) + 1)} sur 3`) : null,
     );
   });
+  // Avancement de la série, bien visible : une case par exercice (verte = acquis), et le compte.
+  const nDone = done(ids);
+  const serieBar = h('div', { class: 'serie-bar', role: 'img', 'aria-label': `${nDone} exercice${nDone > 1 ? 's' : ''} acquis sur ${ids.length}` },
+    h('span', { class: 'sb-txt' }, nDone === ids.length ? 'Série terminée !' : `${nDone} sur ${ids.length} acquis`),
+    h('span', { class: 'sb-cells' }, ids.map((id) => h('i', { class: isMastered(st, id) ? 'ok' : skillStatus(st, id) === 'progress' ? 'mid' : '' }))));
 
   if (free) {
     const i = ids.length;
@@ -98,6 +107,7 @@ export function map(root, app, arg) {
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Mes trésors', onClick: () => app.go('tresors'), html: icon('chest', 26) }),
     ),
     ribbon,
+    serieBar,
     h('div', { class: 'map-body' },
       h('div', { class: `track${pos[0]?.rows > 1 ? ' dense' : ''}` },
         h('svg', { class: 'track-path', viewBox: '0 0 1000 400', preserveAspectRatio: 'none', 'aria-hidden': 'true', html: `<path d="${d}" class="tp-bg"/><path d="${d}" class="tp-dash"/>` }),
@@ -120,7 +130,7 @@ export function map(root, app, arg) {
 
   nodes.forEach((node) => node.addEventListener('click', () => {
     const id = node.dataset.skill;
-    if (node.dataset.free) { sfx('pop'); app.tableauFrom = `carte-${lv.id}-${si}`; if (prenom) app.tableauCasse = 'maj'; app.go(node.dataset.free); return; }
+    if (node.dataset.free) { sfx('pop'); app.tableauFrom = `carte-${lv.id}-${si}`; app.dessinFrom = null; if (prenom) app.tableauCasse = 'maj'; app.go(node.dataset.free); return; }
     if (node.classList.contains('locked')) {
       sfx('oops');
       node.classList.remove('wiggle'); void node.offsetWidth; node.classList.add('wiggle');

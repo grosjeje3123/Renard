@@ -34,7 +34,7 @@ export function bienvenue(root, app) {
     set.accueilFait = true;
     app.applySettings();
     if (said) sfx('win');
-    app.replace(revisit ? 'options' : 'accueil');
+    app.replace(revisit ? 'options' : set.methodeVue ? 'accueil' : 'methode'); // premier lancement : la démarche en trois étapes, tout de suite
   }
   const mark = (i) => [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i));
 

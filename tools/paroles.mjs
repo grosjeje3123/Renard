@@ -4,7 +4,7 @@
 // Ce qui n'est pas dans la liste (prénom de l'enfant, mot tapé librement…) est lu par la voix du système.
 import fs from 'fs';
 import path from 'path';
-import { SKILLS, LEVELS } from '../src/content/skills.js';
+import { SKILLS, LEVELS, ITEMS } from '../src/content/skills.js';
 import { STICKERS } from '../src/content/stickers.js';
 import { FICHES } from '../src/content/fiches.js';
 import { DESSINS, IDEES_LIBRES } from '../src/content/dessins.js';
@@ -36,7 +36,7 @@ for (const s of Object.values(SKILLS)) {
   else add(`Bravo ! Tu as réussi : ${s.title.toLowerCase()} !`, 'félicitation');
 }
 add('On a bien travaillé ! On reprendra une autre fois.', 'félicitation');
-add('Bravo ! Encore un essai sans aide pour gagner ton trésor.', 'félicitation');
+add('Bravo ! Encore un essai sans aide pour réussir.', 'félicitation');
 add('Bravo ! Encore un essai sans aide pour réussir ce mot.', 'félicitation');
 for (let n = 2; n <= 6; n++) add(`Et ${n} nouvelles vignettes !`, 'félicitation');
 
@@ -61,12 +61,13 @@ add(FETE_SUITE, 'félicitation'); add(FETE_SUITE_NIVEAU, 'félicitation'); add(F
 // 2. Vignettes, fiches animaux, album
 for (const st of STICKERS) {
   add(st.fact, 'animal'); add(st.how, 'animal');
-  add(`Et une nouvelle vignette : ${bas(st.name)} !`, 'félicitation');
+  add(`Une nouvelle vignette : ${bas(st.name)} !`, 'félicitation');
   add(`Voici ${bas(st.name)} ! Touche un haut-parleur pour l’écouter, ou « Tout lire ».`, 'animal');
   for (const m of FICHES[st.animal]?.more || []) add(m, 'animal');
   if (FICHES[st.animal]?.move) add(FICHES[st.animal].move, 'animal');
 }
-add('Chaque réussite te donne une vignette d’animal. On les colle ici !', 'animal');
+add('Quand tu avances bien, tu gagnes des vignettes d’animaux. On les colle ici !', 'animal');
+for (const it of Object.values(ITEMS)) add(`Tu gagnes : ${bas(it.name)} !`, 'félicitation');
 add('Tu as toutes les vignettes ! Quelle belle collection !', 'animal');
 for (let n = 1; n < STICKERS.length; n++) add(`Tu as ${n} vignette${n > 1 ? 's' : ''} sur ${STICKERS.length}. Touche une vignette pour la regarder.`, 'animal');
 
