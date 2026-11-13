@@ -63,9 +63,9 @@ export const STICKERS = [
   { id: 'mouton', animal: 'mouton', name: 'Le mouton', page: 2, rule: 'count', level: 2, n: 14,
     how: 'Apprends quatorze lettres.',
     fact: 'La laine du mouton le garde au chaud l’hiver. On la tond au printemps pour faire des pulls.' },
-  { id: 'dauphin', animal: 'dauphin', name: 'Le dauphin', page: 2, rule: 'count', level: 2, n: 20,
+  { id: 'poule', animal: 'poule', name: 'La poule', page: 2, rule: 'count', level: 2, n: 20,
     how: 'Apprends vingt lettres.',
-    fact: 'Le dauphin siffle pour parler à ses amis. Chacun a son propre sifflement, comme un prénom.' },
+    fact: 'La poule gratte la terre avec ses pattes pour trouver des graines et des petits vers.' },
   { id: 'cerf', animal: 'cerf', name: 'Le cerf', page: 2, rule: 'level', level: 2,
     how: 'Apprends toutes les lettres : de a à z !',
     fact: 'Les bois du cerf tombent chaque année, et de nouveaux repoussent.' },
@@ -83,9 +83,9 @@ export const STICKERS = [
   { id: 'vache', animal: 'vache', name: 'La vache', page: 3, rule: 'count', level: 3, n: 35,
     how: 'Apprends trente-cinq sons, mots ou phrases.',
     fact: 'La vache passe plusieurs heures par jour à mâcher l’herbe, tranquillement.' },
-  { id: 'ours', animal: 'ours', name: 'L’ours', page: 3, rule: 'level', level: 3,
+  { id: 'blaireau', animal: 'blaireau', name: 'Le blaireau', page: 3, rule: 'level', level: 3,
     how: 'Apprends tous les sons, les mots et les phrases du niveau 3.',
-    fact: 'L’ours se repose longtemps dans sa tanière pendant l’hiver.' },
+    fact: 'Le blaireau creuse de grands terriers. Parfois, le renard vient y habiter avec lui !' },
 
   // Sur le cahier : on valorise le transfert vers le papier, sans prétendre le vérifier
   { id: 'escargot', animal: 'escargot', name: 'L’escargot', page: 'paper', rule: 'paper', n: 1,

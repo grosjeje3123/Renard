@@ -331,16 +331,35 @@ export const ANIMALS = {
     deco: () => `<path d="M6 94L26 80L28 94Z" fill="#F4C84A"/><circle cx="19" cy="90" r="2" fill="#E3A92A"/><circle cx="24" cy="86" r="1.4" fill="#E3A92A"/>`,
   },
 
-  ours: {
-    bg: '#F3E4D0',
+  blaireau: {
+    bg: '#E4E8DD',
     draw: () => `
-      <circle cx="26" cy="31" r="12" fill="#7A5236"/><circle cx="26" cy="31" r="6.4" fill="#C79A74"/>
-      <circle cx="74" cy="31" r="12" fill="#7A5236"/><circle cx="74" cy="31" r="6.4" fill="#C79A74"/>
-      <circle cx="50" cy="56" r="32" fill="#8A5E3C"/>
-      <ellipse cx="50" cy="68" rx="16" ry="13" fill="#E8C79F"/>
-      <ellipse cx="50" cy="62" rx="6.4" ry="4.4" fill="#2B1A12"/><ellipse cx="48.4" cy="60.6" rx="1.8" ry="1" fill="#fff"/>
-      <path d="M50 66.4V72M50 72Q45.5 76 41.5 73M50 72Q54.5 76 58.5 73" fill="none" stroke="#2B1A12" stroke-width="2.2" stroke-linecap="round"/>
-      ${eye(37, 50, 4)}${eye(63, 50, 4)}${cheek(28, 64, 4.6, 3)}${cheek(72, 64, 4.6, 3)}`,
+      <circle cx="25" cy="36" r="10" fill="#6E6A66"/><circle cx="25" cy="36" r="5.4" fill="#E9E5DE"/>
+      <circle cx="75" cy="36" r="10" fill="#6E6A66"/><circle cx="75" cy="36" r="5.4" fill="#E9E5DE"/>
+      <path d="M50 22C71 22 83 40 81 58C79 76 65 88 50 90C35 88 21 76 19 58C17 40 29 22 50 22Z" fill="#A8A39C"/>
+      <path d="M50 24C62 24 68 40 66 58C64 74 58 84 50 86C42 84 36 74 34 58C32 40 38 24 50 24Z" fill="#FFFFFF"/>
+      <path d="M36 27C41 26 45 42 46 62C46 70 44 72 42 72C38 60 33 44 31 33Z" fill="#2E2A28"/>
+      <path d="M64 27C59 26 55 42 54 62C54 70 56 72 58 72C62 60 67 44 69 33Z" fill="#2E2A28"/>
+      <circle cx="40" cy="52" r="5.2" fill="#fff"/><circle cx="60" cy="52" r="5.2" fill="#fff"/>
+      ${eye(40, 52, 3.4)}${eye(60, 52, 3.4)}
+      <ellipse cx="50" cy="76" rx="6.4" ry="4.6" fill="#2B1A12"/><ellipse cx="48.4" cy="74.6" rx="1.8" ry="1" fill="#fff"/>
+      <path d="M50 80.6V83M50 83Q46.5 86 43.5 84M50 83Q53.5 86 56.5 84" fill="none" stroke="#2B1A12" stroke-width="1.8" stroke-linecap="round"/>
+      ${cheek(29, 66, 4.2, 2.8)}${cheek(71, 66, 4.2, 2.8)}`,
+    deco: () => `<path d="M0 92Q20 84 40 92T80 92T120 92V100H0Z" fill="#B9A27E"/>`,
+  },
+
+  poule: {
+    bg: '#F7ECD8',
+    draw: () => `
+      <path d="M37 26Q37 12 45 17Q48 6 55 16Q63 10 63 25Z" fill="#E2483D"/>
+      <ellipse cx="50" cy="58" rx="30" ry="31" fill="#C9743A"/>
+      <path d="M22 66C26 84 40 92 50 92C60 92 74 84 78 66C70 76 60 80 50 80C40 80 30 76 22 66Z" fill="#A85B2A"/>
+      <ellipse cx="50" cy="64" rx="17" ry="15" fill="#E39A5C"/>
+      ${eye(38, 52, 4)}${eye(62, 52, 4)}
+      <path d="M42 61H58L50 73Z" fill="#F2B632"/><path d="M42 61H58L50 65.5Z" fill="#E09A1E"/>
+      <path d="M47 72Q45.5 82 50 84.5Q54.5 82 53 72Z" fill="#E2483D"/>
+      ${cheek(30, 64, 4.4, 3)}${cheek(70, 64, 4.4, 3)}`,
+    deco: () => `<g fill="#E3B24A"><ellipse cx="12" cy="92" rx="2.2" ry="1.4"/><ellipse cx="20" cy="95" rx="2.2" ry="1.4"/><ellipse cx="84" cy="93" rx="2.2" ry="1.4"/><ellipse cx="91" cy="89" rx="2.2" ry="1.4"/></g>`,
   },
 
 
@@ -374,21 +393,6 @@ export const ANIMALS = {
       <ellipse cx="50" cy="70.4" rx="3" ry="2" fill="#2B1A12"/>
       <path d="M50 72.4V76M50 76Q47 78.6 44.6 77M50 76Q53 78.6 55.4 77" fill="none" stroke="#2B1A12" stroke-width="1.5" stroke-linecap="round"/>
       ${cheek(37, 70, 3.6, 2.4)}${cheek(63, 70, 3.6, 2.4)}`,
-  },
-
-  dauphin: {
-    bg: '#D8EDF6',
-    draw: () => `
-      <path d="M0 78Q14 70 28 78T56 78T84 78T112 78V100H0Z" fill="#7DBFDD"/>
-      <path d="M24 60C14 58 8 50 6 38C12 42 18 44 25 42C30 46 28 56 24 60Z" fill="#5C8BB4"/>
-      <path d="M20 62C22 40 44 28 66 33C76 36 80 42 80 47L95 50C97 54 92 57 85 57C76 58 66 64 58 70C46 78 28 76 20 62Z" fill="#6E9FC7"/>
-      <path d="M32 68C46 70 62 64 72 58C78 57 84 57 85 57C76 58 66 64 58 70C46 78 36 76 32 68Z" fill="#E6F1F8"/>
-      <path d="M40 34C42 24 50 17 60 16C56 24 56 29 58 33Z" fill="#5C8BB4"/>
-      <path d="M52 62C58 66 62 72 60 78C55 74 50 70 48 64Z" fill="#5C8BB4"/>
-      ${eye(70, 44, 3.6)}
-      <path d="M78 53Q86 55 91 52" fill="none" stroke="#3E5F82" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="14" cy="26" r="3" fill="#fff" opacity=".85"/><circle cx="24" cy="16" r="2" fill="#fff" opacity=".85"/><circle cx="86" cy="26" r="2.4" fill="#fff" opacity=".85"/>
-      ${cheek(65, 53, 3.6, 2.4)}`,
   },
 
   cheval: {

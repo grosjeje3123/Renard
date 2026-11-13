@@ -38,6 +38,7 @@ export function newState() {
       depart: 1, // niveau de départ : 1 (avant le CP), 2 (début du CP), 3 (fin du CP) ; les niveaux d'avant sont ouverts
       classe: '', // classe choisie à la première ouverture : 'ms' | 'gs' | 'cp1' | 'cp2' ('' = pas encore dite) ; elle règle `depart` (la grande section ouvre aussi les majuscules d'emblée)
       accueilFait: false, // la présentation du premier lancement (prénom, classe, main) a été faite ou passée
+      dicteeSurprise: true, // le renard propose une petite dictée en cours de route (tous les 5 exercices acquis, après une série)
       methodeVue: false, // l'écran « Comment ça marche » (les trois étapes) a été montré avant le premier exercice lancé depuis l'accueil
     },
     skills: {},
@@ -94,7 +95,10 @@ export function cleanName(raw) {
 export function hydrate(s) {
   const base = newState();
   const galerie = Array.isArray(s.galerie) ? s.galerie.filter(validDrawing).slice(-MAX_DESSINS) : [];
-  return { ...base, ...s, galerie, settings: { ...base.settings, ...(s.settings || {}) }, rest: { ...base.rest, ...(s.rest || {}) } };
+  // vignettes renommées (animaux de la campagne) : celles déjà collées restent collées
+  const stickers = { ...(s.stickers || {}) };
+  for (const [old, nu] of [['dauphin', 'poule'], ['ours', 'blaireau']]) if (stickers[old]) { stickers[nu] ||= stickers[old]; delete stickers[old]; }
+  return { ...base, ...s, stickers, galerie, settings: { ...base.settings, ...(s.settings || {}) }, rest: { ...base.rest, ...(s.rest || {}) } };
 }
 
 const blank = () => ({ sessions: 0, attempts: 0, phase: 0, mastered: false, masteredAt: null, last: null, history: [] });

@@ -6,6 +6,7 @@ import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { sfx } from '../audio.js';
 import { CLASSES, setClasse, cleanName } from '../../core/progress.js';
+import { seg } from './parents-tools.js';
 
 export function bienvenue(root, app) {
   const st = app.state, set = st.settings;
@@ -13,7 +14,7 @@ export function bienvenue(root, app) {
   root.classList.add('home', 'welcome');
   const foxHost = h('div', { class: 'home-fox', role: 'button', tabindex: '0', 'aria-label': 'Caresser le renard' });
   const b = bubble({ big: true });
-  const dots = h('div', { class: 'wl-dots', 'aria-hidden': 'true' }, [0, 1, 2].map(() => h('i')));
+  const dots = h('div', { class: 'wl-dots', 'aria-hidden': 'true' }, [0, 1, 2, 3].map(() => h('i')));
   const body = h('div', { class: 'wl-body' });
   const panel = h('div', { class: 'home-panel wl-panel' }, h('h1', { class: 'logo sm' }, 'Renard'), b, body, dots);
   const skip = h('button', { class: 'btn-sec sm wl-skip', type: 'button', onClick: () => { sfx('tap'); finish(false); } }, revisit ? 'Fermer' : 'Passer');
@@ -74,15 +75,36 @@ export function bienvenue(root, app) {
       sfx('pop');
       set.main = mains[i][0]; app.applySettings();
       tiles.forEach((x, k) => x.classList.toggle('on', k === i));
-      timer = setTimeout(stepEnd, 380);
+      timer = setTimeout(stepAdulte, 380);
     }));
     body.replaceChildren(h('div', { class: 'wl-grid two' }, tiles), h('p', { class: 'muted' }, 'Pour un gaucher, l’écran passe en miroir.'));
     speaker.say('Et tu écris avec quelle main ?', { icon: 'hand' });
   }
 
-  // ---- 4. En route
-  function stepEnd() {
+  // ---- 4. Pour les adultes : le temps d'écran (valeurs conseillées déjà choisies, modifiables plus tard dans l'espace parents)
+  function stepAdulte() {
     mark(3);
+    const pauseSeg = seg('Pause conseillée après', [[10, '10 min'], [15, '15 min'], [20, '20 min'], [0, 'Jamais']], set.pauseMin, (v) => { set.pauseMin = v; app.save(); });
+    const limite = set.pauseMode === 'limite' ? set.limiteMin : 0;
+    const limSeg = seg('Limite par jour', [[0, 'Aucune'], [20, '20 min'], [30, '30 min'], [45, '45 min'], [60, '1 h']], limite, (v) => {
+      if (v) { set.pauseMode = 'limite'; set.limiteMin = v; } else if (set.pauseMode === 'limite') set.pauseMode = 'suggestion';
+      app.save();
+    });
+    const next = h('button', { class: 'btn-big sm', type: 'button', html: `<span>Suivant</span>${icon('arrowR', 28)}` });
+    next.addEventListener('click', () => { sfx('pop'); stepEnd(); });
+    body.replaceChildren(
+      h('div', { class: 'wl-adulte' },
+        h('p', { class: 'wl-kicker' }, 'Pour les adultes'),
+        h('div', { class: 'wl-row' }, h('strong', {}, 'Le renard propose une pause après'), pauseSeg),
+        h('div', { class: 'wl-row' }, h('strong', {}, 'Limite par jour'), limSeg),
+        h('p', { class: 'muted' }, 'Seul le temps d’activité compte, et le renard n’interrompt jamais un essai. Tout se change plus tard dans l’espace parents (cadenas de l’accueil, appui de deux secondes).')),
+      next);
+    speaker.say('Une question pour un adulte : combien de temps on écrit ensemble ?', { icon: 'moon' });
+  }
+
+  // ---- 5. En route
+  function stepEnd() {
+    mark(4);
     const go = h('button', { class: 'btn-big', type: 'button', html: `${icon('play', 34)}<span>C’est parti !</span>` });
     go.addEventListener('click', () => finish(true));
     body.replaceChildren(go);

@@ -39,7 +39,7 @@ export function rewards(root, app) {
     h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }),
     h('header', { class: 'bar' },
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour à l’accueil', onClick: () => app.go('accueil'), html: icon('back', 26) }),
-      h('h2', {}, 'Mes trésors'),
+      h('div', { class: 'bar-title' }, h('h2', {}, 'Mes trésors'), h('p', {}, 'Des objets pour habiller le renard et décorer sa forêt. Chacun se gagne en réussissant un exercice précis.')),
     ),
     h('div', { class: 'rewards-body' }, coin, h('div', { class: 'items-wrap' }, h('div', { class: 'bubble-row' }, b), h('div', { class: 'items' }, cards))),
   );

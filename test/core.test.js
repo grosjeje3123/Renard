@@ -139,9 +139,9 @@ test('vignettes : les étapes de niveau (hibou, cerf) et la vignette dorée', ()
   masterAll(st, l3.slice(0, 1), 4000);
   assert.ok(st.stickers.lapin && !st.stickers.souris, 'un premier mot : le lapin');
   masterAll(st, l3.slice(1, 3), 5000);
-  assert.ok(st.stickers.souris && !st.stickers.ours, 'trois mots : la souris');
+  assert.ok(st.stickers.souris && !st.stickers.blaireau, 'trois mots : la souris');
   masterAll(st, l3.slice(3), 6000);
-  assert.ok(st.stickers.ours, 'niveau 3 terminé');
+  assert.ok(st.stickers.blaireau, 'niveau 3 terminé');
   assert.deepEqual(play(st, 'lignes', [1, 2], 9000), ['tortue', 'renard'], 'un essai raté puis réussi : la tortue, puis le renard doré');
   assert.ok(!st.stickers.escargot && !st.stickers.coccinelle, 'le cahier est un bonus : la vignette dorée ne l\'attend pas');
   ['i', 'o', 'a'].forEach((id) => markPaper(st, id));

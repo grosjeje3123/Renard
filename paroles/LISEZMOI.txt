@@ -8,7 +8,7 @@ Ce dossier contient tout pour donner au renard une voix enregistrée, plus natur
   generer-voix.py      le script qui fabrique les fichiers audio avec l'API OpenAI
 
 COMMENT FAIRE
-1. Créez une clé API sur platform.openai.com (la facturation est à l'usage : la liste fait environ 66 000 caractères, soit 1 893 phrases et environ 74 minutes d'audio ;
+1. Créez une clé API sur platform.openai.com (la facturation est à l'usage : la liste fait environ 66 000 caractères, soit 1 899 phrases et environ 74 minutes d'audio ;
    vérifiez le tarif actuel de la synthèse vocale sur le site d'OpenAI).
 2. Dans un terminal, dans ce dossier :
        pip install openai

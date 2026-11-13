@@ -9,6 +9,7 @@ const browser = await chromium.launch();
 let fails = 0;
 const check = (label, ok, info = '') => { console.log(`${ok ? 'OK  ' : 'ÉCHEC'} ${label}${info ? ' — ' + info : ''}`); if (!ok) fails++; };
 
+const DESSINS_N = (await import(`${process.cwd()}/src/content/dessins.js`)).DESSINS.length;
 async function open(mutate, route = 'accueil', viewport = { width: 1180, height: 820 }) {
   const st = JSON.parse(JSON.stringify(SEED));
   mutate?.(st);
@@ -213,7 +214,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   const reprise = await deb.s.page.evaluate(() => document.querySelector('.side .b-text')?.textContent?.replace(/[\u00A0\u202F]/g, ' ').trim());
   check('modèles : en rouvrant le dessin, on reprend l’idée où on s’était arrêté', !!actuelle && reprise === actuelle, `${actuelle} / ${reprise} (avant : ${dernier})`);
   check('calque : le modèle est tracé sur la feuille dès le départ', withModel.every((o) => o.calque > 0));
-  check('modèles : la difficulté est affichée (★☆☆ Facile)', withModel.every((o) => /^★☆☆ Facile$/.test(o.level)), withModel[0]?.level);
+  check('modèles : la difficulté est affichée (★☆☆☆ Facile)', withModel.every((o) => /^★☆☆☆ Facile$/.test(o.level)), withModel[0]?.level);
   await deb.s.ctx.close();
   // enfant avancé (démo : tout ouvert) : on voit aussi des modèles difficiles, dont ceux du renard
   const adv = await seen((st) => { st.settings.demo = true; }, 80);
@@ -403,7 +404,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
     check('dessiner : la feuille de dessin (10 de large, 7 de haut au moins) remplace la page lignée', /^0 0 10 (\d+(\.\d+)?)$/.test(await s.page.$eval('.tableau-board', (e) => e.getAttribute('viewBox'))) && +(await s.page.$eval('.tableau-board', (e) => e.getAttribute('viewBox'))).split(' ')[3] >= 7 && !(await s.page.$('.tableau-board .rules')));
     check('dessiner : la feuille de dessin est vide (l’écriture reste sur son autre feuille)', (await s.page.$$eval('.tableau-board .ink path', (a) => a.length)) === 0 && !(await s.page.$eval('.model-card:not(.tb-card)', (e) => e.hidden)));
     await clickText(s.page, 'Choisir'); await s.page.waitForTimeout(300);
-    check('dessiner : le choix de calque propose la feuille blanche et tous les dessins', (await s.page.$$eval('.mp-card', (a) => a.length)) === 1 + 15);
+    check('dessiner : le choix de calque propose la feuille blanche et tous les dessins', (await s.page.$$eval('.mp-card', (a) => a.length)) === 1 + DESSINS_N);
     await s.page.click('.mp-card[data-model="soleil"]'); await s.page.waitForTimeout(300);
     check('dessiner : le dessin choisi apparaît en pointillés sur la feuille', !!(await s.page.$('.cal-model.pointille')));
     await s.page.click('.calque-mode[data-mode="plein"]'); await s.page.waitForTimeout(150);
@@ -515,8 +516,12 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   check('présentation : la troisième question propose la main', (await s.page.$$('[data-main]')).length === 2);
   check('présentation : la main gauche est à gauche, la main droite à droite', (await s.page.$$eval('[data-main]', (a) => a.map((x) => x.dataset.main + ':' + Math.round(x.getBoundingClientRect().x)))).map((x) => x.split(':')).every(([m, x], i, all) => i === 0 ? m === 'gauche' : m === 'droite' && +x > +all[0][1]));
   await s.page.click('[data-main=droite]'); await s.page.waitForTimeout(700);
+  check('présentation : une question pour les adultes sur le temps d’écran', /Pour les adultes/i.test(await s.page.innerText('.wl-body')) && (await s.page.$$('.wl-adulte .seg')).length === 2);
+  await clickText(s.page, '^30 min$', '.wl-adulte .seg-b'); await s.page.waitForTimeout(200);
+  await s.page.click('.wl-body .btn-big'); await s.page.waitForTimeout(500);
   await s.page.click('.wl-body .btn-big'); await s.page.waitForTimeout(800);
   let st = await s.state();
+  check('présentation : la limite du jour choisie est enregistrée', st.settings.pauseMode === 'limite' && st.settings.limiteMin === 30, JSON.stringify({ m: st.settings.pauseMode, l: st.settings.limiteMin }));
   check('présentation : prénom nettoyé, classe et main enregistrés', st.name === 'Léa-Rose' && st.settings.classe === 'gs' && st.settings.depart === 1 && st.settings.main === 'droite' && st.settings.accueilFait === true, JSON.stringify({ n: st.name, c: st.settings.classe, d: st.settings.depart }));
   check('présentation : on arrive à l’accueil', (await s.hash()) === '#accueil');
   const opt = await s.page.evaluate(() => { const b = document.querySelector('.top-right [aria-label=Options]'); if (!b) return null; const r = b.getBoundingClientRect(); return { right: r.right, top: r.top, w: innerWidth }; });
@@ -813,6 +818,12 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   const [dlv] = await Promise.all([mt.page.waitForEvent('download', { timeout: 60000 }).catch(() => null), mt.page.click('.papier .pcard:nth-of-type(2) .btn-sec')]);
   check('papier : le cahier de vacances se prépare sans passer par l’espace parents', !!dlv && /cahier-de-vacances/.test(dlv.suggestedFilename()), dlv?.suggestedFilename());
   check('démarche et papier : aucune erreur', mt.errs.length === 0, mt.errs.join(' | '));
+  check('page de travail : aucune récompense annoncée pendant l’effort', !/À gagner|Gagné :/.test(await mt.page.evaluate(() => { location.hash = 'exercice-ronds'; return new Promise((r) => setTimeout(() => r(document.body.innerText), 1500)); })));
+  const sp = await open((x) => { x.settings.voix = true; for (const id of ['i', 'o', 'a', 'maj_I', 'maj_L']) x.skills[id] = { ...(x.skills[id] || {}), sessions: 1, attempts: 3, phase: 3, mastered: true, masteredAt: Date.now() - 3 * 864e5, last: Date.now() - 3 * 864e5, history: [] }; }, 'dictee-surprise');
+  await sp.page.waitForTimeout(1500);
+  check('dictée surprise : trois éléments seulement', (await sp.page.$$('.dc-dots > *')).length === 3, String((await sp.page.$$('.dc-dots > *')).length));
+  check('dictée surprise : aucune erreur', sp.errs.length === 0, sp.errs.join(' | '));
+  await sp.ctx.close();
   await mt.ctx.close();
 
   // espace parents : réglage, avis sur le papier, dictées

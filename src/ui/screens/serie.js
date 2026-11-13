@@ -2,6 +2,7 @@
 // sont acquis, le renard fait la fête (confettis, les mots appris), dit combien de séries il reste, puis propose la série suivante
 // ou un petit dessin sur le tableau pour souffler. La fête n'est montrée qu'une fois par série (core/progress.js : noterSerie).
 // Rien n'est noté ici : c'est une récompense, pas une évaluation. Adresse : #serie-<niveau>-<numéro de la série>.
+import { surpriseOk } from '../../core/dictee.js';
 import { h, icon } from '../dom.js';
 import { forestScene } from '../art.js';
 import { confetti } from '../confetti.js';
@@ -64,6 +65,7 @@ export function serie(root, app, arg) {
     },
     html: `${icon('pencil', 24)}<span>Un petit dessin pour fêter ça</span>`,
   });
+  const dicteeBtn = surpriseOk(st) ? h('button', { class: 'btn-sec sm se-dictee', type: 'button', onClick: () => { app.dicteeApres = nextRoute; go('dictee-surprise'); }, html: `${icon('dice', 20)}<span>Une petite dictée surprise</span>` }) : null;
   const mapBtn = h('button', { class: 'btn-sec sm se-map', type: 'button', onClick: () => go(`carte-${lv.id}-${index}`), html: `${icon('map', 20)}<span>Voir la carte</span>` });
 
   const resteTxt = fini ? 'Tu as fini toutes les séries de ce niveau !' : `${faites} série${faites > 1 ? 's' : ''} terminée${faites > 1 ? 's' : ''} sur ${total}`;
@@ -77,7 +79,7 @@ export function serie(root, app, arg) {
     h('div', { class: 'se-dots', role: 'img', 'aria-label': resteTxt }, dots),
     h('p', { class: 'se-left' }, resteTxt),
     h('div', { class: 'res-actions se-actions' }, drawBtn, nextBtn),
-    mapBtn,
+    h('div', { class: 'se-more-actions' }, dicteeBtn, mapBtn),
   );
   const overlay = h('div', { class: 'result serie-end', role: 'dialog', 'aria-label': 'Série terminée' }, card);
   root.append(h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }), overlay);

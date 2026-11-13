@@ -85,7 +85,7 @@ export function dessin(root, app) {
     modelCard.hidden = !m;
     thumb.innerHTML = m ? `<svg viewBox="1.4 0.4 7.2 6.4" aria-hidden="true">${modelGroup(m)}</svg>` : '';
     calqueG.innerHTML = m && calque ? modelGroup(m, { dotted: true }) : '';
-    if (m) { levelTag.textContent = `${'★'.repeat(m.tier)}${'☆'.repeat(3 - m.tier)} ${NIVEAUX_DESSIN[m.tier]}`; levelTag.setAttribute('aria-label', `Difficulté : ${NIVEAUX_DESSIN[m.tier].toLowerCase()}`); }
+    if (m) { levelTag.textContent = `${'★'.repeat(m.tier)}${'☆'.repeat(Math.max(0, 4 - m.tier))} ${NIVEAUX_DESSIN[m.tier]}`; levelTag.setAttribute('aria-label', `Difficulté : ${NIVEAUX_DESSIN[m.tier].toLowerCase()}`); }
     calqueBtn.classList.toggle('on', calque);
     calqueBtn.setAttribute('aria-pressed', String(calque));
   };

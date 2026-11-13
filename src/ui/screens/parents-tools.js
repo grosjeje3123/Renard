@@ -106,6 +106,7 @@ export function settingsCards(app) {
     toggle(app, 'set-soft', 'Tracé plus souple', 'Plus d’indulgence pour les petites mains.', 'souple'),
     toggle(app, 'set-serie-auto', 'Enchaîner les séries', 'Après la fête de fin de série, si l’enfant ne touche à rien, la carte de la série suivante s’ouvre toute seule (aucun exercice ne démarre).', 'serieAuto'),
     toggle(app, 'set-montee', 'La difficulté monte quand l’enfant réussit tout', 'Après trois nouveaux exercices acquis de suite sans le moindre raté, le renard saute l’étape du guide pour le suivant. Après six, il lance un défi : écrire tout seul du premier coup (au premier raté, on passe aux pointillés). La démonstration est toujours montrée ; au premier raté, tout redevient comme avant. Les rappels et la tolérance du tracé ne changent pas.', 'montee'),
+    toggle(app, 'set-surprise', 'Dictée surprise en cours de route', 'Tous les cinq exercices acquis, et après chaque série fêtée, le renard propose une petite dictée de trois éléments déjà appris. L’enfant peut passer.', 'dicteeSurprise'),
     toggle(app, 'set-demo', 'Mode démonstration', 'Ouvre tous les exercices et raccourcit les séances (1 réussite par étape).', 'demo'));
 
   // Pauses

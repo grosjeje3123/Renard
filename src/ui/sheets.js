@@ -150,6 +150,13 @@ const SOFT_LINE = '#F0D9AC';
 const PAGES_ECRITURE = 6;
 const U_NIVEAU = { 1: 7, 2: 6, 3: 5.5 }; // interligne en mm : bien plus grand que les cahiers d'école (3 mm), pour de grands gestes
 const TOP = 34, BOTTOM = A4.h - 24;
+const FACT_H = 22; // bandeau « Le savais-tu ? » en bas de chaque page d'écriture
+/** Les animaux de la campagne qui accompagnent chaque page d'écriture (une vignette de l'album et sa petite anecdote). */
+const ANIMAUX_CAHIER = {
+  1: ['herisson', 'lapin', 'escargot', 'coccinelle', 'ecureuil', 'souris'],
+  2: ['hibou', 'poule', 'vache', 'mouton', 'cheval', 'canard'],
+  3: ['blaireau', 'cerf', 'grenouille', 'abeille', 'rougegorge', 'papillon'],
+};
 
 /** Le renard en image autonome (carrée) : avec sa feuille de style, pour que seule la pose de repos s'affiche. */
 let foxImg = '';
@@ -219,7 +226,7 @@ function planEcriture(lv) {
   const pack = (list) => {
     const pages = [[]]; let y = TOP;
     for (const bl of list) {
-      if (y + bl.h > BOTTOM) { pages.push([]); y = TOP; }
+      if (y + bl.h > BOTTOM - FACT_H) { pages.push([]); y = TOP; }
       pages[pages.length - 1].push(bl); y += bl.h;
     }
     return pages;
@@ -302,8 +309,18 @@ function vEcriture(lv, blocks, jour, n) {
   const p = new Page();
   vHeader(p, `Jour ${jour}`, secTitle(lv, blocks[0].id));
   let y = TOP;
-  const spare = (BOTTOM - TOP - blocks.reduce((a, b) => a + b.h, 0)) / (blocks.length + 1);
+  const spare = (BOTTOM - FACT_H - TOP - blocks.reduce((a, b) => a + b.h, 0)) / (blocks.length + 1);
   for (const bl of blocks) { y += Math.max(0, Math.min(spare, 12)); drawBlock(p, bl, y); y += bl.h; }
+  // Le savais-tu ? Une vignette d'animal de la campagne et sa petite anecdote, à lire à deux une fois la page finie.
+  const liste = ANIMAUX_CAHIER[lv.id] || ANIMAUX_CAHIER[1];
+  const st = STICKER_BY_ID[liste[(jour - 1) % liste.length]];
+  if (st) {
+    const fy = BOTTOM - FACT_H + 2;
+    p.rect(M, fy, A4.w - 2 * M, FACT_H - 4, { fill: SOFT, color: SOFT_LINE, lw: 0.3 });
+    p.svg(stickerSVG(st.animal).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" '), M + 2, fy + 1, FACT_H - 6, FACT_H - 6);
+    p.text(`Le savais-tu ? ${st.name}`, M + FACT_H - 1, fy + 6, { size: 10, bold: true, color: ORANGE });
+    p.para(st.fact, M + FACT_H - 1, fy + 11, A4.w - 2 * M - FACT_H - 2, { size: 9.5, color: INK });
+  }
   vFooter(p, n);
   return p;
 }

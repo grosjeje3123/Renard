@@ -294,7 +294,7 @@ export function tableau(root, app) {
     const m = current?.model;
     thumb.hidden = !m; levelTag.hidden = !m; calqueBar.hidden = !m;
     thumb.innerHTML = m ? `<svg viewBox="${THUMB_VIEW}" aria-hidden="true">${modelGroup(m)}</svg>` : '';
-    if (m) { levelTag.textContent = `${'★'.repeat(m.tier)}${'☆'.repeat(3 - m.tier)} ${NIVEAUX_DESSIN[m.tier]}`; levelTag.setAttribute('aria-label', `Difficulté : ${NIVEAUX_DESSIN[m.tier].toLowerCase()}`); }
+    if (m) { levelTag.textContent = `${'★'.repeat(m.tier)}${'☆'.repeat(Math.max(0, 4 - m.tier))} ${NIVEAUX_DESSIN[m.tier]}`; levelTag.setAttribute('aria-label', `Difficulté : ${NIVEAUX_DESSIN[m.tier].toLowerCase()}`); }
     calqueModeBtns.forEach((x) => { const on = x.dataset.mode === calqueMode; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); });
   };
   const useModel = (m, { silent = false } = {}) => {
@@ -486,7 +486,7 @@ export function tableau(root, app) {
         onClick: () => { if (locked) { sfx('oops'); msg.textContent = 'Ce dessin s’ouvre un peu plus tard, quand tu auras réussi d’autres exercices.'; return; } choose1(m); } },
       h('span', { class: 'mp-thumb', html: `<svg viewBox="${THUMB_VIEW}" aria-hidden="true">${modelGroup(m)}</svg>${locked ? `<i class="mp-lock">${icon('lock', 26)}</i>` : ''}` }),
       h('span', { class: 'mp-name' }, m.phrase.replace(/^(le|la|l’|un|une) /, '')),
-      h('span', { class: 'mp-lvl', 'aria-hidden': 'true' }, '★'.repeat(m.tier) + '☆'.repeat(3 - m.tier)));
+      h('span', { class: 'mp-lvl', 'aria-hidden': 'true' }, '★'.repeat(m.tier) + '☆'.repeat(Math.max(0, 4 - m.tier))));
     });
     const cancel = h('button', { class: 'btn-sec sm', type: 'button', onClick: () => { sfx('tap'); close(); } }, 'Annuler');
     mpick = h('div', { class: 'result mpick', role: 'dialog', 'aria-label': 'Choisir un calque' },

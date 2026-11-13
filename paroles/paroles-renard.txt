@@ -1,4 +1,4 @@
-PAROLES DU RENARD — 1893 phrases à enregistrer
+PAROLES DU RENARD — 1899 phrases à enregistrer
 Chaque ligne : identifiant | phrase. Le fichier audio de chaque phrase doit porter son identifiant : <identifiant>.mp3
 
 === CONSIGNE (506) ===
@@ -521,20 +521,20 @@ cf514c2c | Et 5 nouvelles vignettes !
 c907b89a | Et une nouvelle vignette : l’abeille !
 621510f8 | Et une nouvelle vignette : l’écureuil !
 24b31c60 | Et une nouvelle vignette : l’escargot !
-c885a657 | Et une nouvelle vignette : l’ours !
 f2e9ac0f | Et une nouvelle vignette : la coccinelle !
 9dd68f92 | Et une nouvelle vignette : la grenouille !
 50b345e2 | Et une nouvelle vignette : la libellule !
 401669fb | Et une nouvelle vignette : la luciole !
+c012f21f | Et une nouvelle vignette : la poule !
 d3d69ecf | Et une nouvelle vignette : la souris !
 89677e1b | Et une nouvelle vignette : la tortue !
 d1c4a955 | Et une nouvelle vignette : la vache !
+e519ebe1 | Et une nouvelle vignette : le blaireau !
 96f4cc01 | Et une nouvelle vignette : le canard !
 880361dc | Et une nouvelle vignette : le castor !
 ed0e8f72 | Et une nouvelle vignette : le cerf !
 948b20bc | Et une nouvelle vignette : le chat !
 c66cdaaf | Et une nouvelle vignette : le cheval !
-68c3d571 | Et une nouvelle vignette : le dauphin !
 73ddfa1b | Et une nouvelle vignette : le hérisson !
 6ab373ff | Et une nouvelle vignette : le hibou !
 c9b72bf6 | Et une nouvelle vignette : le lapin !
@@ -1291,9 +1291,10 @@ eef6aa92 | Écris « vacances » : suis la première ligne, puis les pointillés
 e5940a1a | Écris « xylophone » : suis la première ligne, puis les pointillés, puis écris tout seul !
 dc1fbc5c | Écris « zoo » : suis la première ligne, puis les pointillés, puis écris tout seul !
 
-=== DESSIN (22) ===
+=== DESSIN (27) ===
 54e83c62 | Dessine ce que tu veux sur la feuille !
 ab2b81b2 | Dessine sa maison !
+7d2d9d35 | Et si tu dessinais Renard lui-même ?
 4bca6145 | Où habite Renard ?
 1277948d | Renard a besoin de sa voiture.
 5940364c | Renard part en bateau sur la rivière !
@@ -1310,10 +1311,14 @@ b013475f | Une idée : dessine un arbre !
 29d2ea0b | Une idée : dessine un bonhomme de neige !
 ef51396f | Une idée : dessine un chat !
 379bb9ed | Une idée : dessine un escargot !
+dbf9dfd9 | Une idée : dessine un hérisson et sa pomme !
+e7ec9fbe | Une idée : dessine un lapin et sa carotte !
 822e3020 | Une idée : dessine un poisson dans l’eau !
+8bb2f23c | Une idée : dessine une chouette sur sa branche !
 29562c10 | Une idée : dessine une fleur !
 d65ecec7 | Une idée : dessine une maison !
 ec4a7203 | Une idée : dessine une montagne !
+09638f06 | Une idée : dessine une poule qui picore !
 
 === ANIMAL (214) ===
 185081bd | Apprends à écrire ton premier mot.
@@ -1328,16 +1333,17 @@ e284a08c | Apprends trente-cinq sons, mots ou phrases.
 3e337449 | Apprends vingt lettres.
 cfc90a86 | Avance comme une tortue : très, très lentement, en comptant jusqu’à dix.
 a2ab1457 | Avant d’être papillon, il est chenille.
+6a8d6130 | Avant de sortir de l’œuf, le poussin pépie déjà : sa maman l’entend.
 c8923d9f | Bats des bras comme des ailes de papillon et vole doucement dans la pièce.
 cf6fd21b | Beaucoup de poissons sentent les mouvements de l’eau avec une ligne sur leurs flancs.
 34f1b4c9 | Bourdonne comme une abeille et dessine un grand 8 dans l’air avec ton doigt.
 1b6c2670 | C’est ton ami Renard !
 b5bffc0c | Certaines tortues vivent plus de cent ans.
-db5ca056 | Chacun a son propre sifflement, comme un prénom.
 86df1b7a | Chaque luciole s’allume et s’éteint à son rythme.
 fb001f06 | Chaque réussite te donne une vignette d’animal.
 cd67cccb | Colle toutes les vignettes des niveaux.
 b7495484 | Cours sur place avec de tout petits pas de souris, sans faire de bruit.
+e43218b6 | Creuse un terrier avec tes deux mains, très vite, comme un blaireau !
 cb45674b | Dans une ruche, une seule reine pond les œufs.
 e4b62048 | Écarte les bras comme des ailes et tourne doucement sur toi-même.
 e1769a3c | Écris le a avec trois étoiles.
@@ -1351,6 +1357,7 @@ d2a27928 | Écris sur ton cahier, avec ton crayon, puis touche « J’ai essayé
 0c6114f8 | Elle donne du lait, avec lequel on fait du fromage et du yaourt.
 10aeb771 | Elle est toute petite, mais elle court très vite.
 3b6ae29b | Elle passe l’hiver cachée, souvent avec d’autres coccinelles.
+4f967ce4 | Elle picore des graines, des vers et des petits insectes.
 bf32fed9 | Elle prend son temps, et elle y arrive !
 962b9c66 | Elle saute très loin avec ses grandes pattes arrière.
 ce5856d7 | Elle se faufile dans de minuscules trous.
@@ -1360,6 +1367,7 @@ aca5b4bd | En hiver, il dort pendant plusieurs mois : on dit qu’il hiberne.
 ef079106 | Fais la luciole : ouvre et ferme les mains comme une lumière qui clignote.
 1bec0634 | Galope sur place comme un cheval, puis arrête-toi et souffle doucement.
 830bb0de | Glisse comme un escargot, très doucement, en dessinant une spirale par terre.
+f3033a2b | Gratte le sol avec un pied, puis avec l’autre, et picore comme une poule !
 38273c67 | Grimpe à un arbre imaginaire, puis saute de branche en branche.
 60f2364e | Il avale ses proies entières, puis recrache ce qu’il ne digère pas.
 86d182ee | Il chante pour dire aux autres : ici, c’est chez moi !
@@ -1370,12 +1378,11 @@ a446a425 | Il est très fier : tu as trouvé tous les animaux.
 2cc72c2d | Il les use en grignotant.
 8acc9664 | Il mange de l’herbe et la mâche longtemps.
 52ef7865 | Il mange de l’herbe, du foin et des carottes.
-c8b69f9d | Il mange un peu de tout : des baies, du miel, des poissons, des racines.
 db71a7bf | Il peut descendre le long d’un tronc la tête en bas.
 b024a58f | Il peut tourner la tête presque tout autour de lui.
 ee9c4bc3 | Il retombe presque toujours sur ses pattes quand il saute de haut.
 d0b8e9c6 | Il saute d’arbre en arbre sans tomber.
-fd4a2234 | Il saute hors de l’eau et fait des cabrioles.
+778bdbff | Il sort la nuit pour manger des vers de terre, des fruits et des racines.
 58f7fb50 | Il sort surtout la nuit pour manger des insectes, des vers et des limaces.
 2486acc3 | Ils vivent dans l’eau.
 8ac87c73 | L’abeille fait une petite danse pour dire à ses copines où sont les fleurs.
@@ -1383,8 +1390,6 @@ fe787ff2 | L’écureuil a une grande queue touffue qui l’aide à garder l’�
 f770ae75 | L’écureuil cache des noisettes pour l’hiver.
 4f712475 | L’escargot laisse une trace brillante derrière lui, comme ton crayon sur la feuille.
 de95931f | L’escargot porte sa coquille sur son dos : c’est sa maison.
-6a4ad2b9 | L’ours brun est l’un des plus gros animaux de la forêt.
-827e23f6 | L’ours se repose longtemps dans sa tanière pendant l’hiver.
 ef2a86b2 | La carapace de la tortue fait partie de son squelette : elle ne peut pas l’enlever.
 02b840e3 | La chenille se transforme dans une chrysalide.
 a6cf1fcb | La coccinelle mange les pucerons : c’est une amie du jardin.
@@ -1395,6 +1400,8 @@ d373bc38 | La libellule a quatre ailes et de très grands yeux.
 1426b7d7 | La libellule peut voler en arrière et rester immobile dans les airs.
 9c392c73 | La luciole fabrique sa propre lumière pour briller dans la nuit.
 e390712e | La plupart des poissons n’ont pas de paupières.
+f66421e8 | La poule gratte la terre avec ses pattes pour trouver des graines et des petits vers.
+aee251c5 | La poule pond presque un œuf par jour.
 651b1b54 | La souris a de longues moustaches pour sentir autour d’elle, même dans le noir.
 b54296e4 | La tortue n’a pas de dents : elle coupe sa nourriture avec son bec.
 da621120 | La tortue porte sa maison sur son dos.
@@ -1403,6 +1410,8 @@ b9f80bc2 | La vache a quatre estomacs pour bien digérer l’herbe.
 9a549130 | Le bébé de la vache s’appelle un veau.
 152e9d60 | Le bébé du cheval s’appelle un poulain.
 4730e00a | Le bébé du mouton s’appelle un agneau.
+602f9d54 | Le blaireau a un masque noir et blanc sur la tête.
+bff99a72 | Le blaireau creuse de grands terriers.
 dbbafcff | Le castor a une queue plate, qui lui sert de rame.
 9e89be97 | Le castor coupe des branches avec ses grandes dents pour construire des barrages.
 9e2dcc27 | Le cerf court vite et saute par-dessus les obstacles.
@@ -1410,8 +1419,6 @@ ec036c64 | Le chat dort beaucoup : souvent plus de douze heures par jour.
 5cf84974 | Le chat ronronne quand il est content, et ses moustaches l’aident à sentir les passages étroits.
 b0c9f52b | Le cheval dort souvent debout : ses jambes se verrouillent pour qu’il ne tombe pas.
 524e900f | Le cheval peut courir très vite : plus de 60 kilomètres à l’heure.
-9ccbc5de | Le dauphin n’est pas un poisson : il respire de l’air par le trou sur sa tête.
-0898eca7 | Le dauphin siffle pour parler à ses amis.
 59bc68f8 | Le hérisson a plus de 5 000 piquants sur le dos.
 7564d247 | Le hérisson se roule en boule quand il a peur : ses piquants le protègent.
 7ea0992f | Le hibou voit très bien la nuit.
@@ -1430,11 +1437,9 @@ b3822cee | Le poisson nage en bougeant sa queue et ses nageoires.
 f3182832 | Les bébés grenouilles s’appellent des têtards.
 9f774d51 | Les bois du cerf tombent chaque année, et de nouveaux repoussent.
 6613a37f | Les canetons savent nager peu de temps après leur naissance.
-dadb39bd | Les dauphins vivent en groupe et s’entraident.
 b1db9acd | Les dents de devant de la souris ne s’arrêtent jamais de pousser : elle grignote pour les user.
 9fcd7d38 | Les dents du lapin poussent toute sa vie.
 3730ac3e | Les lucioles s’allument surtout les soirs d’été.
-e36df72c | Les oursons restent près de leur maman pendant longtemps.
 60800555 | Les pattes du canard sont palmées, comme des palmes pour nager.
 d630325a | Les petits canetons suivent leur maman en file.
 3cc1799a | Les plumes du canard sont huilées : l’eau glisse dessus sans les mouiller.
@@ -1443,14 +1448,13 @@ d630325a | Les petits canetons suivent leur maman en file.
 b861508b | Marche comme un canard : petits pas, et un joli « coin-coin » !
 417da33f | Marche la tête haute, les mains au-dessus de la tête comme des bois.
 e847a5f5 | Marche lentement à quatre pattes comme une vache, puis fais « meuh » tout doucement.
-da7a444c | Marche lourdement comme un gros ours, puis fais-toi un grand câlin.
 a2f6ca80 | Marche sur la pointe des pieds comme un renard, sans faire un seul bruit.
-52d3c1d8 | Nage comme un dauphin : fais de grandes vagues avec tout ton corps, puis un petit saut.
 70614e4e | Nage comme un poisson : fais des vagues avec tes bras.
 acaa8dfb | On la tond au printemps pour faire des pulls.
 a69ab4d1 | On les colle ici !
 0474a420 | On ne peut pas deviner l’âge d’une coccinelle avec ses points.
 d534ef8c | Parfois il les oublie, et un arbre pousse !
+d4b8b560 | Parfois, le renard vient y habiter avec lui !
 7eb56353 | Porte une grosse bûche imaginaire jusqu’à ton barrage, comme un castor.
 7c8d70ba | Quand il fait trop sec, il rentre dans sa coquille.
 4540f4f8 | Quand il y a un danger, il frappe l’eau avec sa queue pour prévenir ses amis.
@@ -1469,6 +1473,7 @@ d876571e | Saute comme une grenouille, cinq fois de suite !
 d390e8f7 | Ses yeux brillent dans le noir parce qu’ils renvoient la lumière.
 d7a5e767 | Ses yeux sont au bout de ses grandes antennes.
 958089eb | Seul le cerf mâle a des bois.
+5e9d186f | Son terrier a plusieurs pièces et plusieurs sorties, et il le garde bien propre.
 b88cc671 | Son terrier s’appelle une garenne.
 1382fa92 | Termine ton premier exercice.
 a60321b6 | Touche un haut-parleur pour l’écouter, ou « Tout lire ».
@@ -1508,20 +1513,20 @@ d5149496 | Tu as toutes les vignettes !
 a0b95317 | Voici l’abeille !
 83b7e977 | Voici l’écureuil !
 542d6f1f | Voici l’escargot !
-939490c4 | Voici l’ours !
 c76e4c56 | Voici la coccinelle !
 66561203 | Voici la grenouille !
 0efb2ca9 | Voici la libellule !
 e5fd3594 | Voici la luciole !
+42496e00 | Voici la poule !
 c547186a | Voici la souris !
 a6522356 | Voici la tortue !
 d914bbda | Voici la vache !
+966e38a4 | Voici le blaireau !
 282e2e78 | Voici le canard !
 7f61e29d | Voici le castor !
 e01d5ad3 | Voici le cerf !
 422e6fd5 | Voici le chat !
 78e8d2f2 | Voici le cheval !
-2d1b64fa | Voici le dauphin !
 a378399e | Voici le hérisson !
 36dfa6e4 | Voici le hibou !
 678c8da5 | Voici le lapin !
@@ -1837,7 +1842,7 @@ ec40a893 | On se retrouve tout à l’heure !
 455c7511 | Salut !
 09135c52 | Tu veux apprendre à écrire avec moi ?
 
-=== INTERFACE (75) ===
+=== INTERFACE (76) ===
 80decf28 | À demain !
 f4ce2ab4 | À toi !
 3068c24f | Allez, on y va ?
@@ -1911,6 +1916,7 @@ af0b0056 | Tu écris déjà bien !
 70778d0d | Tu t’en vas ?
 8cd0bd1c | Tu viens écrire avec moi ?
 82bcd537 | Un petit jeu ?
+fe27be18 | Une question pour un adulte : combien de temps on écrit ensemble ?
 f13ca08a | Voilà !
 c051ce0d | Voilà tes dessins !
 

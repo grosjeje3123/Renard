@@ -581,14 +581,14 @@ test('dessin libre : chaque modèle est complet, tient sur la feuille et utilise
   }
 });
 
-test('dessin libre : trois niveaux de difficulté, qui s\'ouvrent avec la progression, et des modèles « à Renard »', () => {
-  for (const t of [1, 2, 3]) assert.ok(DESSINS.filter((d) => d.tier === t).length >= 3, `niveau ${t} : au moins trois modèles`);
-  assert.ok(DESSINS.every((d) => [1, 2, 3].includes(d.tier) && NIVEAUX_DESSIN[d.tier]));
+test('dessin libre : quatre niveaux de difficulté, qui s\'ouvrent avec la progression, et des modèles « à Renard »', () => {
+  for (const t of [1, 2, 3, 4]) assert.ok(DESSINS.filter((d) => d.tier === t).length >= 3, `niveau ${t} : au moins trois modèles`);
+  assert.ok(DESSINS.every((d) => [1, 2, 3, 4].includes(d.tier) && NIVEAUX_DESSIN[d.tier]));
   // plus un dessin est difficile, plus il a de pièces en moyenne
   const moy = (t) => { const l = DESSINS.filter((d) => d.tier === t); return l.reduce((a, d) => a + d.parts.length, 0) / l.length; };
-  assert.ok(moy(1) < moy(2) && moy(2) < moy(3), `${moy(1)} < ${moy(2)} < ${moy(3)}`);
-  assert.deepEqual([0, 2, 3, 6, 7, 20].map((n) => tierFor(n)), [1, 1, 2, 2, 3, 3]);
-  assert.equal(tierFor(0, true), 3, 'mode démonstration : tout est ouvert');
+  assert.ok(moy(1) < moy(2) && moy(2) < moy(3) && moy(3) < moy(4), `${moy(1)} < ${moy(2)} < ${moy(3)} < ${moy(4)}`);
+  assert.deepEqual([0, 2, 3, 6, 7, 19, 20].map((n) => tierFor(n)), [1, 1, 2, 2, 3, 3, 4]);
+  assert.equal(tierFor(0, true), 4, 'mode démonstration : tout est ouvert');
   for (const id of ['maison-renard', 'voiture', 'bateau', 'cerf-volant']) {
     const d = DESSINS.find((x) => x.id === id);
     assert.ok(d && /Renard/.test(d.phrase) && d.ask && /Renard/.test(d.ask), id);
@@ -617,11 +617,11 @@ test('dessin libre : les modèles se suivent du plus simple au plus compliqué, 
   // on rouvre l'écran là où l'enfant s'était arrêté ; quand la progression ouvre un niveau, la suite s'allonge
   const deuxieme = ideeSuivante(1, '');
   assert.equal(ideeSuivante(1, deuxieme.phrase, { reprendre: true }).phrase, deuxieme.phrase);
-  const toutes = suiteIdees(3);
+  const toutes = suiteIdees(4);
   assert.equal(toutes.length, DESSINS.length + IDEES_LIBRES.length);
   assert.equal(toutes[0].model.id, DESSINS_TRIES[0].id);
   assert.equal(toutes[DESSINS.length - 1].model.id, DESSINS_TRIES[DESSINS.length - 1].id, 'le plus compliqué en dernier des modèles');
-  assert.ok(suiteIdees(2).length > suiteIdees(1).length && suiteIdees(3).length > suiteIdees(2).length);
+  assert.ok(suiteIdees(2).length > suiteIdees(1).length && suiteIdees(3).length > suiteIdees(2).length && suiteIdees(4).length > suiteIdees(3).length);
 });
 
 test('progression : la dernière idée de dessin montrée est mémorisée (vide au départ)', () => {
@@ -1380,4 +1380,23 @@ test('stylet : la paume est ignorée pendant qu’on écrit au stylet, le doigt 
 test('les six règles de la reconnaissance sont expliquées aux adultes', async () => {
   const { REGLES } = await import('../src/content/regles.js');
   assert.deepEqual(REGLES.map((r) => r.k), ['start', 'direction', 'shape', 'size', 'lines', 'flow']);
+});
+
+test('animaux de la campagne : la poule et le blaireau remplacent le dauphin et l’ours, les vignettes déjà collées sont gardées', () => {
+  const ids = STICKERS.map((s) => s.id);
+  assert.ok(ids.includes('poule') && ids.includes('blaireau') && !ids.includes('dauphin') && !ids.includes('ours'));
+  for (const id of ['poule', 'blaireau']) assert.ok(FICHES[id] && FICHES[id].more.length >= 3 && FICHES[id].move, id);
+  const st = P.hydrate({ stickers: { dauphin: 111, ours: 222, lapin: 333 } });
+  assert.deepEqual(st.stickers, { poule: 111, blaireau: 222, lapin: 333 });
+});
+
+test('dictée surprise : proposée seulement si la voix est là, hors démonstration, et réglable', async () => {
+  const { surpriseOk, SURPRISE_N } = await import('../src/core/dictee.js');
+  assert.equal(SURPRISE_N, 3);
+  const st = P.newState();
+  st.settings.voix = true;
+  for (const id of ['i', 'o', 'a']) st.skills[id] = { sessions: 1, attempts: 2, phase: 3, mastered: true, masteredAt: 1, last: 1, history: [] };
+  assert.equal(surpriseOk(st), true);
+  st.settings.dicteeSurprise = false; assert.equal(surpriseOk(st), false);
+  st.settings.dicteeSurprise = true; st.settings.voix = false; assert.equal(surpriseOk(st), false);
 });

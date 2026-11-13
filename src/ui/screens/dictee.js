@@ -12,18 +12,22 @@ import { recognizerContext } from '../../core/tolerance.js';
 import { epaisseur } from '../../core/epaisseur.js';
 import { recognizer } from '../../engine/recognizer.js';
 import { buildFeedback } from '../../engine/feedback.js';
-import { dicteeItems, dicteePossible, recordDictee } from '../../core/dictee.js';
+import { dicteeItems, dicteePossible, recordDictee, DICTEE_N, SURPRISE_N } from '../../core/dictee.js';
 import { blocked, breakDue } from '../../core/progress.js';
 import { dist, polyLength } from '../../engine/geometry.js';
 import { sfx, speak, stopSpeaking } from '../audio.js';
 
-export function dictee(root, app) {
+export function dictee(root, app, arg) {
   const st = app.state;
+  // « dictee-surprise » : trois éléments seulement, proposés en cours de route ; ensuite on reprend là où on en était.
+  const surprise = arg === 'surprise';
+  const apres = surprise ? app.dicteeApres || 'accueil' : 'jeux';
+  const N = surprise ? SURPRISE_N : DICTEE_N;
   if (blocked(st)) { app.go('pause'); return; }
   // Sans la voix du renard il n'y a rien à écouter ; sans exercices acquis ou essayés il n'y a rien à dicter
-  if (!st.settings.voix || !dicteePossible(st)) { app.go('jeux'); return; }
+  if (!st.settings.voix || !dicteePossible(st)) { app.go(apres); return; }
 
-  let alive = true, busy = true, items = dicteeItems(st), i = 0, results = [];
+  let alive = true, busy = true, items = dicteeItems(st, N), i = 0, results = [];
   let skill = null, tpl = null, board = null, strokeIdx = 0, strokeEvals = [], retries = 0, overlay = null;
 
   root.classList.add('exo', 'dictee');
@@ -38,7 +42,7 @@ export function dictee(root, app) {
   root.append(
     h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }),
     h('header', { class: 'bar exo-bar' },
-      h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour aux jeux', onClick: () => { sfx('tap'); app.go('jeux'); }, html: icon('back', 26) }),
+      h('button', { class: 'round sm', type: 'button', 'aria-label': surprise ? 'Continuer sans la dictée' : 'Retour aux jeux', onClick: () => { sfx('tap'); app.go(apres); }, html: icon('back', 26) }),
       h('div', { class: 'bar-title' }, h('h2', {}, 'La dictée'), h('p', {}, 'Écoute, puis écris')),
       dotsEl,
     ),
@@ -168,8 +172,8 @@ export function dictee(root, app) {
           h('span', { class: `dc-glyph${s.kind === 'word' ? ' word' : ''}` }, s.glyph),
           h('span', { class: 'dc-st', 'aria-label': r == null ? 'passé' : `${r} étoile${r > 1 ? 's' : ''}`, html: r == null ? '–' : [0, 1, 2].map((n) => `<span class="rs ${n < r ? 's3' : ''}">${icon(n < r ? 'star' : 'starO', 18)}</span>`).join('') }));
       }));
-    const encore = pause ? null : h('button', { class: 'btn-sec', type: 'button', onClick: () => restart(), html: `${icon('replay', 22)}<span>Une autre dictée</span>` });
-    const retour = h('button', { class: 'btn-big sm', type: 'button', onClick: () => { sfx('pop'); app.go(pause ? 'pause' : 'jeux'); }, html: `${icon(pause ? 'moon' : 'arrowR', 28)}<span>${pause ? 'Pause' : 'Les jeux'}</span>` });
+    const encore = pause || surprise ? null : h('button', { class: 'btn-sec', type: 'button', onClick: () => restart(), html: `${icon('replay', 22)}<span>Une autre dictée</span>` });
+    const retour = h('button', { class: 'btn-big sm', type: 'button', onClick: () => { sfx('pop'); app.go(pause ? 'pause' : apres); }, html: `${icon(pause ? 'moon' : 'arrowR', 28)}<span>${pause ? 'Pause' : surprise ? 'On continue' : 'Les jeux'}</span>` });
     overlay = h('div', { class: 'result dictee-end', role: 'dialog', 'aria-label': 'Dictée terminée' },
       h('div', { class: 'result-card rich' }, resFoxHost, h('h2', {}, faits.length ? DICTEE_FIN : 'On fera la dictée une autre fois !'), faits.length ? recap : null,
         h('div', { class: 'res-actions' }, encore, retour)));
@@ -186,7 +190,7 @@ export function dictee(root, app) {
     sfx('pop');
     overlay?.remove(); overlay = null;
     cleanupExtras.splice(0).forEach((f) => f());
-    items = dicteeItems(st); i = 0; results = [];
+    items = dicteeItems(st, N); i = 0; results = [];
     if (items.length < 2) { app.go('jeux'); return; }
     nextItem();
   }

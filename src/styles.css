@@ -877,3 +877,8 @@ button[disabled]{opacity:.35;cursor:default}
 .mt-adultes .regles{margin-top:10px}
 .mt-adultes p{margin:10px 0 0;font-size:15px}
 @media (max-width:640px){.regles{grid-template-columns:1fr}.regles dd{margin-bottom:6px}}
+.se-more-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center}
+.wl-adulte{display:flex;flex-direction:column;gap:12px;background:var(--card-solid);border-radius:22px;padding:14px 18px;border:2px solid var(--line);text-align:left;max-width:560px}
+.wl-kicker{margin:0;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px;color:var(--accent-deep)}
+.wl-row{display:flex;flex-direction:column;gap:6px}
+.wl-adulte .muted{margin:0;font-size:14px}

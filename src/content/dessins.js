@@ -43,7 +43,8 @@ const spiral = (cx, cy, r0, k, turns, c) => {
 };
 
 /**
- * Difficulté (tier) : 1 = ronds et traits droits ; 2 = formes composées (carrés, triangles, courbes) ; 3 = dessins détaillés.
+ * Difficulté (tier) : 1 = ronds et traits droits ; 2 = formes composées (carrés, triangles, courbes) ; 3 = dessins détaillés ;
+ * 4 = animaux de la campagne pour les grands (renard, hérisson, chouette, lapin, poule).
  * `ask` : ce que dit le renard quand le dessin est « à lui » (sa maison, sa voiture…).
  */
 export const DESSINS = [
@@ -143,14 +144,76 @@ export const DESSINS = [
     circle(5.8, 5.4, 0.06, 'orange'),
     poly([[2.4, 6.1], [7.6, 6.1]], 'vert'),
   ] },
+  // Pour les grands : des animaux de la campagne plus élaborés (plus de traits, des courbes, des détails).
+  { id: 'renard-assis', tier: 4, phrase: 'Renard assis dans l’herbe', ask: 'Et si tu dessinais Renard lui-même ?', parts: [
+    path('M 3.6 2.2 Q 5 1.6 6.4 2.2 L 5 3.6 Z', 'orange'),
+    poly([[3.7, 2.15], [3.9, 1], [4.5, 1.85]], 'orange', true),
+    poly([[6.3, 2.15], [6.1, 1], [5.5, 1.85]], 'orange', true),
+    circle(4.5, 2.5, 0.1, 'brun'), circle(5.5, 2.5, 0.1, 'brun'), circle(5, 3.45, 0.13, 'brun'),
+    path('M 4.3 3.4 C 3.6 4.2 3.5 5.6 4 6.2 L 6 6.2 C 6.5 5.6 6.4 4.2 5.7 3.4', 'orange'),
+    path('M 4.6 3.75 Q 5 5.1 5.4 3.75', 'jaune'),
+    poly([[4.6, 5.4], [4.6, 6.2]], 'brun'), poly([[5.4, 5.4], [5.4, 6.2]], 'brun'),
+    path('M 6 6.1 C 7.5 6.3 8.4 5.2 7.8 4.2 C 7.5 4.9 7 5.3 6.3 5.4', 'orange'),
+    path('M 7.8 4.2 C 8.05 4.5 8.1 4.8 7.95 5.1', 'jaune'),
+    poly([[2, 6.35], [8.6, 6.35]], 'vert'),
+  ] },
+  { id: 'herisson', tier: 4, phrase: 'un hérisson et sa pomme', parts: [
+    poly([[2.6, 4.6], [2.6, 3.6], [3.2, 3.9], [3.5, 3], [4, 3.4], [4.5, 2.6], [4.9, 3.2], [5.5, 2.5], [5.8, 3.1], [6.4, 2.7], [6.6, 3.4], [7.2, 3.2], [7.2, 3.9], [7.8, 4]], 'brun'),
+    path('M 2.6 4.6 C 2.8 5.3 3.4 5.4 7.6 5.3', 'brun'),
+    path('M 7.8 4 C 8.6 4.3 9 4.7 9.1 5 L 7.6 5.3', 'orange'),
+    circle(9.1, 5, 0.12, 'brun'), circle(8.15, 4.5, 0.09, 'brun'),
+    poly([[3.6, 5.35], [3.5, 5.8]], 'brun'), poly([[4.6, 5.35], [4.6, 5.8]], 'brun'),
+    poly([[6.2, 5.33], [6.2, 5.8]], 'brun'), poly([[7, 5.3], [7.1, 5.8]], 'brun'),
+    circle(5, 2.05, 0.45, 'rouge'), poly([[5, 1.6], [5.1, 1.3]], 'vert'),
+    path('M 5.1 1.4 Q 5.5 1.2 5.6 1.5 Q 5.3 1.6 5.1 1.4', 'vert'),
+    poly([[1.5, 5.85], [9.5, 5.85]], 'vert'),
+  ] },
+  { id: 'chouette', tier: 4, phrase: 'une chouette sur sa branche', parts: [
+    ellipse(5, 3.9, 1.6, 2, 'brun'),
+    poly([[3.8, 2.4], [3.7, 1.5], [4.4, 2]], 'brun', true), poly([[6.2, 2.4], [6.3, 1.5], [5.6, 2]], 'brun', true),
+    circle(4.35, 3, 0.55, 'jaune'), circle(5.65, 3, 0.55, 'jaune'),
+    circle(4.35, 3, 0.18, 'brun'), circle(5.65, 3, 0.18, 'brun'),
+    poly([[4.85, 3.4], [5.15, 3.4], [5, 3.8]], 'orange', true),
+    path('M 4.3 4.4 Q 4.5 4.7 4.7 4.4 Q 4.9 4.7 5.1 4.4 Q 5.3 4.7 5.5 4.4 Q 5.7 4.7 5.9 4.4', 'orange'),
+    path('M 4.5 4.95 Q 4.7 5.25 4.9 4.95 Q 5.1 5.25 5.3 4.95 Q 5.5 5.25 5.7 4.95', 'orange'),
+    path('M 3.5 3.6 C 3 4.3 3.2 5.2 3.8 5.6', 'brun'), path('M 6.5 3.6 C 7 4.3 6.8 5.2 6.2 5.6', 'brun'),
+    poly([[1.5, 6], [8.5, 6]], 'brun'),
+    poly([[4.5, 5.8], [4.5, 6.15]], 'orange'), poly([[5.5, 5.8], [5.5, 6.15]], 'orange'),
+    circle(8.3, 1.2, 0.5, 'jaune'),
+  ] },
+  { id: 'lapin', tier: 4, phrase: 'un lapin et sa carotte', parts: [
+    circle(4, 3, 0.85, 'brun'),
+    ellipse(3.7, 1.4, 0.25, 0.8, 'brun'), ellipse(4.3, 1.4, 0.25, 0.8, 'brun'),
+    ellipse(5.2, 4.9, 1.7, 1.25, 'brun'),
+    circle(6.95, 4.65, 0.35, 'jaune'),
+    circle(3.75, 2.9, 0.1, 'brun'), circle(3.2, 3.25, 0.1, 'rouge'),
+    poly([[3.2, 3.3], [2.4, 3.1]], 'brun'), poly([[3.2, 3.38], [2.4, 3.55]], 'brun'),
+    poly([[4.2, 5.5], [4.2, 6.1]], 'brun'), ellipse(5.6, 6.05, 0.7, 0.2, 'brun'),
+    poly([[2, 5.2], [2.6, 6.2], [2.9, 5]], 'orange', true),
+    poly([[2.45, 5.05], [2.3, 4.6]], 'vert'), poly([[2.5, 5.05], [2.7, 4.55]], 'vert'),
+    poly([[1.5, 6.4], [8.5, 6.4]], 'vert'),
+  ] },
+  { id: 'poule', tier: 4, phrase: 'une poule qui picore', parts: [
+    path('M 3.4 2.6 C 3.6 3.2 4.2 3.6 4.8 3.6 C 5.8 3.6 6.6 3.2 7.2 2.2 C 7.6 2.8 7.6 3.6 7.2 4.6 C 6.5 6.2 3 5.8 3 4.2', 'orange'),
+    circle(3.3, 2.5, 0.6, 'orange'),
+    path('M 2.9 2 Q 3 1.5 3.25 1.9 Q 3.4 1.4 3.6 1.9 Q 3.8 1.6 3.85 2.1', 'rouge'),
+    poly([[2.75, 2.45], [2.3, 2.62], [2.75, 2.8]], 'jaune', true),
+    path('M 2.8 2.9 Q 2.75 3.3 2.95 3.25', 'rouge'),
+    circle(3.2, 2.4, 0.09, 'brun'),
+    path('M 4.6 4.3 C 5.4 4 6.2 4.3 6.4 4.8 C 5.8 5.2 5 5.1 4.6 4.3', 'brun'),
+    poly([[4.6, 5.65], [4.6, 6.3]], 'jaune'), poly([[5.4, 5.7], [5.4, 6.3]], 'jaune'),
+    poly([[4.3, 6.3], [4.9, 6.3]], 'jaune'), poly([[5.1, 6.3], [5.7, 6.3]], 'jaune'),
+    circle(2.4, 6.1, 0.07, 'jaune'), circle(2, 5.95, 0.07, 'jaune'), circle(1.7, 6.2, 0.07, 'jaune'),
+    poly([[1.5, 6.5], [8.5, 6.5]], 'vert'),
+  ] },
 ];
 
-export const NIVEAUX_DESSIN = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile' };
+export const NIVEAUX_DESSIN = { 1: 'Facile', 2: 'Moyen', 3: 'Difficile', 4: 'Pour les grands' };
 /**
- * Difficulté ouverte selon la progression : exercices acquis (3 → modèles composés, 7 → modèles détaillés).
+ * Difficulté ouverte selon la progression : exercices acquis (3 → modèles composés, 7 → modèles détaillés, 20 → animaux pour les grands).
  * Le mode démonstration ouvre tout. Aucune obligation : l'enfant dessine ce qu'il veut, le modèle n'est qu'une aide.
  */
-export const tierFor = (acquis, demo = false) => (demo || acquis >= 7 ? 3 : acquis >= 3 ? 2 : 1);
+export const tierFor = (acquis, demo = false) => (demo || acquis >= 20 ? 4 : acquis >= 7 ? 3 : acquis >= 3 ? 2 : 1);
 
 /** Idées sans modèle : l'enfant invente. */
 export const IDEES_LIBRES = ['ton animal préféré', 'ta famille', 'ton jouet préféré'];

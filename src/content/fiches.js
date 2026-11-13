@@ -71,9 +71,9 @@ export const FICHES = {
     more: ['Les dents de devant de la souris ne s’arrêtent jamais de pousser : elle grignote pour les user.', 'Elle est toute petite, mais elle court très vite.', 'Elle se faufile dans de minuscules trous.'],
     move: 'Cours sur place avec de tout petits pas de souris, sans faire de bruit.',
   },
-  ours: {
-    more: ['L’ours brun est l’un des plus gros animaux de la forêt.', 'Il mange un peu de tout : des baies, du miel, des poissons, des racines.', 'Les oursons restent près de leur maman pendant longtemps.'],
-    move: 'Marche lourdement comme un gros ours, puis fais-toi un grand câlin.',
+  blaireau: {
+    more: ['Le blaireau a un masque noir et blanc sur la tête.', 'Il sort la nuit pour manger des vers de terre, des fruits et des racines.', 'Son terrier a plusieurs pièces et plusieurs sorties, et il le garde bien propre.'],
+    move: 'Creuse un terrier avec tes deux mains, très vite, comme un blaireau !',
   },
   chat: {
     more: ['Le chat dort beaucoup : souvent plus de douze heures par jour.', 'Ses yeux brillent dans le noir parce qu’ils renvoient la lumière.', 'Il retombe presque toujours sur ses pattes quand il saute de haut.'],
@@ -83,9 +83,9 @@ export const FICHES = {
     more: ['Le mouton vit en troupeau : il aime rester avec ses copains.', 'Il mange de l’herbe et la mâche longtemps.', 'Le bébé du mouton s’appelle un agneau.'],
     move: 'Saute par-dessus un mouton imaginaire, puis compte jusqu’à dix en sautant.',
   },
-  dauphin: {
-    more: ['Le dauphin n’est pas un poisson : il respire de l’air par le trou sur sa tête.', 'Il saute hors de l’eau et fait des cabrioles.', 'Les dauphins vivent en groupe et s’entraident.'],
-    move: 'Nage comme un dauphin : fais de grandes vagues avec tout ton corps, puis un petit saut.',
+  poule: {
+    more: ['La poule pond presque un œuf par jour.', 'Elle picore des graines, des vers et des petits insectes.', 'Avant de sortir de l’œuf, le poussin pépie déjà : sa maman l’entend.'],
+    move: 'Gratte le sol avec un pied, puis avec l’autre, et picore comme une poule !',
   },
   cheval: {
     more: ['Le cheval peut courir très vite : plus de 60 kilomètres à l’heure.', 'Il communique avec ses oreilles, ses yeux et sa queue.', 'Le bébé du cheval s’appelle un poulain.'],

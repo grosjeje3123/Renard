@@ -9,6 +9,8 @@ import { recognizerContext } from '../../core/tolerance.js';
 import { epaisseur } from '../../core/epaisseur.js';
 import { recognizer } from '../../engine/recognizer.js';
 import { buildFeedback } from '../../engine/feedback.js';
+import { surpriseOk } from '../../core/dictee.js';
+import { masteredCount } from '../../core/progress.js';
 import { recordSession, awardStickers, isSkillOpen, skillState, startPhaseFor, breakDue, beginSleep, blocked, noterSerie, serieAFeter, levelSections } from '../../core/progress.js';
 import { STICKER_BY_ID } from '../../content/stickers.js';
 import { stickerSVG } from '../animals.js';
@@ -65,9 +67,10 @@ export function exercise(root, app, skillId) {
     h('span', { class: 'st-dots', 'aria-hidden': 'true' }, sec.skills.map((id) => h('span', { class: `st-dot${id === skillId ? ' cur' : skillState(app.state, id).mastered ? ' ok' : ''}` })))) : null;
   const replayBtn = h('button', { class: 'chip-btn', type: 'button', html: `${icon('replay', 22)}<span>Revoir</span>` });
 
-  const cardText = writing || !item ? skill.short : already ? `Gagné : ${item.name}` : `À gagner : ${item.name}`;
+  // La page de travail reste sobre : le modèle à écrire, rien d'autre (les récompenses se découvrent à la fin, pas pendant l'effort).
+  const cardText = skill.short;
   const card = h('button', { class: 'exo-card', type: 'button', 'aria-label': cardText },
-    skill.capital ? null : h('span', { class: `ec-art${item ? '' : ' ec-glyph'}`, html: item ? itemSVG(skill.item, { locked: !already && !writing }) : glyphIcon(skillId, { stroke: 'var(--accent-deep)', width: 0.3 }) }),
+    skill.capital ? null : h('span', { class: 'ec-art ec-glyph', html: glyphIcon(skillId, { stroke: 'var(--accent-deep)', width: 0.3 }) }),
     h('span', { class: 'ec-text' },
       writing ? h('span', { class: `ec-letter${skill.kind === 'word' ? ' word' : ''}${skill.phrase ? ' phrase' : ''}` }, skill.glyph) : null,
       h('span', {}, cardText)));
@@ -239,6 +242,10 @@ export function exercise(root, app, skillId) {
     const paper = mastered
       ? h('button', { class: 'res-paper', type: 'button', onClick: () => app.go(`cahier-${skillId}`), html: `${icon('pencil', 26)}<span><strong>Essaie sur ton cahier !</strong><small>Du vrai papier, avec ton crayon.</small></span>` })
       : null;
+    // Pour casser la monotonie : tous les 5 exercices acquis, le renard propose une petite dictée surprise (l'enfant peut passer).
+    const surprise = r.newlyMastered && !pause && !fete && masteredCount(st) % 5 === 0 && surpriseOk(st)
+      ? h('button', { class: 'res-paper res-dictee', type: 'button', onClick: () => { app.dicteeApres = `carte-${level.id}`; app.go('dictee-surprise'); }, html: `${icon('dice', 26)}<span><strong>Une petite dictée surprise ?</strong><small>Trois choses à écrire de mémoire.</small></span>` })
+      : null;
     const consolidated = r.consolidated ? h('p', { class: 'res-consol', html: `${icon('star', 22)}<span>Tu t’en souviens, même après plusieurs jours !</span>` }) : null;
     const reward = r.newlyMastered && item
       ? h('div', { class: 'res-reward' }, h('div', { class: 'rr-art', html: itemSVG(skill.item) }), h('p', {}, `Tu gagnes : ${item.name}`), item.type === 'accessoire' ? h('small', {}, 'Le renard le porte déjà !') : h('small', {}, 'Il t’attend dans ton coin de forêt.'))
@@ -252,7 +259,7 @@ export function exercise(root, app, skillId) {
         h('button', { class: 'btn-sec sm', type: 'button', onClick: () => app.go('album') }, 'Voir mon album'))
       : null;
     const overlay = h('div', { class: 'result', role: 'dialog', 'aria-label': 'Résultat' },
-      h('div', { class: `result-card${reward || stickers ? ' rich' : ''}` }, resFoxHost, h('h2', {}, title), starsRow, consolidated, serieFinie, reward || stickers ? h('div', { class: 'res-gifts' }, reward, stickers) : null, paper,
+      h('div', { class: `result-card${reward || stickers ? ' rich' : ''}` }, resFoxHost, h('h2', {}, title), starsRow, consolidated, serieFinie, reward || stickers ? h('div', { class: 'res-gifts' }, reward, stickers) : null, surprise || paper,
         pause ? h('p', { class: 'res-pause', html: `${icon('moon', 20)}<span>Tu as bien travaillé aujourd’hui. Une pause, ça fait du bien.</span>` }) : null,
         h('div', { class: 'res-actions' }, again, next)));
     root.append(overlay);

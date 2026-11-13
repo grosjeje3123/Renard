@@ -47,7 +47,7 @@ export function album(root, app) {
     h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }),
     h('header', { class: 'bar' },
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour à l’accueil', onClick: () => app.go('accueil'), html: icon('back', 26) }),
-      h('h2', {}, 'Mon album'),
+      h('div', { class: 'bar-title' }, h('h2', {}, 'Mon album'), h('p', {}, 'Des vignettes d’animaux de la campagne, chacune avec une petite histoire. Elles se gagnent en avançant.')),
       h('span', { class: 'count-pill', 'aria-label': `${n} vignettes sur ${STICKERS.length}` }, `${n} / ${STICKERS.length}`)),
     h('div', { class: 'album-body' },
       h('div', { class: 'album-pages' }, pages),

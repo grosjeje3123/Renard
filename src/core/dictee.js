@@ -4,6 +4,9 @@ import { SKILLS, skillOrder, isWriting, nbLettres } from '../content/skills.js';
 import { skillState, isSkillOpen } from './progress.js';
 
 export const DICTEE_N = 5;
+/** La dictée surprise, proposée en cours de route (tous les 5 exercices acquis, ou après une série fêtée) : courte. */
+export const SURPRISE_N = 3;
+export const surpriseOk = (st) => st.settings.dicteeSurprise !== false && !st.settings.demo && !!st.settings.voix && dicteePossible(st);
 const MAX_LETTRES_MOT = 5; // un mot plus long ferait un cahier trop réduit pour une dictée
 
 const dictable = (id) => {
