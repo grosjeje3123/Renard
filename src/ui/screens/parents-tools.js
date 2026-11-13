@@ -4,7 +4,7 @@ import { h, icon } from '../dom.js';
 import { glyphIcon } from '../art.js';
 import { SKILLS, LEVELS } from '../../content/skills.js';
 import { STICKERS } from '../../content/stickers.js';
-import { levelSkills, masteredCount, stickerCount, setDepart } from '../../core/progress.js';
+import { levelSkills, masteredCount, stickerCount, setDepart, NIVEAUX_ECRITURE } from '../../core/progress.js';
 import { encodeBackup, decodeBackup } from '../../core/backup.js';
 import { EPAISSEURS } from '../../core/epaisseur.js';
 import { toSVG } from '../../core/pdf.js';
@@ -94,8 +94,8 @@ export function settingsCards(app) {
 
   const child = card('Enfant',
     h('label', { class: 'setrow', for: 'child-name' }, h('span', {}, h('strong', {}, 'Prénom de l’enfant'), h('small', {}, 'Utilisé par le renard pour dire bonjour. Reste sur cet appareil.')), nameInput),
-    row('Où en est l’enfant ?', 'Ouvre d’emblée ce qui précède : avec « Début du CP », les formes du niveau 1 sont déjà ouvertes ; avec « Fin du CP », toutes les lettres le sont et on peut commencer par les sons, les mots et les phrases. Rien n’est marqué comme acquis, et on peut changer à tout moment. La classe exacte (moyenne ou grande section, CP…) se règle dans Options, sur l’écran d’accueil de l’enfant.',
-      seg('Niveau de départ', [[1, 'Avant le CP'], [2, 'Début du CP'], [3, 'Fin du CP']], Math.min(3, Math.max(1, set.depart || 1)), (v) => { setDepart(st, v); save(); })),
+    row('Niveau d’écriture de départ', 'Indépendant de la classe : choisissez ce que l’enfant sait déjà faire. Un enfant de grande section à l’aise peut partir du niveau 2 ; un enfant de CP qui doit reprendre les bases, du niveau 1. Les niveaux d’avant restent ouverts, rien n’est marqué comme acquis, et on peut changer à tout moment.',
+      seg('Niveau d’écriture de départ', NIVEAUX_ECRITURE.map(([n, t]) => [n, t]), Math.min(3, Math.max(1, set.depart || 1)), (v) => { setDepart(st, v); save(); })),
     row('Main qui écrit', 'Gaucher : l’écran passe en miroir (la main ne cache ni le renard ni les boutons), le modèle disparaît de la zone de la main et la pente des lettres (plus droite, ou penchée en arrière) est acceptée un peu plus largement. Le sens d’écriture reste de gauche à droite.',
       seg('Main qui écrit', [['gauche', 'Gaucher'], ['droite', 'Droitier']], set.main || 'droite', (v) => { set.main = v; save(); app.render(); })),
     tiltRow,

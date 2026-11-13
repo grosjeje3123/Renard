@@ -33,7 +33,7 @@ export function options(root, app) {
   nameInput.addEventListener('blur', saveName);
   nameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') nameInput.blur(); });
   const classeHint = h('small', {}, '');
-  const showHint = () => { const c = CLASSES.find((x) => x.id === set.classe); classeHint.textContent = c ? c.sub : 'Le renard ouvre d’emblée ce qui précède : choisis la classe de l’enfant.'; };
+  const showHint = () => { const c = CLASSES.find((x) => x.id === set.classe); classeHint.textContent = c ? `${c.sub}. Le niveau d’écriture se règle aussi à part, dans l’espace parents.` : 'Le renard ouvre d’emblée ce qui précède : choisis la classe de l’enfant.'; };
   showHint();
   const classe = row('Classe de l’enfant', null,
     h('div', { class: 'stackc' }, seg('Classe de l’enfant', CLASSES.map((c) => [c.id, c.label]), set.classe, (id) => { setClasse(st, id); app.applySettings(); showHint(); }), classeHint));

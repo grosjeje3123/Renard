@@ -474,9 +474,9 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   {
     const s = await open(null, 'parents');
     await s.page.focus('.gate-btn'); await s.page.keyboard.press('Enter'); await s.page.waitForTimeout(500);
-    check('parents : le réglage « Où en est l’enfant ? » existe', /Où en est l’enfant/.test(await s.page.innerText('body')));
-    await clickText(s.page, 'Fin du CP', '.seg-b'); await s.page.waitForTimeout(300);
-    check('parents : « Fin du CP » est enregistré', (await s.state()).settings.depart === 3);
+    check('parents : le réglage « Niveau d’écriture de départ » existe', /Niveau d’écriture de départ/.test(await s.page.innerText('body')));
+    await clickText(s.page, 'Sons, mots, phrases', '.seg-b'); await s.page.waitForTimeout(300);
+    check('parents : « Niveau 3 » est enregistré', (await s.state()).settings.depart === 3);
     check('parents : l’ordre des lettres propose l’ordre alphabétique', /Ordre alphabétique/.test(await s.page.innerText('body')));
     await clickText(s.page, 'Ordre alphabétique'); await s.page.waitForTimeout(300);
     check('parents : l’ordre alphabétique est enregistré', JSON.stringify((await s.state()).settings.order2?.slice(0, 3)) === '["a","b","c"]');
@@ -548,15 +548,15 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   check('réouverture : on va droit à l’accueil, sans refaire la présentation', (await s.hash()) === '#accueil', await s.hash());
   check('premier lancement : aucune erreur', s.errs.length === 0, s.errs.join(' | '));
   await s.ctx.close();
-  // Les parents règlent le niveau de départ : la classe suit sans se contredire
+  // Les parents règlent le niveau d'écriture de départ, indépendamment de la classe
   const p = await open((x) => { x.settings.classe = 'gs'; x.settings.depart = 1; x.settings.accueilFait = true; }, 'parents');
   await p.page.focus('.gate-btn'); await p.page.keyboard.press('Enter'); await p.page.waitForTimeout(500);
-  await clickText(p.page, 'Début du CP', '.seg-b'); await p.page.waitForTimeout(300);
+  await clickText(p.page, 'Lettres attachées', '.seg-b'); await p.page.waitForTimeout(300);
   st = await p.state();
-  check('parents : « Début du CP » met aussi la classe à « CP, début d’année »', st.settings.depart === 2 && st.settings.classe === 'cp1', JSON.stringify({ c: st.settings.classe, d: st.settings.depart }));
-  await clickText(p.page, 'Avant le CP', '.seg-b'); await p.page.waitForTimeout(300);
+  check('parents : un enfant de grande section peut partir du niveau 2, sa classe ne change pas', st.settings.depart === 2 && st.settings.classe === 'gs', JSON.stringify({ c: st.settings.classe, d: st.settings.depart }));
+  await clickText(p.page, 'Premiers gestes', '.seg-b'); await p.page.waitForTimeout(300);
   st = await p.state();
-  check('parents : « Avant le CP » redonne une classe de maternelle', st.settings.depart === 1 && ['ms', 'gs'].includes(st.settings.classe), st.settings.classe);
+  check('parents : retour au niveau 1, toujours sans toucher à la classe', st.settings.depart === 1 && st.settings.classe === 'gs', st.settings.classe);
   check('parents : aucune erreur (classe)', p.errs.length === 0, p.errs.join(' | '));
   await p.ctx.close();
   // Grande section : la carte du niveau 1 ouvre d'emblée la première majuscule

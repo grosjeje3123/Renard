@@ -75,14 +75,21 @@ export function setClasse(st, id) {
   st.settings.depart = c.depart;
   return true;
 }
-/** Les parents règlent directement le niveau de départ (1 à 3) : la classe affichée suit, sans jamais le contredire. */
+/**
+ * Les parents règlent directement le niveau d'écriture de départ (1 à 3), indépendamment de la classe : un enfant de grande section
+ * à l'aise peut partir du niveau 2, un enfant de CP qui doit reprendre les bases du niveau 1. La classe reste celle qui a été dite.
+ */
 export function setDepart(st, depart) {
   const d = Math.min(3, Math.max(1, Math.round(depart) || 1));
   st.settings.depart = d;
-  const cur = CLASSES.find((c) => c.id === st.settings.classe);
-  if (!cur || cur.depart !== d) st.settings.classe = CLASSES.find((c) => c.depart === d).id;
   return d;
 }
+/** Les niveaux d'écriture tels que les parents les choisissent : ce que l'enfant sait faire, pas sa classe. */
+export const NIVEAUX_ECRITURE = [
+  [1, 'Niveau 1 · Premiers gestes', 'formes, majuscules, chiffres'],
+  [2, 'Niveau 2 · Lettres attachées', 'il sait tracer les majuscules'],
+  [3, 'Niveau 3 · Sons, mots, phrases', 'il connaît les lettres attachées'],
+];
 /** Tablette neuve, sans progression ni réglage fait : on se présente (prénom, classe, main) avant de jouer. */
 export const needsWelcome = (st) => !st.settings.accueilFait && !st.settings.classe && !st.name && Object.keys(st.skills || {}).length === 0;
 /** Le prénom tapé par l'enfant ou l'adulte : des lettres seulement, une majuscule au début de chaque partie, quatorze lettres au plus. */

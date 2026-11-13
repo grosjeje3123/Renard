@@ -1428,3 +1428,15 @@ test('récompenses : une seule à la fois, et au moins deux exercices acquis ent
   const ancien = P.hydrate({ skills: { lignes: { sessions: 1, attempts: 3, phase: 3, mastered: true, history: [] } } });
   assert.deepEqual(ancien.cadeaux.objets, ['echarpe'], 'une ancienne sauvegarde garde ses objets');
 });
+
+test('niveau d’écriture de départ : réglé indépendamment de la classe', () => {
+  const st = P.newState();
+  P.setClasse(st, 'gs');
+  assert.equal(st.settings.depart, 1, 'la classe propose un niveau');
+  P.setDepart(st, 2);
+  assert.equal(st.settings.depart, 2);
+  assert.equal(st.settings.classe, 'gs', 'la classe ne bouge pas');
+  P.setClasse(st, 'cp2'); P.setDepart(st, 1);
+  assert.deepEqual([st.settings.classe, st.settings.depart], ['cp2', 1], 'un CP peut reprendre les bases');
+  assert.equal(P.NIVEAUX_ECRITURE.length, 3);
+});

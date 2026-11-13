@@ -1,6 +1,6 @@
 {
   "name": "renard",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "description": "Renard, mon compagnon pour apprendre à écrire (prototype jouable)",
   "main": "index.js",
   "scripts": {
