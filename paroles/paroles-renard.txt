@@ -1,4 +1,4 @@
-PAROLES DU RENARD — 1910 phrases à enregistrer
+PAROLES DU RENARD — 1974 phrases à enregistrer
 Chaque ligne : identifiant | phrase. Le fichier audio de chaque phrase doit porter son identifiant : <identifiant>.mp3
 
 === CONSIGNE (506) ===
@@ -922,7 +922,7 @@ f81bcdb3 | Tu y es presque !
 3051089c | Va jusqu’à la ligne du bas.
 73a9b096 | Va tout doucement, sans trembler.
 
-=== DICTÉE (158) ===
+=== DICTÉE (222) ===
 c6e2b359 | « ai ».
 84e790c4 | « aile ».
 85b04590 | « ami ».
@@ -931,33 +931,69 @@ a266adf5 | « arbre ».
 727f53d5 | « au ».
 ef114462 | « avion ».
 1b7132e7 | « balle ».
+5d5c3043 | « ballon ».
+372c771f | « bateau ».
+5c0b2bc6 | « biscuit ».
 0f6a2f31 | « blanc ».
 e33471df | « bleu ».
 973bbd72 | « bois ».
+88b66b7a | « bonjour ».
+b82801cd | « bonsoir ».
 1b8b05bd | « bus ».
+0c03458a | « canard ».
+0899eaa1 | « cartable ».
 940bb32e | « ch ».
+8ca237e9 | « chameau ».
+b9fa0bd2 | « champion ».
 ab7cbf7d | « chat ».
+0b3b97cc | « cheval ».
 6a6ab994 | « chien ».
+91724772 | « chocolat ».
+e430e382 | « citron ».
+af6f3391 | « crayon ».
 af7af9a0 | « cube ».
+32dbf7dd | « cuisine ».
 cf716ec0 | « dent ».
 efe00994 | « eau ».
+88d7cce4 | « elle rit ».
 56d4e049 | « eu ».
 b3e287c5 | « fleur ».
 dad984c1 | « fruit ».
 bcf5faf8 | « gare ».
+b9291cbb | « girafe ».
 3a18fc34 | « gn ».
 489a33b4 | « gris ».
 8c997d0d | « herbe ».
 ac5fcf40 | « il ».
+66d9c34c | « il a faim ».
+d7e9a7fb | « il a un ami ».
+8770d26f | « il a un chien ».
+bc52b16f | « il dort ».
+e74a2c35 | « il joue ».
+944aeca0 | « il neige ».
+5261795a | « il pleut ».
 42d9f742 | « in ».
+6f802a5b | « jardin ».
 be3c32ac | « jaune ».
+ad2f1375 | « je joue ».
+6852b490 | « je lis ».
+e6fd9cf4 | « je sais ecrire ».
 56a1e936 | « jouet ».
 4d1d1adb | « jour ».
 8fc90a6b | « kiwi ».
 87946e16 | « la ».
+bf730cf2 | « la lune brille ».
+67ac738a | « la pluie tombe ».
+7c6e6db9 | « la vache mange ».
 9168c7bd | « lait ».
 e7e2c9e1 | « lapin ».
 21fcff9a | « le ».
+e81fb17b | « le bebe dort ».
+e90825a1 | « le chat dort ».
+787f5e4b | « le chien aboie ».
+fc312c30 | « le lapin saute ».
+ff56f33f | « le lion rugit ».
+ab469d84 | « le loup a faim ».
 1c485a85 | « lion ».
 5b752e40 | « lit ».
 0da0ac01 | « livre ».
@@ -967,10 +1003,14 @@ e10a7c87 | « lundi ».
 b2e5c98d | « lune ».
 0ee25e85 | « ma ».
 7e366b2c | « main ».
+5daee46a | « maison ».
 64b00a59 | « maman ».
+57b23636 | « maman lit ».
 bf0fb376 | « mamie ».
 e8c5d2d7 | « merci ».
+3bae50c2 | « mercredi ».
 96900691 | « mon ».
+98ab0477 | « mon ami joue ».
 5cb7c29c | « moto ».
 57fee147 | « neige ».
 f375b6be | « nid ».
@@ -979,18 +1019,26 @@ f375b6be | « nid ».
 424b0227 | « oi ».
 a75bc5a2 | « oie ».
 d176aa8c | « on ».
+a07dce05 | « orange ».
 5cd542cb | « ou ».
 771afbb2 | « oui ».
 579104aa | « ours ».
 6155be9b | « pain ».
 7e836c2f | « papa ».
+3b92e28c | « papa lit ».
+1641da8e | « papa rit ».
 696aaa17 | « papi ».
+197845ac | « papillon ».
 8cd01cad | « pied ».
+2177ebf0 | « piscine ».
 9bf56d2e | « plage ».
 5b704788 | « pluie ».
 84e5de54 | « poire ».
+3b60de8a | « poisson ».
 4b69c6f9 | « pomme ».
 a6fd9951 | « porte ».
+a28ef178 | « poussin ».
+8c965193 | « pyjama ».
 acb2ba25 | « qu ».
 eb6ef3f2 | « rat ».
 ca70452c | « riz ».
@@ -1002,13 +1050,23 @@ b008accc | « route ».
 3589791b | « rue ».
 ff8c7528 | « sable ».
 221eda08 | « sac ».
+f84e64ec | « samedi ».
 a09b71d9 | « singe ».
+c4339007 | « soleil ».
+cf174a08 | « souris ».
 277faa5b | « table ».
 a62ab7f7 | « tata ».
 590cd5d0 | « tigre ».
+46b69944 | « tortue ».
+920ec621 | « tracteur ».
 985876d2 | « tu ».
+64f5debb | « tu as faim ».
+10074718 | « tu as un ami ».
+319910ce | « tu lis ».
 a3e6b47e | « un ».
+f7509828 | « un ours dort ».
 7b4cfe45 | « une ».
+36212dad | « vacances ».
 240695e4 | « vache ».
 2abcb33e | « vent ».
 f8697002 | « vert ».
@@ -1066,6 +1124,8 @@ d7eef0f3 | Écris la lettre « vé » en majuscule.
 9a363f95 | Écris la lettre « vé ».
 5292867f | Écris la lettre « zède » en majuscule.
 32e5f701 | Écris la lettre « zède ».
+ea604612 | Écris la phrase en majuscules.
+0801f1a1 | Écris la phrase.
 5512eb38 | Écris le chiffre « cinq ».
 bfe80555 | Écris le chiffre « deux ».
 583bc191 | Écris le chiffre « huit ».
@@ -1080,7 +1140,11 @@ a11af75d | Écris le mot en majuscules.
 e84ab90a | Écris le mot.
 c928c282 | Écris le son.
 49249860 | La dictée est terminée !
+a4b70f84 | La prochaine fois, je te dicterai de petites phrases.
+48092398 | La prochaine fois, je te dicterai des mots.
+e8cf8a91 | La prochaine fois, je te dicterai des sons et des petits mots.
 13c75636 | Réussis d’abord quelques exercices.
+67627f8c | Tu es fort !
 
 === TABLEAU (217) ===
 ea748872 | Écris « ai » : suis la première ligne, puis les pointillés, puis écris tout seul !

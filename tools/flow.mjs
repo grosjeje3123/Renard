@@ -807,8 +807,9 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   await mt.page.click('.home-panel .btn-big');
   await mt.page.waitForTimeout(800);
   check('démarche : « Jouer » montre d’abord les trois étapes', (await mt.hash()).startsWith('#methode-'), await mt.hash());
-  check('démarche : trois petits cahiers (guide, pointillés, tout seul)', JSON.stringify(await mt.page.$$eval('.mt-board svg.board', (b) => b.map((x) => x.getAttribute('data-phase')))) === '["0","1","2"]');
-  check('démarche : les règles de la reconnaissance pour les adultes', (await mt.page.$$('.mt-adultes .regles dt')).length === 6);
+  check('démarche : un seul cahier qui passe par les trois étapes', (await mt.page.$$('.mt-one svg.board')).length === 1 && (await mt.page.$$('.mt-pill')).length === 3);
+  check('démarche : tout tient sur une page, sans défiler', await mt.page.evaluate(() => document.scrollingElement.scrollHeight <= innerHeight + 1));
+  check('démarche : les conditions de réussite et les six règles pour les parents', (await mt.page.$$('.mt-cond dt')).length === 4 && (await mt.page.$$('.mt-crit li')).length === 6);
   await mt.page.click('.mt-actions .btn-big');
   await mt.page.waitForTimeout(800);
   check('démarche : « C’est parti » enchaîne sur l’exercice', (await mt.hash()).startsWith('#exercice-'), await mt.hash());
@@ -819,7 +820,7 @@ const clickText = (page, re, sel = 'button') => page.evaluate(([r, s]) => { cons
   check('démarche : la deuxième fois, « Jouer » va droit à l’exercice', (await mt.hash()).startsWith('#exercice-'), await mt.hash());
   await mt.page.evaluate(() => { location.hash = 'papier'; });
   await mt.page.waitForSelector('.papier .pcard');
-  const [dlv] = await Promise.all([mt.page.waitForEvent('download', { timeout: 60000 }).catch(() => null), mt.page.click('.papier .pcard:nth-of-type(2) .btn-sec')]);
+  const [dlv] = await Promise.all([mt.page.waitForEvent('download', { timeout: 60000 }).catch(() => null), mt.page.click('.pp-go')]);
   check('papier : le cahier de vacances se prépare sans passer par l’espace parents', !!dlv && /cahier-de-vacances/.test(dlv.suggestedFilename()), dlv?.suggestedFilename());
   check('démarche et papier : aucune erreur', mt.errs.length === 0, mt.errs.join(' | '));
   check('page de travail : aucune récompense annoncée pendant l’effort', !/À gagner|Gagné :/.test(await mt.page.evaluate(() => { location.hash = 'exercice-ronds'; return new Promise((r) => setTimeout(() => r(document.body.innerText), 1500)); })));

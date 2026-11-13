@@ -7,6 +7,11 @@ export const CREDITS = [
     'Renard accompagne les enfants de 4 à 8 ans dans leurs premiers gestes d’écriture : les formes, les majuscules, les lettres attachées, puis les mots et les phrases.',
     'Une application imaginée et dirigée par Jérôme Hosdez, pour apprendre à écrire sans pression : jamais de note, jamais de perte.',
   ]],
+  ['Qui a créé Renard ?', [
+    'Renard a été conçu par un parent, enseignant et chercheur, pour apprendre à écrire pas à pas, avec plaisir et sans pression.',
+    'Normalien, docteur en mécanique et chercheur-ingénieur, Jérôme Hosdez a consacré une partie de son parcours à l’enseignement et à la transmission des connaissances. Avec Renard, il met cette expérience au service d’un apprentissage fondamental : apprendre à écrire, progressivement, avec plaisir et confiance.',
+    'Sans publicité, sans compte, sans achat intégré : rien ne quitte la tablette.',
+  ]],
   ['La fabrication', [
     'Programmation, dessins et sons réalisés avec Claude, l’assistant d’intelligence artificielle d’Anthropic, sous la direction de Jérôme Hosdez.',
   ]],

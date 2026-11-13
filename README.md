@@ -30,7 +30,7 @@ Contrôle : `node build.mjs --pwa && node tools/pwa-check.mjs` (installable selo
 
 Par défaut le renard parle avec la synthèse vocale de la tablette. Pour une voix enregistrée (générée par IA, une seule fois) :
 
-1. `node tools/paroles.mjs` liste toutes les phrases (1 910, environ 74 minutes) dans `paroles/` : `paroles-renard.txt` (lisible), `paroles-renard.csv` (pour le script), avec un identifiant par phrase (`src/core/voixId.js` : FNV-1a du texte).
+1. `node tools/paroles.mjs` liste toutes les phrases (1 974, environ 75 minutes) dans `paroles/` : `paroles-renard.txt` (lisible), `paroles-renard.csv` (pour le script), avec un identifiant par phrase (`src/core/voixId.js` : FNV-1a du texte).
 2. `paroles/generer-voix.py` (API OpenAI, consigne de voix dans `paroles/prompt-voix.txt`) écrit `voix/<identifiant>.mp3`. Mode d'emploi : `paroles/LISEZMOI.txt`.
 3. `node build.mjs --app` / `--pwa` embarque le dossier `voix/` (la version « lien d'essai » n'en contient pas) : `media-src 'self'` est ajouté à la politique de sécurité, rien d'autre ne change (`connect-src 'none'`). L'APK recompilé par GitHub Actions les contient.
 
@@ -129,6 +129,10 @@ Pas de tirage au sort, pas de série à maintenir, rien ne se retire jamais, et 
 - **Dictée surprise** (`#dictee-surprise`, `SURPRISE_N = 3`, `surpriseOk`) : tous les 5 exercices acquis et après chaque série fêtée, le renard propose une mini-dictée de trois éléments, puis on reprend où on en était. Réglage « Dictée surprise en cours de route ».
 - **Dessins pour les grands** : un 4ᵉ niveau de modèles (« Pour les grands », après 20 exercices acquis) avec des animaux plus élaborés : Renard assis, hérisson, chouette, lapin, poule.
 - **Temps d'écran au premier démarrage** : après le prénom, la classe et la main, une page « Pour les adultes » (pause conseillée après 10, 15 ou 20 min ; limite du jour aucune, 20, 30, 45 min ou 1 h), modifiable ensuite dans l'espace parents.
+- **Comment ça marche, sur une seule page** (v1.11) : un seul cahier montre le guide, puis s'efface pour les pointillés, puis tout seul ; à côté, pour les parents, les conditions de réussite (essai réussi, exercice acquis, retour en arrière, saut du guide) et les six règles du renard. Rien à faire défiler.
+- **Dictée progressive** (`palier`, `palierDictee`, `bilanDictee`) : lettres et chiffres, puis sons et petits mots, puis mots, puis petites phrases (12 lettres au plus), toujours parmi ce qui est acquis ; 4 réussites sur 5 font monter, une seule fait redescendre ; 60 % du palier en cours, le reste en révision. Le palier est affiché aux parents.
+- **Papier plus clair** : en tête de l'écran, les trois cahiers avec un aperçu (couverture, page d'écriture, jeu), un bouton « Imprimer ou enregistrer » et le mode d'emploi en trois étapes ; la carte « Cahiers à imprimer » est en haut de l'espace parents.
+- **Crédits** : rubrique « Qui a créé Renard ? ».
 - **Voix générées sur place** (v1.10) : les 1 910 phrases du renard sont enregistrées avec la synthèse vocale libre Piper, voix française « siwis » (corpus SIWIS, CC BY 4.0), sans clé ni compte : `python3 tools/voix-piper.py <fr-siwis-medium.onnx>` (voix téléchargeable sur les releases v0.0.2 de rhasspy/piper). Les fichiers `voix/*.mp3` (18 Mo) sont embarqués dans l'APK et la version installable : le renard parle même sur une tablette sans voix française.
 - **Récompenses au compte-gouttes** (`distribuer`, `ECART_CADEAU = 2`) : une seule à la fois, seulement pour un exercice acquis, et deux exercices acquis entre deux récompenses ; les autres attendent leur tour (`st.cadeaux`), rien ne se perd. Le cadeau et l'anecdote de l'animal sont lus à voix haute.
 - **Carte des lettres** : avancement très visible (acquis = disque vert coché, en cours = anneau qui se remplit avec « étape 2 sur 3 », prochain = mis en avant avec « À toi ! », bandeau « 2 sur 5 acquis »).

@@ -1,3 +1,4 @@
+import { dicteeDit } from '../src/content/dictee.js';
 // Tests des fonctions ajoutées après le premier prototype : mots, consolidation, cahier papier, pauses,
 // ordre des lettres, gaucher, sauvegarde et fiches PDF.
 import test from 'node:test';
@@ -1200,21 +1201,34 @@ test('dictée : sans exercice acquis ni essayé, rien à dicter ; les acquis d\'
   assert.deepEqual(D.dicteePool(st).sort(), ['a', 'maj_I', 'maj_L'], 'dès trois acquis, on ne dicte que ce qui est acquis');
 });
 
-test('dictée : jamais de graphisme, de phrase ni de mot trop long ; mélange de lettres et de mots, sans doublon', () => {
+test('dictée : jamais de graphisme ni d’élément trop long ; elle se complique palier par palier (lettres, sons, mots, phrases)', () => {
   const st = P.newState();
   st.settings.demo = true; // tout est ouvert
   const pool = D.dicteePool(st);
   assert.ok(pool.length > 50);
   for (const id of pool) {
     const s = SKILLS[id];
-    assert.ok(isWriting(s) && !s.phrase, `${id} : ni graphisme ni phrase`);
-    if (s.kind === 'word') assert.ok(nbLettres(s.word) <= 5, `${id} : mot trop long`);
+    assert.ok(isWriting(s), `${id} : pas de graphisme`);
+    if (s.kind === 'word') assert.ok(nbLettres(s.word) <= (s.phrase ? 12 : 8), `${id} : trop long`);
   }
-  const items = D.dicteeItems(st);
+  assert.equal(D.palierDictee(st), 1);
+  let items = D.dicteeItems(st);
   assert.equal(items.length, D.DICTEE_N);
   assert.equal(new Set(items).size, items.length, 'aucun doublon');
-  assert.equal(items.filter((id) => SKILLS[id].kind === 'letter').length, 3);
-  assert.equal(items.filter((id) => SKILLS[id].kind === 'word').length, 2);
+  assert.ok(items.every((id) => SKILLS[id].kind === 'letter'), 'palier 1 : des lettres');
+  assert.equal(D.bilanDictee(st, [3, 3, 2, 3, 2]), 2, '5 sur 5 : palier suivant');
+  items = D.dicteeItems(st);
+  assert.ok(items.filter((id) => D.palier(SKILLS[id]) === 2).length >= 3 && items.some((id) => D.palier(SKILLS[id]) === 1), 'surtout le palier en cours, avec une révision');
+  assert.equal(D.bilanDictee(st, [3, 3, 3, 3, 3]), 3);
+  assert.equal(D.bilanDictee(st, [3, 3, 3, 3, 2]), 4);
+  assert.ok(D.dicteeItems(st).some((id) => SKILLS[id].phrase), 'palier 4 : de petites phrases');
+  assert.match(dicteeDit(SKILLS[D.dicteeItems(st).find((id) => SKILLS[id].phrase)]), /^Écris la phrase/);
+  assert.equal(D.bilanDictee(st, [0, 1, 0, 2, 1]), 3, 'une seule réussite : on redescend');
+  assert.equal(D.bilanDictee(st, [2, 1, 3, 1, 2]), null, 'entre les deux : on reste');
+  const petit = P.newState();
+  for (const id of ['i', 'o', 'a']) petit.skills[id] = { sessions: 1, attempts: 3, phase: 3, mastered: true, history: [] };
+  petit.dicteePalier = 4;
+  assert.equal(D.palierDictee(petit), 1, 'jamais au-delà de ce qui est acquis');
 });
 
 test('dictée : ce qui n\'a jamais été dicté passe d\'abord, puis le moins récent ; le résultat est noté sans toucher à la maîtrise', () => {

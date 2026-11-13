@@ -19,6 +19,7 @@ export function dicteeDit(skill) {
     const nom = NOMS_LETTRES[skill.glyph.toLowerCase()];
     return skill.capital ? `Écris la lettre « ${nom} » en majuscule.` : `Écris la lettre « ${nom} ».`;
   }
+  if (skill.phrase) return skill.majMot ? `Écris la phrase en majuscules. « ${skill.word.toLowerCase()} ».` : `Écris la phrase. « ${skill.word.toLowerCase()} ».`;
   const mot = `« ${skill.word.toLowerCase()} ».`;
   if (skill.majMot) return `Écris le mot en majuscules. ${mot}`;
   if (skill.groupe) return `Écris le son. ${mot}`;
@@ -27,5 +28,11 @@ export function dicteeDit(skill) {
 
 export const DICTEE_INVITE = 'Écoute bien, puis écris !';
 export const DICTEE_FIN = 'Bravo ! La dictée est terminée !';
+/** Annonce d'un palier gagné (la prochaine dictée sera un peu plus difficile). */
+export const DICTEE_MONTE = {
+  2: 'Tu es fort ! La prochaine fois, je te dicterai des sons et des petits mots.',
+  3: 'Tu es fort ! La prochaine fois, je te dicterai des mots.',
+  4: 'Tu es fort ! La prochaine fois, je te dicterai de petites phrases.',
+};
 export const DICTEE_PAS_ENCORE = 'Réussis d’abord quelques exercices.';
 export const DICTEE_SANS_VOIX = 'Remets la voix du renard pour écouter.';

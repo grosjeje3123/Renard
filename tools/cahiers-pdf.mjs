@@ -6,6 +6,7 @@ import { build } from 'esbuild';
 import { createRequire } from 'module';
 import fs from 'fs';
 import path from 'path';
+import { execFileSync } from 'child_process';
 const require = createRequire('/home/claude/.npm-global/lib/node_modules/');
 const { chromium } = require('playwright');
 const OUT = path.resolve(process.argv[2] || 'papier');
@@ -35,6 +36,12 @@ for (let i = 0; i < 3; i++) {
   const file = path.join(OUT, `renard-cahier-de-vacances-niveau-${i + 1}-${slug[i]}.pdf`);
   fs.writeFileSync(file, Buffer.from(r.pdf, 'base64'));
   console.log(path.basename(file), `${r.pages} pages, ${r.n} exercices d'écriture`, (fs.statSync(file).size / 1024).toFixed(0) + ' Ko');
+  // Aperçus (couverture, une page d'écriture, un jeu) pour l'écran Papier : on voit ce qu'on va imprimer.
+  fs.mkdirSync(path.join(OUT, 'apercu'), { recursive: true });
+  for (const [k, pg] of [[1, 1], [2, 3], [3, 5]]) {
+    const base = path.join(OUT, 'apercu', `niveau-${i + 1}-${k}`);
+    execFileSync('pdftoppm', ['-r', '28', '-f', String(pg), '-l', String(pg), '-singlefile', '-jpeg', '-jpegopt', 'quality=72', file, base]);
+  }
 }
 if (errs.length) console.log('ERREURS:', errs.join(' | '));
 await browser.close();

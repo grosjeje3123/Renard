@@ -9,7 +9,7 @@ import { STICKERS } from '../src/content/stickers.js';
 import { FICHES } from '../src/content/fiches.js';
 import { DESSINS, IDEES_LIBRES } from '../src/content/dessins.js';
 import { feteSerie, feteNiveau, FETE_SUITE, FETE_SUITE_NIVEAU, FETE_SUITE_CARTE, introSeries } from '../src/content/series.js';
-import { dicteeDit, DICTEE_FIN, DICTEE_PAS_ENCORE } from '../src/content/dictee.js';
+import { dicteeDit, DICTEE_FIN, DICTEE_PAS_ENCORE, DICTEE_MONTE } from '../src/content/dictee.js';
 import { dicteePool } from '../src/core/dictee.js';
 import { newState } from '../src/core/progress.js';
 import { LEAD, PRAISE, TIPS } from '../src/engine/feedback.js';
@@ -56,6 +56,7 @@ add(FETE_SUITE, 'félicitation'); add(FETE_SUITE_NIVEAU, 'félicitation'); add(F
   const demo = newState(); demo.settings.demo = true; // tout est ouvert : on liste tout ce qui peut être dicté un jour
   for (const id of dicteePool(demo)) add(dicteeDit(SKILLS[id]), 'dictée');
   add(DICTEE_FIN, 'dictée'); add(DICTEE_PAS_ENCORE, 'dictée');
+  for (const t of Object.values(DICTEE_MONTE)) add(t, 'dictée');
 }
 
 // 2. Vignettes, fiches animaux, album

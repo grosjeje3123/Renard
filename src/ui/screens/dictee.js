@@ -7,12 +7,12 @@ import { forestScene, templateOf } from '../art.js';
 import { Board } from '../board.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { SKILLS } from '../../content/skills.js';
-import { DICTEE_INVITE, DICTEE_FIN, dicteeDit } from '../../content/dictee.js';
+import { DICTEE_INVITE, DICTEE_FIN, DICTEE_MONTE, dicteeDit } from '../../content/dictee.js';
 import { recognizerContext } from '../../core/tolerance.js';
 import { epaisseur } from '../../core/epaisseur.js';
 import { recognizer } from '../../engine/recognizer.js';
 import { buildFeedback } from '../../engine/feedback.js';
-import { dicteeItems, dicteePossible, recordDictee, DICTEE_N, SURPRISE_N } from '../../core/dictee.js';
+import { dicteeItems, dicteePossible, recordDictee, DICTEE_N, SURPRISE_N, bilanDictee } from '../../core/dictee.js';
 import { blocked, breakDue } from '../../core/progress.js';
 import { dist, polyLength } from '../../engine/geometry.js';
 import { sfx, speak, stopSpeaking } from '../audio.js';
@@ -163,6 +163,8 @@ export function dictee(root, app, arg) {
     board?.enable(false);
     drawDots();
     const faits = results.filter((n) => n != null);
+    const monte = bilanDictee(st, results); // la dictée se complique si l'enfant réussit (lettres → sons → mots → phrases)
+    app.save();
     const pause = breakDue(st) || !!blocked(st);
     const resFoxHost = h('div', { class: 'res-fox' });
     const recap = h('ul', { class: 'dc-recap', 'aria-label': 'Ce que tu as écrit' },
@@ -176,6 +178,7 @@ export function dictee(root, app, arg) {
     const retour = h('button', { class: 'btn-big sm', type: 'button', onClick: () => { sfx('pop'); app.go(pause ? 'pause' : apres); }, html: `${icon(pause ? 'moon' : 'arrowR', 28)}<span>${pause ? 'Pause' : surprise ? 'On continue' : 'Les jeux'}</span>` });
     overlay = h('div', { class: 'result dictee-end', role: 'dialog', 'aria-label': 'Dictée terminée' },
       h('div', { class: 'result-card rich' }, resFoxHost, h('h2', {}, faits.length ? DICTEE_FIN : 'On fera la dictée une autre fois !'), faits.length ? recap : null,
+        monte ? h('p', { class: 'res-serie', html: `${icon('star', 22)}<span>${DICTEE_MONTE[monte]}</span>` }) : null,
         h('div', { class: 'res-actions' }, encore, retour)));
     root.append(overlay);
     const rf = app.makeFox(resFoxHost, { accessories: app.equipped() });
@@ -183,7 +186,7 @@ export function dictee(root, app, arg) {
     const bien = faits.some((n) => n >= 2);
     rf.setMood(bien ? 'joy' : 'encourage', 4000);
     sfx(bien ? 'win' : 'ok');
-    if (faits.length) speak(DICTEE_FIN, { onStart: () => rf.talk(true), onEnd: () => rf.talk(false) });
+    if (faits.length) speak(monte ? `${DICTEE_FIN} ${DICTEE_MONTE[monte]}` : DICTEE_FIN, { onStart: () => rf.talk(true), onEnd: () => rf.talk(false) });
   }
 
   function restart() {

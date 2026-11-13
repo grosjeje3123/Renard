@@ -1,21 +1,29 @@
-// Comment ça marche : la démarche d'un exercice, montrée en vrai avec trois petits cahiers (le guide, les pointillés, tout seul).
-// Le renard raconte les trois étapes l'une après l'autre ; on peut toucher une étape pour la revoir. Montrée une fois avant le premier exercice
-// lancé depuis l'accueil, et toujours accessible depuis le bouton « Comment ça marche ». Adresse : #methode ou #methode-<exercice> (on y enchaîne).
+// Comment ça marche : tout sur une seule page, sans défiler.
+// À gauche, un seul cahier montre les trois étapes l'une après l'autre (le guide, puis on efface et ce sont les pointillés, puis tout seul),
+// racontées par le renard ; on touche une étape pour la revoir. À droite, pour les parents, les conditions de réussite en un coup d'œil.
+// Montrée au premier lancement, et toujours accessible par le bouton « Démarche ». Adresse : #methode ou #methode-<exercice> (on y enchaîne).
 import { h, icon, sleep } from '../dom.js';
 import { forestScene, templateOf } from '../art.js';
 import { Board } from '../board.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { sfx } from '../audio.js';
-import { reglesList } from './parents-tools.js';
-import { REGLES_NOTE } from '../../content/regles.js';
+import { REGLES } from '../../content/regles.js';
 
 /** L'exemple montré : un geste simple et net, qui a un point de départ, un sens et un chemin. */
 const EXEMPLE = 'vagues';
 
 export const ETAPES = [
-  { titre: 'Le guide', court: 'Je suis le chemin', texte: 'Le renard montre le geste. Je le refais avec mon doigt, sur le chemin : le point vert pour commencer, les flèches pour le sens.' },
-  { titre: 'Les pointillés', court: 'Je suis les points', texte: 'Le chemin plein disparaît. Il ne reste que des points : je les suis, et le geste devient le mien.' },
-  { titre: 'Tout seul', court: 'J’écris de mémoire', texte: 'Plus d’aide ! Je pars du point vert et j’écris de mémoire, comme un grand.' },
+  { titre: 'Le guide', court: 'Je suis le chemin avec mon doigt : point vert pour partir, flèches pour le sens.' },
+  { titre: 'Les pointillés', court: 'Le chemin s’efface : je suis les points.' },
+  { titre: 'Tout seul', court: 'Plus d’aide : j’écris de mémoire, en partant du point vert.' },
+];
+
+/** Les conditions de réussite, pour les parents. */
+const CONDITIONS = [
+  ['Un essai réussi', '2 étoiles sur 3 ou plus.'],
+  ['Un exercice acquis', 'une réussite à chaque étape ; la dernière, tout seul, sans revoir le modèle.'],
+  ['Si c’est difficile', '3 ratés de suite : retour à l’étape d’avant, le renard remontre le geste. Jamais de punition.'],
+  ['S’il est à l’aise', 'il saute le guide, puis passe au défi « tout seul » d’emblée.'],
 ];
 
 export function methode(root, app, arg) {
@@ -24,23 +32,13 @@ export function methode(root, app, arg) {
   app.save();
   const suite = arg && arg !== 'accueil' ? `exercice-${arg}` : null;
 
-  const tpl = templateOf(EXEMPLE);
-  const foxHost = h('div', { class: 'side-fox' });
+  const foxHost = h('div', { class: 'mt-fox' });
   const b = bubble();
-  const boards = [], cards = [];
+  const host = h('div', { class: 'board-host mt-one' });
+  const steps = ETAPES.map((e, i) => h('button', { class: 'mt-pill', type: 'button', 'data-etape': String(i), 'aria-label': `Étape ${i + 1} sur 3 : ${e.titre}. Toucher pour revoir.` },
+    h('span', { class: 'mt-n', 'aria-hidden': 'true' }, String(i + 1)), h('span', {}, e.titre)));
 
-  const steps = ETAPES.map((e, i) => {
-    const host = h('div', { class: 'board-host mt-board' });
-    const card = h('button', { class: 'mt-step', type: 'button', 'aria-label': `Étape ${i + 1} sur 3 : ${e.titre}. ${e.court}. Toucher pour revoir.`, 'data-etape': String(i) },
-      h('span', { class: 'mt-head' }, h('span', { class: 'mt-n', 'aria-hidden': 'true' }, String(i + 1)), h('strong', {}, e.titre)),
-      host,
-      h('span', { class: 'mt-court' }, e.court),
-      h('span', { class: 'mt-text' }, e.texte));
-    cards.push(card);
-    return { host, card };
-  });
-
-  const go = h('button', { class: 'btn-big', type: 'button', html: `${icon(suite ? 'play' : 'check', 34)}<span>${suite ? 'C’est parti !' : 'Compris !'}</span>` });
+  const go = h('button', { class: 'btn-big sm', type: 'button', html: `${icon(suite ? 'play' : 'check', 30)}<span>${suite ? 'C’est parti !' : 'Compris !'}</span>` });
   const again = h('button', { class: 'btn-sec sm', type: 'button', html: `${icon('replay', 22)}<span>Revoir</span>` });
 
   root.classList.add('levels', 'methode');
@@ -49,62 +47,57 @@ export function methode(root, app, arg) {
     h('header', { class: 'bar' },
       h('button', { class: 'round sm', type: 'button', 'aria-label': suite ? 'Passer' : 'Retour à l’accueil', onClick: () => { sfx('tap'); app.go(suite || 'accueil'); }, html: icon(suite ? 'close' : 'back', 26) }),
       h('div', { class: 'bar-title' }, h('h2', {}, 'Comment ça marche ?'), h('p', {}, 'Chaque exercice se fait en trois étapes'))),
-    h('div', { class: 'mt-body' },
-      h('aside', { class: 'side' }, foxHost, b),
-      h('div', { class: 'mt-main' },
-        h('div', { class: 'mt-steps' }, steps.map((s) => s.card)),
-        h('p', { class: 'mt-foot' }, 'Trois étapes réussies, et l’exercice est gagné ! Si c’est difficile, le renard revient en arrière et montre le geste : il n’y a jamais de punition.'),
-        h('div', { class: 'mt-actions' }, again, go),
-        h('details', { class: 'mt-adultes', open: '' },
-          h('summary', {}, 'Pour les adultes : ce que le renard regarde'),
-          reglesList(),
-          h('p', { class: 'muted' }, REGLES_NOTE)))),
+    h('div', { class: 'mt2' },
+      h('section', { class: 'mt2-show' },
+        h('div', { class: 'mt-pills' }, steps),
+        host,
+        h('div', { class: 'mt-talk' }, foxHost, h('div', { class: 'mt-talk-r' }, b))),
+      h('section', { class: 'mt2-rules', 'aria-label': 'Pour les parents : les conditions de réussite' },
+        h('p', { class: 'wl-kicker' }, 'Pour les parents'),
+        h('h3', {}, 'Les conditions de réussite'),
+        h('dl', { class: 'regles mt-cond' }, CONDITIONS.flatMap(([k, t]) => [h('dt', {}, k), h('dd', {}, t)])),
+        h('h3', {}, 'Ce que le renard regarde'),
+        h('ul', { class: 'mt-crit' }, REGLES.map((r) => h('li', {}, h('strong', {}, r.titre), ' : ', r.texte.charAt(0).toLowerCase() + r.texte.slice(1).replace(/\.$/, '')))),
+        h('div', { class: 'mt-actions' }, again, go))),
   );
 
-  // Trois cahiers, un par étape : la même lettre, avec de moins en moins d'aide (c'est le vrai plateau, avec ses vraies règles d'affichage).
-  steps.forEach((s, i) => {
-    const bd = new Board(s.host, tpl, {});
-    bd.setPhase(i);
-    bd.setProgress(0, 0);
-    bd.enable(false);
-    boards.push(bd);
-  });
-
+  // Un seul cahier : on montre l'étape, puis on efface et on passe à la suivante (le vrai plateau, avec ses vraies règles d'affichage).
+  const board = new Board(host, templateOf(EXEMPLE), {});
+  board.setProgress(0, 0);
+  board.enable(false);
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
   let alive = true, run = 0;
-  const mark = (k) => cards.forEach((c, i) => c.classList.toggle('on', i === k));
-  const pause = (ms) => sleep(ms);
+  const montrer = (i) => {
+    steps.forEach((s, k) => { s.classList.toggle('on', k === i); s.classList.toggle('past', k < i); });
+    board.cancelDemo();
+    board.setPhase(i);
+  };
+  const lignes = [
+    () => speaker.say('Étape 1 : le guide. Je suis le chemin avec mon doigt.', { mood: 'neutral', icon: 'eye', ms: 2600 }),
+    () => speaker.say('Étape 2 : les pointillés. Je suis les points.', { mood: 'neutral', icon: 'eye', ms: 2600 }),
+    () => speaker.say('Étape 3 : tout seul ! J’écris de mémoire, comme un grand.', { mood: 'joy', icon: 'star', ms: 2800 }),
+  ];
 
-  async function raconter(from = -1) {
+  async function raconter(seule = -1) {
     const mine = ++run, live = () => alive && mine === run;
-    boards.forEach((bd) => bd.cancelDemo());
-    mark(-1);
-    if (from < 0) {
-      await Promise.all([speaker.say('Pour chaque exercice, on fait trois étapes. Regarde !', { mood: 'wave', icon: 'hand', ms: 2400 }), pause(2200)]);
-    }
-    const lignes = [
-      () => speaker.say('Étape 1 : le guide. Je suis le chemin avec mon doigt.', { mood: 'neutral', icon: 'eye', ms: 2600 }),
-      () => speaker.say('Étape 2 : les pointillés. Je suis les points.', { mood: 'neutral', icon: 'eye', ms: 2600 }),
-      () => speaker.say('Étape 3 : tout seul ! J’écris de mémoire, comme un grand.', { mood: 'joy', icon: 'star', ms: 2800 }),
-    ];
-    for (let i = Math.max(0, from); i < 3; i++) {
+    if (seule < 0) await Promise.all([speaker.say('Pour chaque exercice, on fait trois étapes. Regarde !', { mood: 'wave', icon: 'hand', ms: 2400 }), sleep(1800)]);
+    for (let i = seule < 0 ? 0 : seule; i < 3; i++) {
       if (!live()) return;
-      mark(i);
-      cards[i].scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
-      const demo = pause(500).then(() => live() && boards[i].playDemo());
-      await Promise.all([lignes[i](), pause(3000), demo]);
-      if (from >= 0) break; // une étape touchée : on ne raconte que celle-là
+      montrer(i);
+      const demo = sleep(450).then(() => live() && board.playDemo());
+      await Promise.all([lignes[i](), sleep(3400), demo]);
+      if (seule >= 0) return;
     }
     if (!live()) return;
-    mark(-1);
-    if (from < 0) await Promise.all([speaker.say('Quand tu as réussi les trois étapes, l’exercice est gagné !', { mood: 'joy', icon: 'star', ms: 2800 }), pause(2400)]);
+    steps.forEach((s) => { s.classList.remove('on'); s.classList.add('past'); });
+    await speaker.say('Quand tu as réussi les trois étapes, l’exercice est gagné !', { mood: 'joy', icon: 'star', ms: 2800 });
   }
 
-  cards.forEach((c, i) => c.addEventListener('click', () => { sfx('tap'); raconter(i); }));
+  montrer(0);
+  steps.forEach((s, i) => s.addEventListener('click', () => { sfx('tap'); raconter(i); }));
   again.addEventListener('click', () => { sfx('tap'); raconter(); });
   go.addEventListener('click', () => { sfx('pop'); app.go(suite || 'accueil'); });
-
   setTimeout(() => alive && raconter(), 500);
-  return () => { alive = false; run++; boards.forEach((bd) => bd.destroy()); fox.destroy(); };
+  return () => { alive = false; run++; board.destroy(); fox.destroy(); };
 }

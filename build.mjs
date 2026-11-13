@@ -17,7 +17,8 @@ const font = (pkg, file, family, weights) => {
 const fonts = font('fredoka', 'fredoka-latin-wght-normal.woff2', 'Fredoka', '300 700') + font('nunito', 'nunito-latin-wght-normal.woff2', 'Nunito', '200 1000');
 // Cahiers de vacances tout prêts (papier/, fabriqués par tools/cahiers-pdf.mjs) : embarqués tels quels, l'application ne fabrique rien.
 const cahiers = Object.fromEntries((fs.existsSync('papier') ? fs.readdirSync('papier') : []).map((f) => [f.match(/niveau-(\d)/)?.[1], f]).filter(([n]) => n)
-  .map(([n, f]) => [n, { nom: f, b64: fs.readFileSync(path.join('papier', f)).toString('base64') }]));
+  .map(([n, f]) => [n, { nom: f, b64: fs.readFileSync(path.join('papier', f)).toString('base64'),
+    apercus: [1, 2, 3].map((k) => path.join('papier', 'apercu', `niveau-${n}-${k}.jpg`)).filter((a) => fs.existsSync(a)).map((a) => `data:image/jpeg;base64,${fs.readFileSync(a).toString('base64')}`) }]));
 async function assemble(voix) {
   const out = await build({ entryPoints: ['src/main.js'], bundle: true, minify: process.env.NOMIN ? false : true, format: 'iife', target: ['es2020'], write: false, legalComments: 'none', define: { __VOIX__: JSON.stringify(voix), __CAHIERS__: JSON.stringify(cahiers), __APP_VERSION__: JSON.stringify(JSON.parse(fs.readFileSync('package.json', 'utf8')).version), __APP_DATE__: JSON.stringify(new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })) } });
   const js = out.outputFiles[0].text.replace(/<\/script>/gi, '<\\/script>');

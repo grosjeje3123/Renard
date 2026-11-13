@@ -32,14 +32,26 @@ function cahierCard(app) {
     }
     btn.disabled = false;
   };
-  const boutons = cahierSeries().map((nv) => {
-    const btn = h('button', { class: 'btn-sec pp-cahier', type: 'button', 'data-niveau': String(nv.id), html: `${icon('page', 24)}<span><strong>Niveau ${nv.id} · ${nv.name}</strong><small>${nv.classe} · 11 pages</small></span>` });
+  const lignes = cahierSeries().map((nv) => {
+    const pret = PRETS[nv.id];
+    const btn = h('button', { class: 'btn-sec pp-go', type: 'button', 'data-niveau': String(nv.id), html: `${icon('page', 24)}<span>Imprimer ou enregistrer</span>` });
     btn.addEventListener('click', () => ouvrir(nv, btn));
-    return btn;
+    return h('div', { class: 'pp-row' },
+      h('div', { class: 'pp-thumbs', 'aria-hidden': 'true' }, (pret?.apercus || []).map((src) => h('img', { src, alt: '' }))),
+      h('div', { class: 'pp-info' }, h('strong', {}, `Niveau ${nv.id} · ${nv.name}`), h('small', {}, `${nv.classe} · 11 pages : couverture, règles, six pages d’écriture, trois jeux`), btn));
   });
-  return card('Les cahiers de vacances',
-    h('p', { class: 'muted' }, 'Trois cahiers tout prêts, un par niveau, les mêmes pour tous les enfants : une couverture avec le renard, les règles, six pages d’écriture en grand (deux ou trois modèles par page, sans numéros), une vignette d’animal et une anecdote par page, et trois petits jeux. Une page par jour suffit.'),
-    h('div', { class: 'pp-cahiers' }, boutons), status);
+  const c = card('Les cahiers de vacances',
+    h('p', { class: 'muted' }, 'Les mêmes pour tous les enfants, tout prêts dans l’application. Une page par jour suffit.'),
+    h('div', { class: 'pp-rows' }, lignes),
+    h('div', { class: 'pp-how' },
+      h('strong', {}, 'Comment faire ?'),
+      h('ol', {},
+        h('li', {}, 'Touchez « Imprimer ou enregistrer » sous le cahier choisi.'),
+        h('li', {}, 'Le menu de partage de la tablette s’ouvre : choisissez Drive, Gmail ou « Fichiers » pour l’enregistrer ou vous l’envoyer.'),
+        h('li', {}, 'Imprimez-le en A4, à 100 % : depuis la tablette (ouvrez le PDF, puis le menu ⋮, « Imprimer ») ou depuis un ordinateur.'))),
+    status);
+  c.classList.add('wide');
+  return c;
 }
 
 export function papier(root, app) {
@@ -50,10 +62,10 @@ export function papier(root, app) {
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Retour', onClick: () => { sfx('tap'); app.go(app.papierFrom || 'parents'); }, html: icon('back', 26) }),
       h('div', { class: 'bar-title' }, h('h2', {}, 'Papier'), h('p', {}, 'Pour les adultes : feuilles à imprimer'))),
     h('div', { class: 'pgrid' },
+      cahierCard(app),
       h('section', { class: 'pcard wide pp-intro' },
         h('h3', {}, 'Écrire sur du vrai papier'),
         h('p', { class: 'muted' }, 'Sur l’écran, l’enfant apprend le geste avec le renard ; sur la feuille, il le refait avec un crayon. Ces feuilles suivent la même démarche en trois étapes : le modèle, les pointillés, puis tout seul. Ces cahiers sont dans l’application : rien n’est téléchargé ni envoyé sur Internet.'),
-        h('p', { class: 'muted' }, 'Ensuite, l’enfant touche « J’ai essayé » (mission cahier après un exercice), et vous pouvez donner votre avis dans l’espace parents : « réussi facilement », « avec de l’aide » ou « à retravailler ».')),
-      cahierCard(app)),
+        h('p', { class: 'muted' }, 'Ensuite, l’enfant touche « J’ai essayé » (mission cahier après un exercice), et vous pouvez donner votre avis dans l’espace parents : « réussi facilement », « avec de l’aide » ou « à retravailler ».'))),
   );
 }

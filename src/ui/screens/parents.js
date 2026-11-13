@@ -1,4 +1,5 @@
 // Espace parents : suivi des compétences, difficultés, temps d'utilisation, réglages et vie privée.
+import { DICTEE_PALIERS, palierDictee } from '../../core/dictee.js';
 import { h, icon } from '../dom.js';
 import { glyphIcon } from '../art.js';
 import { SKILLS, LEVELS } from '../../content/skills.js';
@@ -158,6 +159,7 @@ function dashboard(root, app) {
   // Dictées : ce que l'enfant a écrit sans modèle (indication pour les adultes ; rien ne change dans les exercices acquis)
   const dictees = Object.entries(st.dictees || {}).filter(([id]) => SKILLS[id]).sort((a, b) => (b[1].t || 0) - (a[1].t || 0));
   const dicteeCard = card('Dictées',
+    h('p', {}, h('strong', {}, 'Palier actuel : '), `${DICTEE_PALIERS[palierDictee(st)]}. `, h('span', { class: 'muted' }, 'La dictée se complique quand l’enfant réussit (4 sur 5) : lettres, puis sons et petits mots, puis mots, puis petites phrases, toujours parmi ce qu’il a acquis.')),
     dictees.length
       ? h('ul', { class: 'recs dict-list' }, dictees.slice(0, 12).map(([id, d]) => h('li', { class: 'paper-row dict-row', 'data-id': id },
         h('span', { class: 'gl', html: glyphIcon(id, { width: 0.34 }) }),
@@ -178,6 +180,8 @@ function dashboard(root, app) {
         h('div', { class: 'chart-wrap', html: usageChart(st) }),
         h('p', { class: 'muted' }, st.settings.pauseMin ? `Seul le temps d’activité compte. Le renard propose une pause après ${st.settings.pauseMin} minutes d’activité continue (réglable plus bas).` : 'Seul le temps d’activité compte. Les pauses sont désactivées (réglable plus bas).'))),
       reglesCard(),
+      card('Cahiers à imprimer', h('p', { class: 'muted' }, 'Trois cahiers de vacances tout prêts (un par niveau, 11 pages) : les mêmes modèles que sur l’écran, en grand, avec des jeux autour du renard.'),
+        h('button', { class: 'btn-sec', type: 'button', onClick: () => { app.papierFrom = 'parents'; app.go('papier'); }, html: `${icon('page', 22)}<span>Voir et imprimer les cahiers</span>` })),
       card('Progression par niveau', ...levelBars),
       card('Exercices recommandés', recList),
       card('Difficultés rencontrées', diffList),
@@ -195,8 +199,7 @@ function dashboard(root, app) {
         h('p', { class: 'muted' }, 'Les vignettes récompensent la réussite (trois étoiles ou exercice acquis), la persévérance (recommencer après un essai difficile), les étapes franchies et l’écriture sur papier. Pas de tirage au sort, pas de série à maintenir, rien pour le temps passé : une vignette gagnée reste acquise.')),
       ...settingsCards(app),
       orderCard(app),
-      card('Cahiers à imprimer', h('p', { class: 'muted' }, 'Trois cahiers de vacances tout prêts (un par niveau, 11 pages) : les mêmes modèles que sur l’écran, en grand, avec des jeux autour du renard.'),
-        h('button', { class: 'btn-sec', type: 'button', onClick: () => { app.papierFrom = 'parents'; app.go('papier'); }, html: `${icon('page', 22)}<span>Voir les cahiers</span>` })),
+
       backupCard(app),
       card('Données de l’enfant', h('p', { class: 'muted' }, 'Effacer supprime la progression, les vignettes, les dessins de la galerie et les réglages de cet appareil. Pensez à créer un code de sauvegarde avant.'), resetBtn),
       card('Vie privée',
