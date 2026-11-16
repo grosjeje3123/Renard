@@ -1,10 +1,18 @@
 // Application : état persistant (local uniquement), routage par ancre, temps d'utilisation, renard partagé.
-import { newState, hydrate, STATE_VERSION, addUsage, foxStage, unlockedItems } from '../core/progress.js';
+import { newState, hydrate, STATE_VERSION, addUsage, foxStage, unlockedItems, blocked } from '../core/progress.js';
 import { configureAudio, unlockAudio, stopSpeaking } from './audio.js';
 import { Fox } from './fox.js';
 
 const KEY = 'renard-v1';
+/** Les écrans où l'enfant écrit ou dessine librement : fermés pendant la sieste du renard et une fois la limite du jour atteinte. */
+const ECRANS_ACTIFS = ['tableau', 'dessin', 'jeux'];
 let memoryCopy = null; // si le stockage du navigateur est indisponible
+
+/**
+ * Une progression qu'on ne sait pas relire (fichier abîmé, ou format d'une autre version) n'est jamais écrasée sans trace :
+ * elle est mise de côté sous une autre clé, d'où une version ultérieure (ou un adulte, avec de l'aide) pourra la reprendre.
+ */
+function mettreDeCote(raw) { try { localStorage.setItem(`${KEY}-secours`, raw); } catch { /* stockage plein ou indisponible */ } }
 
 function load() {
   let raw = null;
@@ -12,9 +20,9 @@ function load() {
   if (!raw) return newState();
   try {
     const s = JSON.parse(raw);
-    if (!s || s.v !== STATE_VERSION) return newState();
+    if (!s || s.v !== STATE_VERSION) { mettreDeCote(raw); return newState(); }
     return hydrate(s);
-  } catch { return newState(); }
+  } catch { mettreDeCote(raw); return newState(); }
 }
 
 export const app = {
@@ -27,10 +35,13 @@ export const app = {
 
   save() {
     clearTimeout(this.saveTimer);
-    this.saveTimer = setTimeout(() => {
-      const raw = JSON.stringify(this.state);
-      try { localStorage.setItem(KEY, raw); } catch { memoryCopy = raw; }
-    }, 250);
+    this.saveTimer = setTimeout(() => this.flush(), 250);
+  },
+  /** Écrit tout de suite (l'application passe à l'arrière-plan ou se ferme : rien ne doit rester en attente). */
+  flush() {
+    clearTimeout(this.saveTimer); this.saveTimer = null;
+    const raw = JSON.stringify(this.state);
+    try { localStorage.setItem(KEY, raw); } catch { memoryCopy = raw; }
   },
   reset() {
     this.state = newState();
@@ -77,7 +88,9 @@ export const app = {
     // À l'ouverture de l'application (adresse sans ancre), un premier écran « Touche pour jouer » : le geste de l'enfant
     // débloque le son, et la petite musique de marimba peut alors jouer. Les liens directs (#carte-1…) l'évitent.
     const start = !location.hash && !this.splashDone && !this.noSplash;
-    const [name, ...rest] = (start ? 'demarrage' : location.hash.slice(1) || 'accueil').split('-');
+    let [name, ...rest] = (start ? 'demarrage' : location.hash.slice(1) || 'accueil').split('-');
+    // Pause douce ou limite du jour : toutes les activités d'écran s'arrêtent (tableau, dessin, jeux), pas seulement les exercices et la dictée.
+    if (ECRANS_ACTIFS.includes(name) && blocked(this.state)) { name = 'pause'; rest = []; }
     const arg = rest.join('-');
     const screen = this.screens[name] || this.screens.accueil;
     this.root.replaceChildren();
@@ -101,6 +114,9 @@ export const app = {
     configureAudio(this.state.settings);
     document.addEventListener('pointerdown', () => { this.lastTouch = Date.now(); unlockAudio(); }, { capture: true, passive: true });
     window.addEventListener('hashchange', () => this.render());
+    // L'enfant appuie sur le bouton d'accueil de la tablette juste après une réussite : on écrit tout de suite, sans attendre.
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && this.saveTimer) this.flush(); });
+    window.addEventListener('pagehide', () => { if (this.saveTimer) this.flush(); });
     // Temps d'utilisation : on compte seulement les moments actifs (écran visible, interaction récente).
     setInterval(() => {
       if (document.visibilityState === 'visible' && Date.now() - this.lastTouch < 30000) { addUsage(this.state, 5); this.save(); }

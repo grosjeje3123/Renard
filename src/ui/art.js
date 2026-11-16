@@ -71,9 +71,12 @@ export function levelThumb(id) {
 // ---------- Icône d'un tracé (nœuds de la carte, tableau des parents) ----------
 const tplCache = {};
 export const templateOf = (id) => (tplCache[id] ||= buildTemplate(SKILLS[id]));
+/** Le gabarit tel qu'on l'écrit à l'écran : une longue phrase y revient à la ligne (les fiches à imprimer gardent `templateOf`). */
+const tplEcran = {};
+export const templateEcran = (id) => (SKILLS[id].ecran ? (tplEcran[id] ||= buildTemplate(SKILLS[id], undefined, { ecran: true })) : templateOf(id));
 
-export function glyphIcon(id, { stroke = 'currentColor', width = 0.34, pad = 0.6 } = {}) {
-  const t = templateOf(id);
+export function glyphIcon(id, { stroke = 'currentColor', width = 0.34, pad = 0.6, ecran = false } = {}) {
+  const t = ecran ? templateEcran(id) : templateOf(id);
   const bb = bbox(t.strokes.flatMap((s) => s.pts));
   const w = bb.w + pad * 2, hgt = bb.h + pad * 2;
   const d = t.strokes.map((s) => (s.kind === 'dot' ? `M ${s.start.x} ${s.start.y} l 0.01 0` : strokeToSvgPath(s, 4))).join(' ');

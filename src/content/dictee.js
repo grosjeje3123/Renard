@@ -6,6 +6,7 @@ export const NOMS_LETTRES = {
   a: 'a', b: 'bé', c: 'cé', d: 'dé', e: 'e', f: 'effe', g: 'gé', h: 'ache', i: 'i', j: 'ji', k: 'ka', l: 'elle', m: 'emme',
   n: 'enne', o: 'o', p: 'pé', q: 'ku', r: 'erre', s: 'esse', t: 'té', u: 'u', v: 'vé', w: 'double vé', x: 'ixe', y: 'i grec', z: 'zède',
 };
+import { SON_REPERE } from './skills.js';
 export const NOMS_CHIFFRES = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
 
 /**
@@ -22,7 +23,8 @@ export function dicteeDit(skill) {
   if (skill.phrase) return skill.majMot ? `Écris la phrase en majuscules. « ${skill.word.toLowerCase()} ».` : `Écris la phrase. « ${skill.word.toLowerCase()} ».`;
   const mot = `« ${skill.word.toLowerCase()} ».`;
   if (skill.majMot) return `Écris le mot en majuscules. ${mot}`;
-  if (skill.groupe) return `Écris le son. ${mot}`;
+  // Plusieurs écritures font le même son (« o », « au », « eau »…) : le mot repère de la classe dit laquelle on attend.
+  if (skill.groupe) return `Écris le son. ${mot}${SON_REPERE[skill.word] ? ` Comme dans « ${SON_REPERE[skill.word]} ».` : ''}`;
   return `Écris le mot. ${mot}`;
 }
 

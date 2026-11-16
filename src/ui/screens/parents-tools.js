@@ -107,7 +107,7 @@ export function settingsCards(app) {
     toggle(app, 'set-serie-auto', 'Enchaîner les séries', 'Après la fête de fin de série, si l’enfant ne touche à rien, la carte de la série suivante s’ouvre toute seule (aucun exercice ne démarre).', 'serieAuto'),
     toggle(app, 'set-montee', 'La difficulté monte quand l’enfant réussit tout', 'Après trois nouveaux exercices acquis de suite sans le moindre raté, le renard saute l’étape du guide pour le suivant. Après six, il lance un défi : écrire tout seul du premier coup (au premier raté, on passe aux pointillés). La démonstration est toujours montrée ; au premier raté, tout redevient comme avant. Les rappels et la tolérance du tracé ne changent pas.', 'montee'),
     toggle(app, 'set-surprise', 'Dictée surprise en cours de route', 'Tous les cinq exercices acquis, et après chaque série fêtée, le renard propose une petite dictée de trois éléments déjà appris. L’enfant peut passer.', 'dicteeSurprise'),
-    toggle(app, 'set-demo', 'Mode démonstration', 'Ouvre tous les exercices et raccourcit les séances (1 réussite par étape).', 'demo'));
+    toggle(app, 'set-demo', 'Mode démonstration', 'Pour les essais d’un adulte : ouvre tous les exercices et raccourcit les séances (1 réussite par étape). À couper avant de rendre la tablette à l’enfant : ce qui est réussi dans ce mode compte comme acquis.', 'demo'));
 
   // Pauses
   const modeHint = h('small', {}, PAUSE_HINT[set.pauseMode]);
@@ -183,7 +183,7 @@ function voiceCard(app) {
   const listen = h('button', { class: 'btn-sec', type: 'button' }, 'Écouter un exemple');
   listen.addEventListener('click', () => {
     unlockAudio();
-    speak(`Salut${app.state.name ? ' ' + app.state.name : ''} ! Je suis Renard. Aujourd’hui, on écrit ensemble ?`, { force: true }); // l’essai marche même si la voix est coupée
+    speak(`Salut${app.state.name ? ' ' + app.state.name : ''} ! Je suis Renard. Aujourd’hui, on écrit ensemble ?`, { force: true, repli: ['Salut !', 'Je suis Renard.', 'Aujourd’hui, on écrit ensemble ?'] }); // l’essai marche même si la voix est coupée
   });
 
   return card('Voix du renard',

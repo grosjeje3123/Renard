@@ -18,10 +18,10 @@ const dejaLues = new Set();
 export function makeSpeaker(fox, bubbleEl) {
   const p = bubbleEl.querySelector('.b-text');
   const ico = bubbleEl.querySelector('.b-ico');
-  let last = '';
+  let last = '', lastOpts = {};
   const api = {
-    async say(text, { mood, icon: ic, ms, silent = false, once = null, dit } = {}) {
-      last = text;
+    async say(text, { mood, icon: ic, ms, silent = false, once = null, dit, repli } = {}) {
+      last = text; lastOpts = { dit, repli }; // le haut-parleur de la bulle redit la même chose (le mot dicté, pas seulement la consigne affichée)
       if (once) { if (dejaLues.has(once)) silent = true; else dejaLues.add(once); } // `once` : lu à voix haute la première fois seulement
       p.textContent = fr(text);
       ico.innerHTML = ic ? icon(ic, 30) : '';
@@ -29,9 +29,9 @@ export function makeSpeaker(fox, bubbleEl) {
       bubbleEl.classList.remove('pop'); void bubbleEl.offsetWidth; bubbleEl.classList.add('pop');
       if (mood) fox.setMood(mood, ms ?? 2800);
       if (silent) return;
-      await speak(text, { dit, onStart: () => fox.talk(true), onEnd: () => fox.talk(false) });
+      await speak(text, { dit, repli, onStart: () => fox.talk(true), onEnd: () => fox.talk(false) });
     },
-    repeat() { return last ? api.say(last) : Promise.resolve(); },
+    repeat() { return last ? api.say(last, lastOpts) : Promise.resolve(); },
     get last() { return last; },
   };
   bubbleEl.querySelector('.b-say').addEventListener('click', () => api.repeat());

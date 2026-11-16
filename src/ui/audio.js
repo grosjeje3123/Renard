@@ -139,8 +139,11 @@ function synth(text, state) {
  * Fait parler le renard, phrase après phrase : le fichier enregistré de la phrase s'il existe (dossier voix/),
  * sinon la voix du système. Retourne une promesse résolue à la fin. `dit` : texte à lire s'il diffère du texte affiché.
  * Sans voix (réglage coupé), la durée est estimée pour animer la bouche quand même.
+ * `dit` peut aussi être une liste de phrases déjà découpées.
  */
-export function speak(text, { onStart, onEnd, force = false, dit } = {}) {
+/** Pas de synthèse vocale utilisable sur cet appareil (aucune, ou aucune voix française) : seules les voix enregistrées parlent. */
+export const sansVoixSysteme = () => !('speechSynthesis' in window) || !voice;
+export function speak(text, { onStart, onEnd, force = false, dit, repli } = {}) {
   stopSpeaking();
   return new Promise((resolve) => {
     let done = false;
@@ -148,7 +151,10 @@ export function speak(text, { onStart, onEnd, force = false, dit } = {}) {
     const state = { finish, timer: null, audio: null, release: null, stopped: false };
     current = state;
     onStart?.();
-    const parts = cfg.voix || force ? decouper(dit ?? text) : [];
+    let parts = cfg.voix || force ? (Array.isArray(dit) ? dit.flatMap(decouper) : decouper(dit ?? text)) : [];
+    // `repli` : des phrases enregistrées à dire à la place quand une partie du texte (un prénom, un mot libre) n'a pas d'enregistrement
+    // et que l'appareil n'a pas de voix française (c'est le cas dans l'application Android, qui n'a que les voix enregistrées).
+    if (repli && parts.length && sansVoixSysteme() && parts.some((p) => !clips[idPhrase(p)])) parts = repli.flatMap(decouper);
     if (!parts.length) { state.timer = setTimeout(finish, Math.max(900, text.length * 62)); return; }
     (async () => {
       for (const p of parts) {

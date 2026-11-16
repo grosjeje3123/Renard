@@ -1,0 +1,62 @@
+# Construit la version à publier sur Google Play : un fichier .aab signé avec VOTRE clé d'envoi.
+# À lancer à la main : onglet « Actions » > « AAB Google Play » > « Run workflow ».
+# Le fichier n'est PAS publié dans les Releases : il se télécharge depuis l'exécution (artefact « renard-aab »), puis s'envoie dans la Play Console.
+#
+# À faire une seule fois (voir docs/publier-sur-google-play.md) : créer le fichier de clés, puis ajouter quatre secrets au dépôt
+# (Settings > Secrets and variables > Actions) :
+#   RENARD_KEYSTORE_BASE64    le fichier de clés encodé en base64
+#   RENARD_KEYSTORE_PASSWORD  le mot de passe du fichier de clés
+#   RENARD_KEY_ALIAS          le nom de la clé (alias)
+#   RENARD_KEY_PASSWORD       le mot de passe de la clé
+name: AAB Google Play
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  aab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: SDK Android
+        run: |
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKM="$(ls -d "$SDK"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)"
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "platforms;android-36" "build-tools;36.0.0"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+      - name: Clé d'envoi (secrets du dépôt)
+        env:
+          KEYSTORE_B64: ${{ secrets.RENARD_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then echo "Le secret RENARD_KEYSTORE_BASE64 manque : voir docs/publier-sur-google-play.md"; exit 1; fi
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/renard.jks"
+          echo "RENARD_KEYSTORE=$RUNNER_TEMP/renard.jks" >> "$GITHUB_ENV"
+      - run: npm ci
+      - run: npm test
+      - run: npm run build:app
+      - run: npx cap sync android
+      - run: chmod +x android/gradlew
+      - name: Compiler le bundle signé
+        working-directory: android
+        env:
+          RENARD_KEYSTORE_PASSWORD: ${{ secrets.RENARD_KEYSTORE_PASSWORD }}
+          RENARD_KEY_ALIAS: ${{ secrets.RENARD_KEY_ALIAS }}
+          RENARD_KEY_PASSWORD: ${{ secrets.RENARD_KEY_PASSWORD }}
+        run: ./gradlew bundleRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: renard-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error

@@ -12,10 +12,13 @@ export const PRAISE = {
 };
 
 export const TIPS = [
+  ['autre-lettre', 'On dirait une autre lettre. Regarde bien le modèle.'],
   ['sens-inverse', 'Regarde les flèches : on va dans l’autre sens.'],
   ['depart-loin', 'On commence au point vert.'],
   ['point-loin', 'Le point se pose juste au-dessus.'],
   ['point-trop-long', 'Pour le point, tape une seule fois.'],
+  ['accent-pente', 'L’accent penche de l’autre côté.'],
+  ['accent-loin', 'L’accent se pose tout près de sa lettre.'],
   ['incomplet', 'Continue jusqu’au bout du chemin !'],
   ['trop-petit', 'Tu peux faire un peu plus grand !'],
   ['trop-grand', 'Un peu plus petit, pour rester dans les lignes.'],

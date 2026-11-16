@@ -63,7 +63,8 @@ test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tienne
     const sk = SKILLS[id];
     assert.equal(sk.kind, 'word');
     assert.ok(isWriting(sk));
-    assert.ok(/^[a-z ]+$/.test(sk.glyph), `${id} : lettres sans accent`);
+    assert.ok(/^[a-zéèêëàâîïôùûüç ]+$/.test(sk.glyph), `${id} : lettres a–z et accents du français`);
+    assert.ok(/^[a-z_]+$/.test(id), `${id} : identifiant sans accent`);
     assert.ok(sk.needs.every((l) => LEVELS[1].skills.includes(l)), `${id} : lettres connues`);
     kinds[sk.phrase ? 'phrase' : sk.groupe ? 'groupe' : 'mot']++;
     const t = buildTemplate(sk);
@@ -175,7 +176,7 @@ test('étapes de la carte : les étapes couvrent le niveau, et un ordre de class
     assert.ok(secs.every((x) => x.title && x.skills.length >= 5 && x.skills.length <= 14), lv.name);
   }
   assert.deepEqual(P.levelSections(st, LEVELS[0]).flatMap((x) => x.skills), LEVELS[0].skills, 'niveau 1 : les formes, puis les majuscules par familles');
-  assert.equal(LEVELS[0].sections.length, 13, 'les formes, cinq familles de majuscules, les chiffres, quatre paliers de mots et deux de phrases en capitales');
+  assert.equal(LEVELS[0].sections.length, 14, 'les formes, d’autres formes, cinq familles de majuscules, les chiffres, quatre paliers de mots et deux de phrases en capitales');
   assert.equal(LEVELS[0].sections.flatMap((x) => x.skills).filter((id) => SKILLS[id].capital).length, 26);
   st.settings.order2 = ['z', 'y', ...LEVELS[1].skills.filter((x) => x !== 'z' && x !== 'y').reverse()];
   const secs = P.levelSections(st, LEVELS[1]);
@@ -521,7 +522,7 @@ test('cahier : sommets et creux des formes du niveau 1 tombent exactement sur le
 test('cahier : lettres et mots sont calés sur les lignes (pied sur la ligne d\'écriture, hauteurs de 2 ou 3 interlignes, point du i sur la ligne de 3)', () => {
   const bodyOf = (id) => {
     const t = buildTemplate(SKILLS[id]);
-    const body = t.strokes.filter((s) => s.kind !== 'dot');
+    const body = t.strokes.filter((s) => s.kind !== 'dot' && !s.mark); // le corps des lettres : ni les points, ni les accents
     return { base: t.board.baseline, y0: Math.min(...body.map((s) => s.bbox.y0)), y1: Math.max(...body.map((s) => s.bbox.y1)), dots: t.strokes.filter((s) => s.kind === 'dot') };
   };
   const DESC = 'fgjpqy'; // les jambages descendent sous la ligne
@@ -838,10 +839,11 @@ test('galerie : le code de sauvegarde ne contient jamais les dessins', async () 
 
 // ---------- Tableau libre ----------
 import * as T from '../src/core/tableau.js';
-test('tableau libre : le texte est nettoyé (a–z sans accent), le calque tient sur la page et la page s\'agrandit pour un texte long', () => {
-  assert.equal(T.clean('  Léa-Rose Œuf '), 'lea rose oeuf ');
-  assert.equal(T.clean('ÉLÈVE ça va 123'), 'eleve ca va 123', 'les chiffres sont gardés');
-  assert.equal(T.clean('Léa : 6 ans !!'), 'lea 6 ans ');
+test('tableau libre : le texte est nettoyé (a–z et accents du français), le calque tient sur la page et la page s\'agrandit pour un texte long', () => {
+  assert.equal(T.clean('  Léa-Rose Œuf '), 'léa rose oeuf ');
+  assert.equal(T.clean('ÉLÈVE ça va 123'), 'élève ça va 123', 'les accents et les chiffres sont gardés');
+  assert.equal(T.clean('Léa : 6 ans !!'), 'léa 6 ans ');
+  assert.equal(T.clean('Iñaki Zoë Le\u0301o'), 'inaki zoë léo', 'un signe qu’on ne sait pas écrire redevient sa lettre ; un accent tapé en deux temps est reconnu');
   assert.equal(T.clean(''), '');
   assert.equal(T.clean('x'.repeat(100)).length, T.TABLEAU.maxLen);
   const a = T.calque('il');
@@ -861,7 +863,7 @@ test('tableau libre : le texte est nettoyé (a–z sans accent), le calque tient
   assert.equal(T.suggestions(st).prenom, '');
   st.name = 'Léa'; tried(st, 'i'); tried(st, 'l'); tried(st, 'mot_il');
   const sg = T.suggestions(st);
-  assert.equal(sg.prenom, 'lea');
+  assert.equal(sg.prenom, 'léa', 'le prénom garde son accent');
   assert.deepEqual(sg.mots, ['il']);
   st.name = 'Jean-Baptiste-Alexandre-Maximilien';
   assert.equal(T.suggestions(st).prenom, '', 'un prénom trop long pour la page n\'est pas proposé');
@@ -885,7 +887,7 @@ test('majuscules : 26 exercices dans le niveau 1, par familles, droits et posés
   }
   const I = buildTemplate(SKILLS.maj_I).strokes[0];
   assert.ok(I.bbox.w < 0.01, 'le I est une barre bien verticale (pas penchée comme l\'écriture cursive)');
-  const sections = LEVELS[0].sections.slice(1, 6); // les cinq familles de majuscules (les chiffres viennent après)
+  const sections = LEVELS[0].sections.slice(2, 7); // les cinq familles de majuscules (après les formes et les autres formes ; les chiffres viennent ensuite)
   assert.deepEqual(sections.map((x) => x.skills.length), [6, 6, 5, 5, 4]);
   assert.ok(sections.every((x) => x.title && x.skills.every((id) => SKILLS[id].section === x.id)));
 });
@@ -988,7 +990,7 @@ test('chiffres : une file à part, ouverte dès que les ronds sont essayés (d\'
 
 test('tableau libre : les chiffres s\'écrivent aussi (un âge, un numéro), droits à côté des lettres', async () => {
   const T = await import('../src/core/tableau.js');
-  assert.equal(T.clean('Léa a 6 ans !').trim(), 'lea a 6 ans');
+  assert.equal(T.clean('Léa a 6 ans !').trim(), 'léa a 6 ans');
   assert.equal(T.cased('lea 6', 'maj'), 'LEA 6');
   const c = T.calque('lea 6', undefined, 'debut');
   assert.equal(c.text, 'Lea 6');
@@ -1263,8 +1265,10 @@ test('dictée : ce que dit le renard — une lettre, un chiffre ou un mot, en ph
       const nom = s.chiffre ? DC.NOMS_CHIFFRES[+s.glyph] : DC.NOMS_LETTRES[s.glyph.toLowerCase()];
       assert.ok(nom && dit.includes(`« ${nom} »`), `${id} : le nom « ${nom} » est dit`);
     } else {
-      assert.equal(parts.length, 2, `${id} : la consigne, puis le mot seul`);
+      // un son : la consigne, le son seul, puis son mot repère (« o », « au » et « eau » se prononcent pareil : le mot repère dit lequel écrire)
+      assert.equal(parts.length, s.groupe ? 3 : 2, `${id} : la consigne, puis le mot seul`);
       assert.equal(parts[1], `« ${s.word.toLowerCase()} ».`);
+      if (s.groupe) assert.ok(/^Comme dans « [a-z]+ »\.$/.test(parts[2]) && parts[2].includes(s.word), `${id} : mot repère qui contient le son (${parts[2]})`);
     }
   }
   assert.ok(/majuscule/.test(DC.dicteeDit(SKILLS.maj_B)) && /majuscules/.test(DC.dicteeDit(SKILLS.mm_IL)));

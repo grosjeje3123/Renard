@@ -22,9 +22,9 @@ const base = TABLEAU.rows[1];
 const run = (text, mode, strokes, phase = 1, boardW = TABLEAU.W) => checkRow({ text, mode, baseline: base, strokes, phase, boardW });
 
 test('tableau : « Casse » : minuscules, MAJUSCULES, majuscule au début', () => {
-  assert.equal(cased('Léa-Rose', 'min'), 'lea rose');
-  assert.equal(cased('Léa-Rose', 'maj'), 'LEA ROSE');
-  assert.equal(cased('Léa', 'debut'), 'Lea');
+  assert.equal(cased('Léa-Rose', 'min'), 'léa rose');
+  assert.equal(cased('Léa-Rose', 'maj'), 'LÉA ROSE');
+  assert.equal(cased('Léa', 'debut'), 'Léa');
   assert.deepEqual(CASSES.map((c) => c.id), ['min', 'maj', 'debut']);
 });
 

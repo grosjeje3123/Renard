@@ -102,7 +102,7 @@ button:focus-visible,input:focus-visible,.home-fox:focus-visible{outline:4px sol
 .levels-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px;padding:6px 0 20px;overflow:auto}
 .album-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px;padding:6px 0 20px}
 .album-pages{display:flex;flex-direction:column;gap:18px;overflow:auto;padding:4px 6px 14px;min-height:0}
-.levels-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-content:center}
+.levels-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-content:center}
 .level-card{position:relative;text-align:left;background:var(--card-solid);border-radius:28px;overflow:hidden;box-shadow:0 7px 0 var(--line),0 14px 26px #0002;border:3px solid var(--card-solid);display:flex;flex-direction:column;transition:transform .15s}
 .level-card:active{transform:translateY(4px)}
 .level-card.rec{border-color:var(--accent)}
@@ -939,3 +939,6 @@ button[disabled]{opacity:.35;cursor:default}
 .pp-go{align-self:flex-start}
 .pp-how{background:#E8F3EA;border-radius:16px;padding:10px 14px}
 .pp-how ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+/* Appui long pour couper la voix (accueil) : même anneau que le cadenas des parents */
+.top-right .round{position:relative}
+.top-right .round .ring{inset:-4px;border-radius:50%;pointer-events:none}

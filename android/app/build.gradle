@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+// La version vient de package.json (une seule source) : « 1.12.3 » donne versionName 1.12.3 et versionCode 11203.
+// Google Play exige un versionCode qui augmente à chaque envoi.
+def renardPkg = new groovy.json.JsonSlurper().parseText(file('../../package.json').text)
+def renardVersion = renardPkg.version.toString()
+def renardParts = (renardVersion.tokenize('.') + ['0', '0', '0']).take(3).collect { (it.replaceAll('[^0-9]', '') ?: '0').toInteger() }
+def renardCode = renardParts[0] * 10000 + renardParts[1] * 100 + renardParts[2]
+// Signature de la version à publier : le fichier de clés et ses mots de passe sont donnés par des variables d'environnement
+// (jamais écrits dans le dépôt). Sans elles, seule la version de test (debug) se construit.
+def renardKeystore = System.getenv('RENARD_KEYSTORE')
+
 android {
     namespace = "fr.renard.ecriture"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +17,8 @@ android {
         applicationId "fr.renard.ecriture"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode renardCode
+        versionName renardVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,8 +26,21 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (renardKeystore) {
+                storeFile file(renardKeystore)
+                storePassword System.getenv('RENARD_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('RENARD_KEY_ALIAS')
+                keyPassword System.getenv('RENARD_KEY_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
+            if (renardKeystore) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

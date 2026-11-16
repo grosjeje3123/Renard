@@ -91,7 +91,11 @@ for (const m of mots) add(`Écris « ${m} » : suis la première ligne, puis les
 // 6. Accueil (version sans prénom : avec un prénom, la phrase du prénom est lue par la voix du système)
 for (const t of ['On se retrouve demain ! Aujourd’hui, on a bien travaillé.', 'Je fais une petite sieste… On se retrouve tout à l’heure !', 'J’ai bien travaillé avec toi ! Et si on faisait une pause ?',
   'Bonjour ! Je m’appelle Renard. Tu veux apprendre à écrire avec moi ?', 'Content de te revoir !', 'Bravo pour tes progrès !', 'Salut ! On refait un exercice que tu aimes ?',
-  'Salut ! Je suis Renard. Aujourd’hui, on écrit ensemble ?']) add(t, 'accueil');
+  'Salut ! Je suis Renard. Aujourd’hui, on écrit ensemble ?',
+  // phrases de repli, dites quand le prénom ou le nom de l'exercice n'a pas d'enregistrement et que l'appareil n'a pas de voix (application Android)
+  'On se retrouve demain !', 'Aujourd’hui, on a bien travaillé.', 'J’ai bien travaillé avec toi !', 'Et si on faisait une pause ?', 'Bonjour !', 'Salut !',
+  'On s’entraîne encore ?', 'Tu t’en souviens ? On vérifie ensemble !', 'On continue ?', 'Prêt pour la suite ?',
+  'C’est parti !', 'À toi d’écrire !', 'Suis la première ligne, puis les pointillés, puis écris tout seul !', 'Prends ton cahier et ton crayon.', 'Écris-le comme tu l’as fait avec moi !']) add(t, 'accueil');
 
 // 7. Tout le reste : les textes littéraux passés à say() / speak() dans l'interface
 const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : e.name.endsWith('.js') ? [path.join(d, e.name)] : []));
