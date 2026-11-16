@@ -42,6 +42,7 @@ L'APK de test (workflow « APK Android ») reste signé avec la clé de débogag
 - Ouvrir un cahier PDF et partager le code de sauvegarde.
 - Écouter une vingtaine de phrases (dont « Comme dans bateau », « On dirait une autre lettre »).
 - Vérifier la sauvegarde : `adb shell bmgr backupnow fr.renard.ecriture` doit répondre que la sauvegarde n'est pas autorisée (« Backup is not allowed »).
+- **Licence de la voix** : la voix du renard (v1.12) vient du modèle Piper « upmc », dont la fiche indique un corpus sous licence CC BY-SA 4.0 : usage commercial permis, à condition de citer la source (c'est fait dans les Crédits) ; la clause « partage dans les mêmes conditions » vise les œuvres dérivées du corpus. Savoir si elle s'étend aux enregistrements produits par le modèle n'est pas tranché : faites-le confirmer avant la mise en vente. La voix précédente (« siwis », CC BY 4.0, sans cette clause) se régénère en une commande : `python3 tools/voix-piper.py fr-siwis-medium.onnx --voix siwis --refaire`.
 - **Permission INTERNET** : elle est encore déclarée dans `AndroidManifest.xml`, par prudence. L'application n'en a pas besoin pour fonctionner en théorie, mais cela doit être vérifié sur tablette : retirez la ligne `<uses-permission android:name="android.permission.INTERNET" />`, reconstruisez l'APK de test, et vérifiez que l'application s'ouvre, que les voix se lisent, que les PDF s'ouvrent. Si tout marche, gardez-la retirée : la fiche Play affichera alors « aucune autorisation », ce qui prouve la promesse « hors ligne ».
 
 ## 6. Déclarations dans la Play Console
