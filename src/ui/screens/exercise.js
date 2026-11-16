@@ -166,7 +166,8 @@ export function exercise(root, app, skillId) {
     const ctx = recognizerContext(skill, session.phase, st.settings, stroke.pointerType, tpl.board?.W);
     const trace = { points: stroke.points, lifts: stroke.lifts };
     // Sans le guide plein, on vérifie aussi que ce n'est pas une autre lettre (un « o » à la place d'un « a »…) : voir core/rivaux.js
-    const ev = avecRivale(ts, trace, ctx, recognizer.evaluateStroke(ts, trace, ctx));
+    const brut = recognizer.evaluateStroke(ts, trace, ctx);
+    const ev = st.settings.rivales === false ? brut : avecRivale(ts, trace, ctx, brut);
     board.markInk(stroke.el, ev.stars);
 
     if (tpl.strokes.length > 1 && ev.stars === 0 && retries < 1) {

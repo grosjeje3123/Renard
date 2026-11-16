@@ -104,6 +104,7 @@ export function settingsCards(app) {
     ...traitRows(app, 'set'),
     toggle(app, 'set-sound', 'Sons', 'Petits sons de réussite.', 'sons'),
     toggle(app, 'set-soft', 'Tracé plus souple', 'Plus d’indulgence pour les petites mains.', 'souple'),
+    toggle(app, 'set-rivales', 'Vérifier que c’est la bonne lettre', 'Aux étapes « pointillés » et « tout seul » et en dictée, un « o » n’est pas accepté pour un « a », ni un « n » pour un « m » : le renard dit « On dirait une autre lettre ». À couper seulement s’il refuse trop souvent une lettre bien écrite.', 'rivales'),
     toggle(app, 'set-serie-auto', 'Enchaîner les séries', 'Après la fête de fin de série, si l’enfant ne touche à rien, la carte de la série suivante s’ouvre toute seule (aucun exercice ne démarre).', 'serieAuto'),
     toggle(app, 'set-montee', 'La difficulté monte quand l’enfant réussit tout', 'Après trois nouveaux exercices acquis de suite sans le moindre raté, le renard saute l’étape du guide pour le suivant. Après six, il lance un défi : écrire tout seul du premier coup (au premier raté, on passe aux pointillés). La démonstration est toujours montrée ; au premier raté, tout redevient comme avant. Les rappels et la tolérance du tracé ne changent pas.', 'montee'),
     toggle(app, 'set-surprise', 'Dictée surprise en cours de route', 'Tous les cinq exercices acquis, et après chaque série fêtée, le renard propose une petite dictée de trois éléments déjà appris. L’enfant peut passer.', 'dicteeSurprise'),
@@ -169,8 +170,9 @@ function voiceCard(app) {
   };
   const explain = () => {
     const v = currentVoice();
-    if (!('speechSynthesis' in window)) { now.textContent = 'Cet appareil n’a pas de synthèse vocale : le renard reste silencieux et les consignes restent écrites.'; warn.hidden = true; return; }
-    if (!v) { now.textContent = 'Aucune voix française trouvée : le renard utilisera la voix par défaut du système, ou restera silencieux.'; warn.hidden = true; return; }
+    // Avec les voix enregistrées (application Android, version installable), le renard parle de toute façon : le dire, plutôt qu'inquiéter.
+    if (!('speechSynthesis' in window)) { now.textContent = hasClips() ? 'Le renard parle avec ses voix enregistrées. Cette tablette n’a pas d’autre voix : le choix ci-dessous ne s’applique pas ici (le prénom, lui, n’est pas prononcé).' : 'Cet appareil n’a pas de synthèse vocale : le renard reste silencieux et les consignes restent écrites.'; warn.hidden = true; return; }
+    if (!v) { now.textContent = hasClips() ? 'Le renard parle avec ses voix enregistrées. Aucune autre voix française n’a été trouvée sur cette tablette (le prénom n’est pas prononcé).' : 'Aucune voix française trouvée : le renard utilisera la voix par défaut du système, ou restera silencieux.'; warn.hidden = true; return; }
     now.textContent = `Voix utilisée : ${v.name}${v.local ? ' (sur l’appareil)' : ' (en ligne)'}.`;
     warn.hidden = v.local;
     warn.textContent = 'Cette voix est fournie par un service en ligne : le texte lu par le renard peut être envoyé à son fournisseur. Pour garder tout sur l’appareil, installez une voix française dans les réglages du système (voir ci-dessous).';

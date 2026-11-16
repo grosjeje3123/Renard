@@ -27,6 +27,7 @@ export function newState() {
       dessinVu: '', // la dernière idée de dessin montrée (les modèles se suivent du plus simple au plus compliqué)
       traitAide: true, // épaissir le trait d'un cran (deux au plus) quand l'enfant a du mal
       reps: 1, // réussites demandées à chaque étape d'un exercice (1 ou 2)
+      rivales: true, // sans le guide plein, vérifier que l'enfant n'a pas écrit une autre lettre (voir core/rivaux.js)
       main: 'droite', // main d'écriture : 'droite' | 'gauche' (miroir de l'écran, tolérance de pente élargie)
       plateau: 0, // inclinaison du cahier à l'écran, en degrés (positif = vers la droite)
       pauseMin: 15, // minutes d'activité continue avant de proposer une pause (0 = jamais)

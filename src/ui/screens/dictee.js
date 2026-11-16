@@ -117,7 +117,8 @@ export function dictee(root, app, arg) {
     busy = true; board.enable(false); skipBtn.disabled = replayBtn.disabled = true;
     const ctx = recognizerContext(skill, 2, st.settings, stroke.pointerType, tpl.board?.W);
     const trace = { points: stroke.points, lifts: stroke.lifts };
-    const ev = avecRivale(ts, trace, ctx, recognizer.evaluateStroke(ts, trace, ctx)); // une dictée vérifie que c'est la bonne lettre
+    const brut = recognizer.evaluateStroke(ts, trace, ctx);
+    const ev = st.settings.rivales === false ? brut : avecRivale(ts, trace, ctx, brut); // une dictée vérifie que c'est la bonne lettre
     board.markInk(stroke.el, ev.stars);
     if (tpl.strokes.length > 1 && ev.stars === 0 && retries < 1) {
       retries++; sfx('oops');
