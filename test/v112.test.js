@@ -192,7 +192,7 @@ test('graphisme : six formes de plus au niveau 1, reconnues dans le bon sens seu
   assert.ok(P.isSkillOpen(vieux, 'maj_L'));
 });
 
-test('dictée : un son est dicté avec son mot repère ; une dictée ratée remet l\'exercice « à reprendre » jusqu\'à ce qu\'il soit rejoué', () => {
+test('dictée : une dictée ratée remet l\'exercice « à reprendre » jusqu\'à ce qu\'il soit rejoué ; un son seul ne se dicte plus', () => {
   assert.deepEqual(Object.keys(SON_REPERE).sort(), LEVELS[2].sections.find((x) => x.id === 'sons').skills.map((id) => SKILLS[id].word).sort());
   for (const [son, mot] of Object.entries(SON_REPERE)) assert.ok(mot.includes(son) && SKILLS[`son_${son}`].say.intro.includes(`comme dans « ${mot} »`), son);
   const st = P.newState(), now = Date.now();
@@ -206,6 +206,11 @@ test('dictée : un son est dicté avec son mot repère ; une dictée ratée reme
   assert.equal(P.skillStatus(st, 'a'), 'mastered');
   D.recordDictee(st, 'a', 3, now + 1000);
   assert.equal(P.skillStatus(st, 'a'), 'mastered', 'une dictée réussie ne change rien');
+  // un son raté en dictée avant la v1.12 (mal entendu, peut-être) ne reste pas « à reprendre » : il ne se dicte plus
+  st.skills.son_in = { sessions: 1, attempts: 3, phase: 2, mastered: true, masteredAt: now - 5 * 86400000, last: now - 5 * 86400000, history: [] };
+  D.recordDictee(st, 'son_in', 0, now - 1000);
+  assert.equal(P.skillStatus(st, 'son_in'), 'mastered');
+  assert.ok(!D.dicteePool(st).includes('son_in'));
 });
 
 test('séance : moins d\'essais pour un exercice long, mais toujours la place de réussir', () => {

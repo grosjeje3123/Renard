@@ -3,6 +3,7 @@
 
 import { SKILLS, LEVELS, ITEMS } from '../content/skills.js';
 import { STICKERS } from '../content/stickers.js';
+import { seDicte } from '../content/dictee.js';
 import { CRITERIA } from '../engine/recognizer.js';
 import { validDrawing, MAX_DESSINS } from './galerie.js';
 
@@ -216,7 +217,7 @@ const paperEncore = (s) => s.paper?.avis === 'encore' && (s.paper.avisAt || 0) >
  * Une dictée ratée (une étoile au plus) est l'information la plus précieuse : l'enfant ne sait pas encore écrire cela sans modèle.
  * L'exercice revient dans les « à reprendre » jusqu'à ce qu'il soit rejoué. La maîtrise acquise n'est pas retirée.
  */
-export const dicteeRatee = (st, id) => { const d = st.dictees?.[id]; return !!d && d.last <= 1 && d.t > (st.skills[id]?.last || 0); };
+export const dicteeRatee = (st, id) => { const d = st.dictees?.[id]; return !!d && seDicte(SKILLS[id]) && d.last <= 1 && d.t > (st.skills[id]?.last || 0); }; // ce qui ne se dicte plus (un son seul, un mot très court) ne compte plus
 export const paperCount = (st) => Object.values(st.skills).filter((s) => s.paper?.n > 0).length;
 
 const roundCrit = (c) => Object.fromEntries(Object.entries(c).map(([k, v]) => [k, Math.round(v * 100) / 100]));

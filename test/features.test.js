@@ -1205,7 +1205,7 @@ test('dictée : sans exercice acquis ni essayé, rien à dicter ; les acquis d\'
   assert.deepEqual(D.dicteePool(st).sort(), ['a', 'maj_I', 'maj_L'], 'dès trois acquis, on ne dicte que ce qui est acquis');
 });
 
-test('dictée : jamais de graphisme ni d’élément trop long ; elle se complique palier par palier (lettres, sons, mots, phrases)', () => {
+test('dictée : jamais de graphisme, de son seul ni de mot trop court ou trop long ; elle se complique palier par palier (lettres, petits mots, mots plus longs, phrases)', () => {
   const st = P.newState();
   st.settings.demo = true; // tout est ouvert
   const pool = D.dicteePool(st);
@@ -1214,6 +1214,8 @@ test('dictée : jamais de graphisme ni d’élément trop long ; elle se compliq
     const s = SKILLS[id];
     assert.ok(isWriting(s), `${id} : pas de graphisme`);
     if (s.kind === 'word') assert.ok(nbLettres(s.word) <= (s.phrase ? 12 : 8), `${id} : trop long`);
+    assert.ok(!s.groupe, `${id} : un son seul ne se dicte pas`);
+    if (s.kind === 'word' && !s.phrase) assert.ok(nbLettres(s.word) >= 4, `${id} : un mot de moins de quatre lettres ne se dicte pas`);
   }
   assert.equal(D.palierDictee(st), 1);
   let items = D.dicteeItems(st);
@@ -1226,7 +1228,7 @@ test('dictée : jamais de graphisme ni d’élément trop long ; elle se compliq
   assert.equal(D.bilanDictee(st, [3, 3, 3, 3, 3]), 3);
   assert.equal(D.bilanDictee(st, [3, 3, 3, 3, 2]), 4);
   assert.ok(D.dicteeItems(st).some((id) => SKILLS[id].phrase), 'palier 4 : de petites phrases');
-  assert.match(dicteeDit(SKILLS[D.dicteeItems(st).find((id) => SKILLS[id].phrase)]), /^Écris la phrase/);
+  assert.match(dicteeDit(SKILLS[D.dicteeItems(st).find((id) => SKILLS[id].phrase)]), /^Écris la phrase « [^»]+ »( en majuscules)?\.$/);
   assert.equal(D.bilanDictee(st, [0, 1, 0, 2, 1]), 3, 'une seule réussite : on redescend');
   assert.equal(D.bilanDictee(st, [2, 1, 3, 1, 2]), null, 'entre les deux : on reste');
   const petit = P.newState();
@@ -1237,7 +1239,7 @@ test('dictée : jamais de graphisme ni d’élément trop long ; elle se compliq
 
 test('dictée : ce qui n\'a jamais été dicté passe d\'abord, puis le moins récent ; le résultat est noté sans toucher à la maîtrise', () => {
   const st = P.newState();
-  for (const id of ['i', 'o', 'a', 'maj_I', 'maj_L', 'maj_T', 'mot_il', 'mot_la', 'mot_le']) mastered(st, id);
+  for (const id of ['i', 'o', 'a', 'maj_I', 'maj_L', 'maj_T', 'mot_papa', 'mot_lune', 'mot_maman']) mastered(st, id);
   const avant = JSON.stringify(st.skills);
   const first = D.dicteeItems(st);
   first.forEach((id, k) => D.recordDictee(st, id, 3, 1000 + k));
@@ -1257,7 +1259,7 @@ test('dictée : un ancien enregistrement reçoit un carnet de dictées vide', ()
   assert.deepEqual(st.dictees, {});
 });
 
-test('dictée : ce que dit le renard — une lettre, un chiffre ou un mot, en phrases que la voix enregistrée sait découper', () => {
+test('dictée : ce que dit le renard — une lettre, un chiffre ou un mot, toujours porté par sa phrase', () => {
   const st = P.newState(); st.settings.demo = true;
   for (const id of D.dicteePool(st)) {
     const s = SKILLS[id], dit = DC.dicteeDit(s), parts = decouper(dit);
@@ -1267,14 +1269,15 @@ test('dictée : ce que dit le renard — une lettre, un chiffre ou un mot, en ph
       const nom = s.chiffre ? DC.NOMS_CHIFFRES[+s.glyph] : DC.NOMS_LETTRES[s.glyph.toLowerCase()];
       assert.ok(nom && dit.includes(`« ${nom} »`), `${id} : le nom « ${nom} » est dit`);
     } else {
-      // un son : la consigne, le son seul, puis son mot repère (« o », « au » et « eau » se prononcent pareil : le mot repère dit lequel écrire)
-      assert.equal(parts.length, s.groupe ? 3 : 2, `${id} : la consigne, puis le mot seul`);
-      assert.equal(parts[1], `« ${s.word.toLowerCase()} ».`);
-      if (s.groupe) assert.ok(/^Comme dans « [a-z]+ »\.$/.test(parts[2]) && parts[2].includes(s.word), `${id} : mot repère qui contient le son (${parts[2]})`);
+      // un mot ou une phrase n'est jamais lancé seul : il est dit dans la consigne, d'une seule traite
+      assert.equal(parts.length, 1, `${id} : une seule phrase`);
+      assert.ok(dit.startsWith(`Écris ${s.phrase ? 'la phrase' : 'le mot'} « ${s.word.toLowerCase()} »`), `${id} : « ${dit} »`);
     }
   }
-  assert.ok(/majuscule/.test(DC.dicteeDit(SKILLS.maj_B)) && /majuscules/.test(DC.dicteeDit(SKILLS.mm_IL)));
-  assert.ok(/le son/.test(DC.dicteeDit(SKILLS.son_ou)));
+  assert.ok(/majuscule/.test(DC.dicteeDit(SKILLS.maj_B)) && /majuscules\.$/.test(DC.dicteeDit(SKILLS.mm_PAPA)));
+  assert.equal(DC.dicteeDit(SKILLS.mot_maman), 'Écris le mot « maman ».');
+  for (const id of ['son_ou', 'son_in', 'mot_il', 'mot_roi', 'mm_IL', 'lignes']) assert.equal(DC.seDicte(SKILLS[id]), false, `${id} ne se dicte pas`);
+  for (const id of ['a', 'maj_B', 'mot_chat', 'mot_maman', 'phr_le_chat_dort']) assert.equal(DC.seDicte(SKILLS[id]), true, `${id} se dicte`);
   for (const l of 'abcdefghijklmnopqrstuvwxyz') assert.ok(DC.NOMS_LETTRES[l], `nom de la lettre ${l}`);
   assert.equal(DC.NOMS_CHIFFRES.length, 10);
 });

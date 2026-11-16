@@ -1,4 +1,4 @@
-PAROLES DU RENARD — 2054 phrases à enregistrer
+PAROLES DU RENARD — 2040 phrases à enregistrer
 Chaque ligne : identifiant | phrase. Le fichier audio de chaque phrase doit porter son identifiant : <identifiant>.mp3
 
 === CONSIGNE (551) ===
@@ -989,178 +989,7 @@ f81bcdb3 | Tu y es presque !
 3051089c | Va jusqu’à la ligne du bas.
 73a9b096 | Va tout doucement, sans trembler.
 
-=== DICTÉE (244) ===
-c6e2b359 | « ai ».
-84e790c4 | « aile ».
-85b04590 | « ami ».
-43dd9aaa | « an ».
-a266adf5 | « arbre ».
-727f53d5 | « au ».
-ef114462 | « avion ».
-1b7132e7 | « balle ».
-5d5c3043 | « ballon ».
-372c771f | « bateau ».
-43f9f82b | « bébé ».
-5c0b2bc6 | « biscuit ».
-0f6a2f31 | « blanc ».
-e33471df | « bleu ».
-973bbd72 | « bois ».
-88b66b7a | « bonjour ».
-b82801cd | « bonsoir ».
-1b8b05bd | « bus ».
-0c03458a | « canard ».
-0899eaa1 | « cartable ».
-940bb32e | « ch ».
-8ca237e9 | « chameau ».
-b9fa0bd2 | « champion ».
-ab7cbf7d | « chat ».
-0b3b97cc | « cheval ».
-6a6ab994 | « chien ».
-91724772 | « chocolat ».
-e430e382 | « citron ».
-af6f3391 | « crayon ».
-af7af9a0 | « cube ».
-32dbf7dd | « cuisine ».
-cf716ec0 | « dent ».
-efe00994 | « eau ».
-bc852119 | « école ».
-88d7cce4 | « elle rit ».
-72039f57 | « été ».
-56d4e049 | « eu ».
-9c7b8d3a | « fête ».
-b3e287c5 | « fleur ».
-889c3420 | « forêt ».
-dad984c1 | « fruit ».
-c2cd5311 | « garçon ».
-bcf5faf8 | « gare ».
-b9291cbb | « girafe ».
-3a18fc34 | « gn ».
-489a33b4 | « gris ».
-8c997d0d | « herbe ».
-ac5fcf40 | « il ».
-66d9c34c | « il a faim ».
-d7e9a7fb | « il a un ami ».
-8770d26f | « il a un chien ».
-bc52b16f | « il dort ».
-e74a2c35 | « il joue ».
-944aeca0 | « il neige ».
-5261795a | « il pleut ».
-42d9f742 | « in ».
-6f802a5b | « jardin ».
-be3c32ac | « jaune ».
-ad2f1375 | « je joue ».
-6852b490 | « je lis ».
-04858b58 | « je sais écrire ».
-56a1e936 | « jouet ».
-4d1d1adb | « jour ».
-8fc90a6b | « kiwi ».
-87946e16 | « la ».
-bf730cf2 | « la lune brille ».
-67ac738a | « la pluie tombe ».
-7c6e6db9 | « la vache mange ».
-9168c7bd | « lait ».
-e7e2c9e1 | « lapin ».
-21fcff9a | « le ».
-04209ea3 | « le bébé dort ».
-e90825a1 | « le chat dort ».
-787f5e4b | « le chien aboie ».
-fc312c30 | « le lapin saute ».
-ff56f33f | « le lion rugit ».
-ab469d84 | « le loup a faim ».
-b04de858 | « leçon ».
-1c485a85 | « lion ».
-5b752e40 | « lit ».
-0da0ac01 | « livre ».
-5efc6e4f | « loi ».
-c667c057 | « loup ».
-e10a7c87 | « lundi ».
-b2e5c98d | « lune ».
-0ee25e85 | « ma ».
-7e366b2c | « main ».
-5daee46a | « maison ».
-64b00a59 | « maman ».
-57b23636 | « maman lit ».
-bf0fb376 | « mamie ».
-e8c5d2d7 | « merci ».
-3bae50c2 | « mercredi ».
-ac22dfab | « mère ».
-96900691 | « mon ».
-98ab0477 | « mon ami joue ».
-5cb7c29c | « moto ».
-57fee147 | « neige ».
-f375b6be | « nid ».
-7bcfe573 | « noir ».
-30f0254b | « nuit ».
-424b0227 | « oi ».
-a75bc5a2 | « oie ».
-d176aa8c | « on ».
-a07dce05 | « orange ».
-5cd542cb | « ou ».
-771afbb2 | « oui ».
-579104aa | « ours ».
-6155be9b | « pain ».
-7e836c2f | « papa ».
-3b92e28c | « papa lit ».
-1641da8e | « papa rit ».
-696aaa17 | « papi ».
-197845ac | « papillon ».
-f6509760 | « père ».
-8cd01cad | « pied ».
-2177ebf0 | « piscine ».
-9bf56d2e | « plage ».
-5b704788 | « pluie ».
-84e5de54 | « poire ».
-3b60de8a | « poisson ».
-4b69c6f9 | « pomme ».
-a6fd9951 | « porte ».
-a28ef178 | « poussin ».
-8c965193 | « pyjama ».
-acb2ba25 | « qu ».
-eb6ef3f2 | « rat ».
-ca70452c | « riz ».
-cb4ec581 | « robe ».
-09232fd5 | « roi ».
-c6ac446a | « rose ».
-7e1dd9c9 | « rouge ».
-b008accc | « route ».
-3589791b | « rue ».
-ff8c7528 | « sable ».
-221eda08 | « sac ».
-f84e64ec | « samedi ».
-a09b71d9 | « singe ».
-c4339007 | « soleil ».
-cf174a08 | « souris ».
-277faa5b | « table ».
-a62ab7f7 | « tata ».
-590cd5d0 | « tigre ».
-46b69944 | « tortue ».
-920ec621 | « tracteur ».
-985876d2 | « tu ».
-64f5debb | « tu as faim ».
-10074718 | « tu as un ami ».
-319910ce | « tu lis ».
-a3e6b47e | « un ».
-f7509828 | « un ours dort ».
-7b4cfe45 | « une ».
-36212dad | « vacances ».
-240695e4 | « vache ».
-d1e34daf | « vélo ».
-2abcb33e | « vent ».
-f8697002 | « vert ».
-344f90ef | « wagon ».
-7410c88b | « zoo ».
-08ed3340 | Comme dans « bateau ».
-df5f8b40 | Comme dans « bleu ».
-045ba932 | Comme dans « chat ».
-d3636921 | Comme dans « jaune ».
-1e969706 | Comme dans « lait ».
-88d0f6fc | Comme dans « lapin ».
-cbee3a64 | Comme dans « loup ».
-a9186af4 | Comme dans « maman ».
-2ce2e299 | Comme dans « montagne ».
-b11b0ef8 | Comme dans « mouton ».
-f6e665f8 | Comme dans « quille ».
-cceb6998 | Comme dans « roi ».
+=== DICTÉE (230) ===
 25c8b90f | Écris la lettre « a » en majuscule.
 e5d827d1 | Écris la lettre « a ».
 1ec90ed1 | Écris la lettre « ache » en majuscule.
@@ -1213,8 +1042,44 @@ d7eef0f3 | Écris la lettre « vé » en majuscule.
 9a363f95 | Écris la lettre « vé ».
 5292867f | Écris la lettre « zède » en majuscule.
 32e5f701 | Écris la lettre « zède ».
-ea604612 | Écris la phrase en majuscules.
-0801f1a1 | Écris la phrase.
+17d2a115 | Écris la phrase « elle rit » en majuscules.
+44cd85e2 | Écris la phrase « elle rit ».
+5150c641 | Écris la phrase « il a faim » en majuscules.
+3eb375de | Écris la phrase « il a un ami » en majuscules.
+10fc2c85 | Écris la phrase « il a un ami ».
+54801d21 | Écris la phrase « il a un chien ».
+78723836 | Écris la phrase « il dort » en majuscules.
+7cd1253d | Écris la phrase « il dort ».
+b3f4e4f0 | Écris la phrase « il joue » en majuscules.
+ecca6f83 | Écris la phrase « il joue ».
+4ffcc585 | Écris la phrase « il neige » en majuscules.
+7d67ab92 | Écris la phrase « il neige ».
+796a109b | Écris la phrase « il pleut » en majuscules.
+028d02c4 | Écris la phrase « il pleut ».
+bbf17c84 | Écris la phrase « je joue » en majuscules.
+e61c3c95 | Écris la phrase « je lis » en majuscules.
+b6d0e03a | Écris la phrase « je sais écrire ».
+f7b9cd10 | Écris la phrase « la lune brille ».
+8e5241f4 | Écris la phrase « la pluie tombe ».
+b315806b | Écris la phrase « la vache mange ».
+34beb81d | Écris la phrase « le bébé dort ».
+9cd6711f | Écris la phrase « le chat dort ».
+d899a045 | Écris la phrase « le chien aboie ».
+46127972 | Écris la phrase « le lapin saute ».
+090f3845 | Écris la phrase « le lion rugit ».
+cf3cce86 | Écris la phrase « le loup a faim ».
+01cea1a7 | Écris la phrase « maman lit » en majuscules.
+34b5ac08 | Écris la phrase « maman lit ».
+a99364c9 | Écris la phrase « mon ami joue ».
+27471e31 | Écris la phrase « papa lit » en majuscules.
+e9d00846 | Écris la phrase « papa lit ».
+b281490b | Écris la phrase « papa rit » en majuscules.
+861a23b4 | Écris la phrase « papa rit ».
+fb18864e | Écris la phrase « tu as faim » en majuscules.
+284bca5a | Écris la phrase « tu as un ami ».
+5a64e6f3 | Écris la phrase « tu lis » en majuscules.
+dd18785c | Écris la phrase « tu lis ».
+ae80570a | Écris la phrase « un ours dort ».
 5512eb38 | Écris le chiffre « cinq ».
 bfe80555 | Écris le chiffre « deux ».
 583bc191 | Écris le chiffre « huit ».
@@ -1225,13 +1090,134 @@ a6bb37af | Écris le chiffre « sept ».
 e9a36cde | Écris le chiffre « trois ».
 eb51a4c2 | Écris le chiffre « un ».
 682c78b1 | Écris le chiffre « zéro ».
-a11af75d | Écris le mot en majuscules.
-e84ab90a | Écris le mot.
-c928c282 | Écris le son.
+86a3429b | Écris le mot « aile ».
+979c5d5c | Écris le mot « arbre ».
+adb875b4 | Écris le mot « avion » en majuscules.
+c5d60a8f | Écris le mot « avion ».
+b2476cfd | Écris le mot « balle » en majuscules.
+95a5a92a | Écris le mot « balle ».
+dce4addb | Écris le mot « ballon » en majuscules.
+15c81304 | Écris le mot « ballon ».
+94a65133 | Écris le mot « bateau » en majuscules.
+96ef9e9c | Écris le mot « bateau ».
+24a199ec | Écris le mot « bébé ».
+a922177f | Écris le mot « biscuit ».
+4ce96cfc | Écris le mot « blanc ».
+8fda29ec | Écris le mot « bleu ».
+5f03e849 | Écris le mot « bois ».
+f94209b8 | Écris le mot « bonjour » en majuscules.
+d9a405eb | Écris le mot « bonjour ».
+1d633f18 | Écris le mot « bonsoir ».
+f4c93b39 | Écris le mot « canard ».
+02f6b181 | Écris le mot « cartable » en majuscules.
+d0a159d6 | Écris le mot « cartable ».
+57959400 | Écris le mot « chameau ».
+884cbe85 | Écris le mot « champion ».
+4420bcae | Écris le mot « chat ».
+0e213187 | Écris le mot « cheval ».
+ea4715d1 | Écris le mot « chien ».
+78e64a49 | Écris le mot « chocolat ».
+9cf1d705 | Écris le mot « citron ».
+27fbefa9 | Écris le mot « crayon » en majuscules.
+7634b35e | Écris le mot « crayon ».
+db21c5ef | Écris le mot « cube ».
+6cd73404 | Écris le mot « cuisine ».
+aeb29de0 | Écris le mot « dent » en majuscules.
+71d0e5f3 | Écris le mot « dent ».
+3ca52940 | Écris le mot « école ».
+ca6d3239 | Écris le mot « fête ».
+825103d8 | Écris le mot « fleur ».
+acef9dad | Écris le mot « forêt ».
+de201c2f | Écris le mot « fruit » en majuscules.
+95f495f0 | Écris le mot « fruit ».
+a5008ef2 | Écris le mot « garçon ».
+4cda7c3c | Écris le mot « gare » en majuscules.
+73804657 | Écris le mot « gare ».
+8eb6f290 | Écris le mot « girafe ».
+36cbdc37 | Écris le mot « gris ».
+1a9d765c | Écris le mot « herbe ».
+9697693b | Écris le mot « jardin » en majuscules.
+3b02a9e4 | Écris le mot « jardin ».
+a4494465 | Écris le mot « jaune ».
+18d4dce3 | Écris le mot « jouet ».
+70d6396f | Écris le mot « jour » en majuscules.
+548f9530 | Écris le mot « jour ».
+d4e0ae74 | Écris le mot « kiwi ».
+35b891ed | Écris le mot « lait » en majuscules.
+22642e5a | Écris le mot « lait ».
+e7065118 | Écris le mot « lapin ».
+5c3ceb15 | Écris le mot « leçon ».
+84124c46 | Écris le mot « lion ».
+cd3a7ec8 | Écris le mot « livre ».
+e81ee770 | Écris le mot « loup ».
+6c7f98d5 | Écris le mot « lundi » en majuscules.
+c8c69ea2 | Écris le mot « lundi ».
+c2f5aa11 | Écris le mot « lune » en majuscules.
+5f4a55a6 | Écris le mot « lune ».
+7949fb48 | Écris le mot « main » en majuscules.
+d49d0a3b | Écris le mot « main ».
+cf0b95aa | Écris le mot « maison » en majuscules.
+355762b9 | Écris le mot « maison ».
+a6ff58c7 | Écris le mot « maman » en majuscules.
+ad93e628 | Écris le mot « maman ».
+b51f8adf | Écris le mot « mamie ».
+44affa8d | Écris le mot « merci » en majuscules.
+9f9a9afa | Écris le mot « merci ».
+5f39ec0d | Écris le mot « mercredi ».
+0835fa80 | Écris le mot « mère ».
+ba90c5e0 | Écris le mot « moto » en majuscules.
+f9154df3 | Écris le mot « moto ».
+cde28ea2 | Écris le mot « neige ».
+a2a66468 | Écris le mot « noir ».
+4f31eccf | Écris le mot « nuit » en majuscules.
+803d3990 | Écris le mot « nuit ».
+4f691e0d | Écris le mot « orange » en majuscules.
+19ea4a7a | Écris le mot « orange ».
+cbb51f0d | Écris le mot « ours ».
+6563e0a3 | Écris le mot « pain » en majuscules.
+e750fbcc | Écris le mot « pain ».
+f56ff79f | Écris le mot « papa » en majuscules.
+ec293060 | Écris le mot « papa ».
+9c2bc758 | Écris le mot « papi ».
+0b7e4f07 | Écris le mot « papillon ».
+6b8551cb | Écris le mot « père ».
+a1dc0722 | Écris le mot « pied ».
+f83cead9 | Écris le mot « piscine ».
+33b7ed5f | Écris le mot « plage ».
+a407c52d | Écris le mot « pluie ».
+7f50d961 | Écris le mot « poire ».
+a0ee0b33 | Écris le mot « poisson ».
+9be8a704 | Écris le mot « pomme ».
+87b52d40 | Écris le mot « porte ».
+46280b4d | Écris le mot « poussin ».
+138da638 | Écris le mot « pyjama ».
+03a928b6 | Écris le mot « robe ».
+95b947ed | Écris le mot « rose ».
+ffdf6cd0 | Écris le mot « rouge ».
+6fc270c6 | Écris le mot « route » en majuscules.
+8ab2954d | Écris le mot « route ».
+3db162c5 | Écris le mot « sable ».
+233f1aef | Écris le mot « samedi ».
+cd5014b3 | Écris le mot « singe » en majuscules.
+ff88ee1c | Écris le mot « singe ».
+d1a2469c | Écris le mot « soleil ».
+2f007bab | Écris le mot « souris ».
+33e71266 | Écris le mot « table ».
+b9516380 | Écris le mot « tata ».
+320d220a | Écris le mot « tigre » en majuscules.
+93395c99 | Écris le mot « tigre ».
+f0736207 | Écris le mot « tortue ».
+28946ade | Écris le mot « tracteur ».
+a6f0f5d6 | Écris le mot « vacances ».
+3a1d6bf1 | Écris le mot « vache ».
+f2ee3954 | Écris le mot « vélo ».
+c53365b9 | Écris le mot « vent ».
+a241892d | Écris le mot « vert ».
+6c3b2dda | Écris le mot « wagon ».
 49249860 | La dictée est terminée !
 a4b70f84 | La prochaine fois, je te dicterai de petites phrases.
-48092398 | La prochaine fois, je te dicterai des mots.
-e8cf8a91 | La prochaine fois, je te dicterai des sons et des petits mots.
+05395544 | La prochaine fois, je te dicterai de petits mots.
+a5499f29 | La prochaine fois, je te dicterai des mots plus longs.
 13c75636 | Réussis d’abord quelques exercices.
 67627f8c | Tu es fort !
 

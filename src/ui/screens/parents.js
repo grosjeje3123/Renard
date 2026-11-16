@@ -1,5 +1,6 @@
 // Espace parents : suivi des compétences, difficultés, temps d'utilisation, réglages et vie privée.
 import { DICTEE_PALIERS, palierDictee } from '../../core/dictee.js';
+import { seDicte } from '../../content/dictee.js';
 import { h, icon } from '../dom.js';
 import { glyphIcon } from '../art.js';
 import { SKILLS, LEVELS } from '../../content/skills.js';
@@ -157,9 +158,9 @@ function dashboard(root, app) {
     h('p', { class: 'muted' }, 'L’application ne peut pas voir le papier : c’est l’enfant qui déclare, et vous pouvez regarder son travail, le marquer comme vu et noter comment cela s’est passé. « À retravailler » remet l’exercice dans les « à reprendre » du renard. Le geste sur papier reste le vrai but.'));
 
   // Dictées : ce que l'enfant a écrit sans modèle (indication pour les adultes ; rien ne change dans les exercices acquis)
-  const dictees = Object.entries(st.dictees || {}).filter(([id]) => SKILLS[id]).sort((a, b) => (b[1].t || 0) - (a[1].t || 0));
+  const dictees = Object.entries(st.dictees || {}).filter(([id]) => seDicte(SKILLS[id])).sort((a, b) => (b[1].t || 0) - (a[1].t || 0));
   const dicteeCard = card('Dictées',
-    h('p', {}, h('strong', {}, 'Palier actuel : '), `${DICTEE_PALIERS[palierDictee(st)]}. `, h('span', { class: 'muted' }, 'La dictée se complique quand l’enfant réussit (4 sur 5) : lettres, puis sons et petits mots, puis mots, puis petites phrases, toujours parmi ce qu’il a acquis.')),
+    h('p', {}, h('strong', {}, 'Palier actuel : '), `${DICTEE_PALIERS[palierDictee(st)]}. `, h('span', { class: 'muted' }, 'La dictée se complique quand l’enfant réussit (4 sur 5) : lettres, puis petits mots, puis mots plus longs, puis petites phrases, toujours parmi ce qu’il a acquis. Les sons seuls et les mots de moins de quatre lettres ne sont pas dictés : trop courts pour être bien compris à l’oreille.')),
     dictees.length
       ? h('ul', { class: 'recs dict-list' }, dictees.slice(0, 12).map(([id, d]) => h('li', { class: 'paper-row dict-row', 'data-id': id },
         h('span', { class: 'gl', html: glyphIcon(id, { width: 0.34 }) }),
