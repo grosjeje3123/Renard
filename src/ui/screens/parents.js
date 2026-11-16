@@ -3,7 +3,7 @@ import { DICTEE_PALIERS, palierDictee } from '../../core/dictee.js';
 import { h, icon } from '../dom.js';
 import { glyphIcon } from '../art.js';
 import { SKILLS, LEVELS } from '../../content/skills.js';
-import { skillState, skillStatus, levelProgress, levelSkills, levelSections, orderedSkills, difficulties, recommend, usageDays, todaySeconds, masteredCount, isSkillOpen, stickerCount, isConsolidated, reviewDue, paperState, confirmPaper, avisPapier, AVIS_PAPIER } from '../../core/progress.js';
+import { skillState, skillStatus, levelProgress, levelSkills, levelSections, orderedSkills, difficulties, recommend, usageDays, todaySeconds, masteredCount, isSkillOpen, stickerCount, isConsolidated, reviewDue, paperState, confirmPaper, avisPapier, AVIS_PAPIER, bilanSemaine } from '../../core/progress.js';
 import { sfx } from '../audio.js';
 import { STICKERS } from '../../content/stickers.js';
 import { stickerSVG } from '../animals.js';
@@ -167,11 +167,26 @@ function dashboard(root, app) {
       : h('p', { class: 'muted' }, 'Pas encore de dictée. Dans « Jeux », le renard dit une lettre ou un mot et l’enfant l’écrit sans aucun modèle.'),
     h('p', { class: 'muted' }, 'Une dictée ne change rien aux exercices acquis et ne rapporte ni vignette ni accessoire : c’est un contrôle amical, à regarder comme une indication. Un résultat à revoir veut seulement dire que l’exercice mérite d’être repris, sur la tablette ou sur le papier.'));
 
+  // ---- La semaine en bref : l'essentiel en quelques phrases, avant le détail
+  const bs = bilanSemaine(st);
+  const noms = (liste, max = 6) => { const t = liste.slice(0, max).map((id) => SKILLS[id].label || SKILLS[id].glyph || SKILLS[id].title.toLowerCase()); return t.join(', ') + (liste.length > max ? ` et ${liste.length - max} de plus` : ''); };
+  const qui = st.name || 'L’enfant';
+  const RAISON = { papier: 'à retravailler sur le cahier', dictee: 'raté en dictée', fragile: 'encore fragile' };
+  const lignes = [
+    bs.minutes ? `${qui} a joué ${bs.minutes} minute${bs.minutes > 1 ? 's' : ''} sur ${bs.jours} jour${bs.jours > 1 ? 's' : ''} ces sept derniers jours.` : `${qui} n’a pas joué ces sept derniers jours.`,
+    bs.acquis.length ? `Nouveaux acquis : ${noms(bs.acquis)}.` : bs.minutes ? 'Pas de nouvel acquis cette semaine : c’est normal quand un exercice résiste, l’important est d’y revenir.' : null,
+    bs.consolides.length ? `Retrouvés de mémoire après plusieurs jours (consolidés) : ${noms(bs.consolides)}.` : null,
+    bs.reprendre.length ? `À reprendre : ${bs.reprendre.slice(0, 4).map((r) => `${SKILLS[r.id].label || SKILLS[r.id].glyph || SKILLS[r.id].title.toLowerCase()} (${RAISON[r.pourquoi]})`).join(', ')}.` : null,
+    bs.confusions.length ? `Une autre lettre a été écrite à la place de : ${noms(bs.confusions)}. Regardez ensemble le modèle : par où commence-t-elle, où s’arrête-t-elle ?` : null,
+  ].filter(Boolean);
+  const semaineCard = wide(card('La semaine en bref', h('ul', { class: 'semaine' }, lignes.map((t) => h('li', {}, t)))));
+
   root.append(
     h('header', { class: 'bar' },
       h('button', { class: 'round sm', type: 'button', 'aria-label': 'Fermer l’espace parents', onClick: () => { app.parentOk = 0; app.go('accueil'); }, html: icon('close', 26) }),
       h('div', { class: 'bar-title' }, h('h2', {}, 'Espace parents'), h('p', {}, st.name ? `Suivi de ${st.name}` : 'Suivi de l’enfant'))),
     h('div', { class: 'pgrid' },
+      semaineCard,
       wide(card('Aujourd’hui',
         h('div', { class: 'big-stats' },
           h('div', {}, h('b', {}, `${today}`), h('span', {}, 'min aujourd’hui')),

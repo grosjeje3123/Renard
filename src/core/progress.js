@@ -564,3 +564,23 @@ export function usageDays(st, n = 7, now = Date.now()) {
 }
 
 export const todaySeconds = (st, now = Date.now()) => st.usage[dayKey(now)] || 0;
+
+/**
+ * La semaine en bref, pour les parents (les sept derniers jours) : le temps passé, ce qui vient d'être acquis ou consolidé,
+ * ce qui est à reprendre (et pourquoi), et les lettres écrites à la place d'une autre. Tout vient de l'état enregistré.
+ */
+export function bilanSemaine(st, now = Date.now()) {
+  const depuis = now - 7 * DAY;
+  const jours = usageDays(st, 7, now);
+  const ids = orderedSkills(st);
+  const recent = (t) => !!t && t >= depuis && t <= now;
+  const pourquoi = (id) => (paperEncore(st.skills[id] || {}) ? 'papier' : dicteeRatee(st, id) ? 'dictee' : 'fragile');
+  return {
+    minutes: Math.round(jours.reduce((a, d) => a + d.seconds, 0) / 60),
+    jours: jours.filter((d) => d.seconds >= 60).length,
+    acquis: ids.filter((id) => recent(st.skills[id]?.masteredAt)),
+    consolides: ids.filter((id) => recent(st.skills[id]?.consolidatedAt)),
+    reprendre: ids.filter((id) => skillStatus(st, id) === 'review').map((id) => ({ id, pourquoi: pourquoi(id) })),
+    confusions: ids.filter((id) => (st.skills[id]?.history || []).some((e) => recent(e.t) && (e.tg || []).includes('autre-lettre'))),
+  };
+}

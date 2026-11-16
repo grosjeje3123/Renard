@@ -219,3 +219,22 @@ test('séance : moins d\'essais pour un exercice long, mais toujours la place de
   assert.equal(deux.maxTries, 8, 'deux réussites par étape : six essais nécessaires, plus deux ratés permis');
   assert.equal(new Session('a').maxTries, 10);
 });
+
+test('parents : la semaine en bref dit le temps, les acquis, ce qui est à reprendre et les lettres confondues', () => {
+  const now = new Date(2026, 10, 16, 18).getTime(), J = 86400000;
+  const st = P.newState();
+  st.usage[P.dayKey(now)] = 600; st.usage[P.dayKey(now - 2 * J)] = 900; st.usage[P.dayKey(now - 20 * J)] = 3000;
+  const sk = (o) => ({ sessions: 1, attempts: 3, phase: 2, mastered: false, masteredAt: null, last: now - 3 * J, history: [], ...o });
+  st.skills.i = sk({ mastered: true, masteredAt: now - J });
+  st.skills.o = sk({ mastered: true, masteredAt: now - 30 * J, consolidatedAt: now - 2 * J });
+  st.skills.a = sk({ mastered: true, masteredAt: now - 30 * J, history: [{ t: now - J, ph: 2, sc: 0.5, st: 1, c: {}, tg: ['autre-lettre'] }] });
+  st.skills.l = sk({ mastered: true, masteredAt: now - 30 * J, last: now - 5 * J });
+  D.recordDictee(st, 'l', 0, now - J);
+  const b = P.bilanSemaine(st, now);
+  assert.deepEqual({ minutes: b.minutes, jours: b.jours }, { minutes: 25, jours: 2 });
+  assert.deepEqual(b.acquis, ['i']);
+  assert.deepEqual(b.consolides, ['o']);
+  assert.deepEqual(b.reprendre, [{ id: 'l', pourquoi: 'dictee' }]);
+  assert.deepEqual(b.confusions, ['a']);
+  assert.deepEqual(P.bilanSemaine(P.newState(), now), { minutes: 0, jours: 0, acquis: [], consolides: [], reprendre: [], confusions: [] });
+});
