@@ -535,21 +535,24 @@ const mkText = (sec, text, kind) => {
   const n = needsOf(text).length;
   const L = n === 1 ? 'la lettre' : 'les lettres';
   const apres = `${dots ? ', et pose le point du i juste après le i' : ''}`;
-  const ecran = kind === 'phrase' ? composeLines(text, { period: true }) : null;
+  // Une phrase commence par une majuscule et finit par un point. Tant que les majuscules cursives ne sont pas apprises (elles viennent
+  // au CE1), la majuscule est celle d'imprimerie, droite, que l'enfant connaît depuis le niveau 1 : c'est l'usage du début du CP.
+  const affiche = kind === 'phrase' ? text[0].toUpperCase() + text.slice(1) : text;
+  const ecran = kind === 'phrase' ? composeLines(affiche, { period: true, skills: ECRITURE }) : null;
   SKILLS[id] = {
-    id, kind: 'word', level: 3, glyph: text, word: text, section: sec.id,
+    id, kind: 'word', level: 3, glyph: affiche, word: text, section: sec.id,
     groupe: kind === 'groupe', phrase: kind === 'phrase',
-    title: kind === 'groupe' ? `Le son « ${text} »` : kind === 'phrase' ? `La phrase « ${text} »` : `Le mot « ${text} »`,
-    label: text, short: kind === 'groupe' ? `Le son « ${text} »` : kind === 'phrase' ? `La phrase « ${text} »` : `Le mot « ${text} »`,
-    skillLabel: kind === 'groupe' ? `Écrire le son « ${text} »` : kind === 'phrase' ? `Écrire la phrase « ${text} »` : `Écrire le mot « ${text} »`,
-    needs: needsOf(text),
-    strokes: composeText(text, { period: kind === 'phrase' }),
+    title: kind === 'groupe' ? `Le son « ${text} »` : kind === 'phrase' ? `La phrase « ${affiche} »` : `Le mot « ${text} »`,
+    label: affiche, short: kind === 'groupe' ? `Le son « ${text} »` : kind === 'phrase' ? `La phrase « ${affiche} »` : `Le mot « ${text} »`,
+    skillLabel: kind === 'groupe' ? `Écrire le son « ${text} »` : kind === 'phrase' ? `Écrire la phrase « ${affiche} »` : `Écrire le mot « ${text} »`,
+    needs: needsOf(kind === 'phrase' ? text.slice(1) : text), // les lettres cursives réellement écrites (la première d'une phrase est une majuscule)
+    strokes: kind === 'phrase' ? composeText(affiche, { period: true, skills: ECRITURE }) : composeText(text),
     // à l'écran, une longue phrase revient à la ligne (les fiches à imprimer et le tableau gardent la ligne unique `strokes`)
     ...(ecran && ecran.lignes.length > 1 ? { ecran } : {}),
     say: kind === 'groupe'
       ? { intro: `Le son « ${text} », comme dans « ${SON_REPERE[text]} », s’écrit avec ${text.length} lettres : ${[...text].join(', ')}. Je les écris l’une après l’autre.`, how: `Écris les lettres l’une après l’autre, de gauche à droite${dots ? ', et pose le point juste après le i' : ''}.`, bubble: 'Lettre après lettre' }
       : kind === 'phrase'
-        ? { intro: `La phrase « ${text} ». J’écris les mots l’un après l’autre, et je pose un point à la fin.`, how: `Écris chaque mot lettre par lettre${ecran && ecran.lignes.length > 1 ? ', reviens à la ligne comme dans ton cahier' : ''}, puis pose le point final sur la ligne.${accent ? ` ${ACCENT_DIT[accent]}` : ''}`, bubble: 'Mot après mot, puis le point' }
+        ? { intro: `La phrase « ${affiche} ». Elle commence par une majuscule, et je pose un point à la fin.`, how: `Commence par la majuscule, bien droite. Écris chaque mot lettre par lettre${ecran && ecran.lignes.length > 1 ? ', reviens à la ligne comme dans ton cahier' : ''}, puis pose le point final sur la ligne.${accent ? ` ${ACCENT_DIT[accent]}` : ''}`, bubble: 'La majuscule, les mots, le point' }
         : { intro: `Le mot « ${text} ». J’écris ${L} une par une, de gauche à droite.${accent ? ` ${ACCENT_DIT[accent]}` : ''}`, how: `Écris les lettres une par une, de gauche à droite${apres}.${accent ? ' N’oublie pas l’accent !' : ''}`, bubble: accent ? 'Lettre par lettre, et l’accent' : 'Lettre par lettre' },
     item: null,
   };

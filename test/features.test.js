@@ -63,7 +63,9 @@ test('niveau 3 : sons, mots et phrases sont composés de lettres connues, tienne
     const sk = SKILLS[id];
     assert.equal(sk.kind, 'word');
     assert.ok(isWriting(sk));
-    assert.ok(/^[a-zéèêëàâîïôùûüç ]+$/.test(sk.glyph), `${id} : lettres a–z et accents du français`);
+    assert.ok(/^[a-zéèêëàâîïôùûüç ]+$/.test(sk.word), `${id} : lettres a–z et accents du français`);
+    // une phrase s'affiche et s'écrit avec sa majuscule (d'imprimerie) ; un mot ou un son, tout en minuscules
+    assert.equal(sk.glyph, sk.phrase ? sk.word[0].toUpperCase() + sk.word.slice(1) : sk.word, `${id} : texte affiché`);
     assert.ok(/^[a-z_]+$/.test(id), `${id} : identifiant sans accent`);
     assert.ok(sk.needs.every((l) => LEVELS[1].skills.includes(l)), `${id} : lettres connues`);
     kinds[sk.phrase ? 'phrase' : sk.groupe ? 'groupe' : 'mot']++;
@@ -545,8 +547,8 @@ test('cahier : lettres et mots sont calés sur les lignes (pied sur la ligne d\'
   for (const id of LEVELS[2].skills) {
     const sk = SKILLS[id], b = bodyOf(id);
     const letters = sk.needs;
-    // à l'école : b f h k l montent à la 3e ligne, d et t à la « 2e ligne » (2,5 interlignes), les autres à 2
-    const top = letters.some((l) => 'bfhkl'.includes(l)) ? 3 : letters.some((l) => 'dt'.includes(l)) ? 2.5 : 2;
+    // à l'école : b f h k l montent à la 3e ligne, d et t à la « 2e ligne » (2,5 interlignes), les autres à 2 ; la majuscule d'une phrase monte à 3
+    const top = sk.phrase || letters.some((l) => 'bfhkl'.includes(l)) ? 3 : letters.some((l) => 'dt'.includes(l)) ? 2.5 : 2;
     const desc = letters.some((l) => (DESC + 'z').includes(l)); // le z cursif descend aussi sous la ligne
     assert.ok(desc ? b.y1 - b.base > 1.3 : Math.abs(b.y1 - b.base) <= 0.04, `${id} : pied ${(b.y1 - b.base).toFixed(3)}`);
     assert.ok(Math.abs(b.y0 - (b.base - top)) <= 0.04, `${id} : haut ${(b.base - b.y0).toFixed(3)}`);
@@ -1006,7 +1008,7 @@ test('échelle : mots puis phrases, de plus en plus longs, et à longueur égale
   assert.equal(mots.length, 7); assert.equal(phrases.length, 4);
   assert.deepEqual(sections.slice(-11).map((x) => x.id), [...mots, ...phrases].map((x) => x.id), 'l\'échelle est à la fin du niveau 3 : d\'abord les mots, puis les phrases');
   for (const groupe of [mots, phrases]) {
-    const textes = groupe.flatMap((x) => x.skills.map((id) => SKILLS[id].glyph));
+    const textes = groupe.flatMap((x) => x.skills.map((id) => SKILLS[id].word));
     for (let i = 1; i < textes.length; i++) {
       const a = textes[i - 1], b = textes[i];
       assert.ok(nbLettres(a) < nbLettres(b) || (nbLettres(a) === nbLettres(b) && difficulte(a) <= difficulte(b)), `« ${a} » (${nbLettres(a)}/${difficulte(a)}) doit précéder « ${b} » (${nbLettres(b)}/${difficulte(b)})`);

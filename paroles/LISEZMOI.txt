@@ -7,9 +7,11 @@ Ce dossier contient tout pour donner au renard une voix enregistrée, plus natur
   prompt-voix.txt      la consigne de voix donnée à l'IA (à ajuster à votre goût)
   generer-voix.py      le script qui fabrique les fichiers audio avec l'API OpenAI
 
-SANS CLÉ NI COMPTE (déjà fait, version 1.10)
-  python3 tools/voix-piper.py fr-siwis-medium.onnx   (pip install piper-tts ; voix « siwis » : releases v0.0.2 de github.com/rhasspy/piper)
-  Une voix libre, générée sur l'ordinateur, plus mécanique que l'API ci-dessous mais gratuite.
+SANS CLÉ NI COMPTE (déjà fait ; nouvelle voix en version 1.12)
+  python3 tools/voix-piper.py fr_FR-upmc-medium.onnx   (pip install piper-tts ; il faut aussi ffmpeg avec le filtre rubberband)
+  Voix « upmc », locutrice Jessica, remontée de trois demi-tons : plus enfantine. Licence du corpus : CC BY-SA 4.0 (source citée dans les Crédits).
+  L'ancienne voix : python3 tools/voix-piper.py fr-siwis-medium.onnx --voix siwis   (corpus SIWIS, CC BY 4.0)
+  Des voix libres, générées sur l'ordinateur, plus mécaniques que l'API ci-dessous mais gratuites.
 
 COMMENT FAIRE (voix plus naturelle, avec l'API OpenAI)
 1. Créez une clé API sur platform.openai.com (la facturation est à l'usage : la liste fait environ 68 000 caractères, soit 1 974 phrases et environ 75 minutes d'audio ;

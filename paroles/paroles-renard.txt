@@ -1,7 +1,7 @@
-PAROLES DU RENARD — 2098 phrases à enregistrer
+PAROLES DU RENARD — 2054 phrases à enregistrer
 Chaque ligne : identifiant | phrase. Le fichier audio de chaque phrase doit porter son identifiant : <identifiant>.mp3
 
-=== CONSIGNE (549) ===
+=== CONSIGNE (551) ===
 09fd300b | Barre, biais, barre
 b3b2065d | Barre, biais, ventre, enroulé
 65819cf7 | Boucle en haut, boucle en bas
@@ -13,6 +13,7 @@ b3b2065d | Barre, biais, ventre, enroulé
 db947097 | Comme un u qui descend plus bas
 c9eea5c1 | Comme un u, mais la deuxième jambe descend sous la ligne.
 a302823f | Commence en haut, trace la barre vers la droite, descends en biais, fais le ventre, descends sous la ligne et enroule vers la gauche.
+7410ae44 | Commence par la majuscule, bien droite.
 5512dce4 | D’abord un c à l’envers (qui s’ouvre vers la gauche) ; lève le crayon, puis un c normal à droite, qui touche le premier au milieu.
 619ee326 | De gauche à droite
 503df385 | Des lianes qui pendent !
@@ -62,6 +63,7 @@ d4b5b5f8 | Écris chaque mot lettre par lettre, reviens à la ligne comme dans t
 bf3fccef | Écris les lettres une par une, de gauche à droite, bien droites, en levant le crayon entre les lettres.
 b56dcc84 | Écris les lettres une par une, de gauche à droite, et pose le point du i juste après le i.
 e63c9bf0 | Écris les lettres une par une, de gauche à droite.
+2148e250 | Elle commence par une majuscule, et je pose un point à la fin.
 c1cb261c | Elles montent et elles descendent, doucement.
 56da4d04 | Fais comme un u, mais la dernière descente va sous la ligne ; fais la boucle et remonte en croisant ton trait.
 da6009d6 | Fais la bedaine en haut.
@@ -142,56 +144,57 @@ a3086c8d | L’accent circonflexe se pose après la lettre : un petit chapeau po
 00686a76 | La barre, puis le tour
 fda549c4 | La cédille se pose après le c : un petit crochet sous la ligne.
 dfbebfcd | La coquille de l’escargot !
+84172e49 | La majuscule, les mots, le point
 d2eb14ab | La phrase « ELLE RIT », en majuscules.
-43047a2c | La phrase « elle rit ».
+c3a997cc | La phrase « Elle rit ».
 fb242bd3 | La phrase « IL A FAIM », en majuscules.
 3d0919ee | La phrase « IL A UN AMI », en majuscules.
-e69672b3 | La phrase « il a un ami ».
-d0bf67d7 | La phrase « il a un chien ».
+287917d3 | La phrase « Il a un ami ».
+b3f99377 | La phrase « Il a un chien ».
 ecade36a | La phrase « IL DORT », en majuscules.
-1ecbbf87 | La phrase « il dort ».
+f55a6ca7 | La phrase « Il dort ».
 7bcb4a48 | La phrase « IL JOUE », en majuscules.
-4c85f93d | La phrase « il joue ».
+aac62edd | La phrase « Il joue ».
 c7cacc0f | La phrase « IL NEIGE », en majuscules.
-6e3ccb98 | La phrase « il neige ».
+edfa57b8 | La phrase « Il neige ».
 f78995c1 | La phrase « IL PLEUT », en majuscules.
-109be9c2 | La phrase « il pleut ».
+c93e17e2 | La phrase « Il pleut ».
 624c5a98 | La phrase « JE JOUE », en majuscules.
 be02f34f | La phrase « JE LIS », en majuscules.
-d72263d0 | La phrase « je sais écrire ».
-ffb8730a | La phrase « la lune brille ».
-1a77e0f2 | La phrase « la pluie tombe ».
-de2056d1 | La phrase « la vache mange ».
-4a7e79bb | La phrase « le bébé dort ».
-66aa7a19 | La phrase « le chat aime le lait ».
-54a13307 | La phrase « le chat boit du lait ».
-30434da9 | La phrase « le chat dort ».
-49dd1c22 | La phrase « le chat lit un livre ».
-19759983 | La phrase « le chien aboie ».
-b54bd648 | La phrase « le chien est gentil ».
-da36fd65 | La phrase « le lapin a un nid ».
-9c935bc8 | La phrase « le lapin saute ».
-9ccf7b07 | La phrase « le lion rugit ».
-2d84b48c | La phrase « le loup a faim ».
-919317d5 | La phrase « le petit chat dort ».
-fb9f703e | La phrase « le renard a faim ».
-0596c6fd | La phrase « le renard est malin ».
-dc28fca0 | La phrase « le soleil brille ».
-1f77af81 | La phrase « le soleil est chaud ».
+a2f0cff0 | La phrase « Je sais écrire ».
+1b64e3aa | La phrase « La lune brille ».
+19838c12 | La phrase « La pluie tombe ».
+1faf6171 | La phrase « La vache mange ».
+97c41e5b | La phrase « Le bébé dort ».
+3337c0b9 | La phrase « Le chat aime le lait ».
+4fe7f3a7 | La phrase « Le chat boit du lait ».
+88bcfbc9 | La phrase « Le chat dort ».
+ea79a8c2 | La phrase « Le chat lit un livre ».
+9792b123 | La phrase « Le chien aboie ».
+c4c260e8 | La phrase « Le chien est gentil ».
+0eca0a85 | La phrase « Le lapin a un nid ».
+1e09dbe8 | La phrase « Le lapin saute ».
+8e974ea7 | La phrase « Le lion rugit ».
+b454d62c | La phrase « Le loup a faim ».
+d9867575 | La phrase « Le petit chat dort ».
+754da0de | La phrase « Le renard a faim ».
+9042279d | La phrase « Le renard est malin ».
+4a238a40 | La phrase « Le soleil brille ».
+0c5e6921 | La phrase « Le soleil est chaud ».
 873b83c5 | La phrase « MAMAN LIT », en majuscules.
-0c0d9bee | La phrase « maman lit ».
-a13f5c1f | La phrase « mon ami joue ».
+cf88128e | La phrase « Maman lit ».
+b933f8bf | La phrase « Mon ami joue ».
 144fc7a3 | La phrase « PAPA LIT », en majuscules.
-ed7bf8a4 | La phrase « papa lit ».
-a5f132f9 | La phrase « papa lit un livre ».
+9e606744 | La phrase « Papa lit ».
+e589e299 | La phrase « Papa lit un livre ».
 7669c12d | La phrase « PAPA RIT », en majuscules.
-1fe620d6 | La phrase « papa rit ».
+4bd34176 | La phrase « Papa rit ».
 2ef7ab2e | La phrase « TU AS FAIM », en majuscules.
-0417ee20 | La phrase « tu as un ami ».
-7077bc59 | La phrase « tu as un joli livre ».
+784fe040 | La phrase « Tu as un ami ».
+db4aa8f9 | La phrase « Tu as un joli livre ».
 7aab71fd | La phrase « TU LIS », en majuscules.
-de8b5d46 | La phrase « tu lis ».
-27a02f10 | La phrase « un ours dort ».
+5b4375e6 | La phrase « Tu lis ».
+0d5019b0 | La phrase « Un ours dort ».
 e26b6950 | La rivière fait des vagues.
 3d341518 | Le A majuscule.
 c08e5946 | Le a, comme abeille.
@@ -473,7 +476,6 @@ c3bfea9d | Monte, descends, un pont
 c7461d78 | Monte, toit plat, descends
 5fb9a8df | Monte, tourne à droite, descends, tourne à droite.
 3dd46ff5 | Monte, ventre rond
-8cc32d21 | Mot après mot, puis le point
 7082080a | N’oublie pas l’accent !
 06bc7bcc | Pars de la petite pointe, monte jusqu’en haut, puis descends tout droit.
 7c9c2b39 | Pars du haut, tourne vers la gauche et ferme l’ovale.
@@ -806,56 +808,56 @@ b4e94887 | Tu sais écrire « vélo » !
 6f648f41 | Tu sais écrire « wagon » !
 fcd8d553 | Tu sais écrire « xylophone » !
 fb242a3d | Tu sais écrire « zoo » !
-800c9dca | Tu sais écrire la phrase « elle rit » !
+432c1c6a | Tu sais écrire la phrase « Elle rit » !
 0e8c522a | Tu sais écrire la phrase « ELLE RIT » !
 7cc40d9c | Tu sais écrire la phrase « IL A FAIM » !
-09f65549 | Tu sais écrire la phrase « il a un ami » !
+aeaaf469 | Tu sais écrire la phrase « Il a un ami » !
 c67b16c9 | Tu sais écrire la phrase « IL A UN AMI » !
-0c6edd4d | Tu sais écrire la phrase « il a un chien » !
-d0992651 | Tu sais écrire la phrase « il dort » !
+fbce6c6d | Tu sais écrire la phrase « Il a un chien » !
+ec37d371 | Tu sais écrire la phrase « Il dort » !
 7f4d9951 | Tu sais écrire la phrase « IL DORT » !
-dc6376db | Tu sais écrire la phrase « il joue » !
+1890fcfb | Tu sais écrire la phrase « Il joue » !
 a49ab51b | Tu sais écrire la phrase « IL JOUE » !
-131db04e | Tu sais écrire la phrase « il neige » !
+1ef3e8ee | Tu sais écrire la phrase « Il neige » !
 d00866ae | Tu sais écrire la phrase « IL NEIGE » !
-1c646838 | Tu sais écrire la phrase « il pleut » !
+e464b7d8 | Tu sais écrire la phrase « Il pleut » !
 02a38158 | Tu sais écrire la phrase « IL PLEUT » !
 7923465b | Tu sais écrire la phrase « JE JOUE » !
 31e33696 | Tu sais écrire la phrase « JE LIS » !
-2c777d0a | Tu sais écrire la phrase « je sais écrire » !
-ce0a4860 | Tu sais écrire la phrase « la lune brille » !
-1a3fe068 | Tu sais écrire la phrase « la pluie tombe » !
-69d8c91d | Tu sais écrire la phrase « la vache mange » !
-c0dbc09b | Tu sais écrire la phrase « le bébé dort » !
-77558c35 | Tu sais écrire la phrase « le chat aime le lait » !
-a3fd6273 | Tu sais écrire la phrase « le chat boit du lait » !
-cc1ffef1 | Tu sais écrire la phrase « le chat dort » !
-1c64327c | Tu sais écrire la phrase « le chat lit un livre » !
-fd0af423 | Tu sais écrire la phrase « le chien aboie » !
-bff2f024 | Tu sais écrire la phrase « le chien est gentil » !
-d45c95eb | Tu sais écrire la phrase « le lapin a un nid » !
-74f74f9a | Tu sais écrire la phrase « le lapin saute » !
-af10a3c9 | Tu sais écrire la phrase « le lion rugit » !
-1994c666 | Tu sais écrire la phrase « le loup a faim » !
-7d7a3d15 | Tu sais écrire la phrase « le petit chat dort » !
-01955c90 | Tu sais écrire la phrase « le renard a faim » !
-2a93b8e7 | Tu sais écrire la phrase « le renard est malin » !
-bc7e4eda | Tu sais écrire la phrase « le soleil brille » !
-bdfdb3b3 | Tu sais écrire la phrase « le soleil est chaud » !
-a119d3ae | Tu sais écrire la phrase « maman lit » !
+80d8672a | Tu sais écrire la phrase « Je sais écrire » !
+8a95d080 | Tu sais écrire la phrase « La lune brille » !
+00428588 | Tu sais écrire la phrase « La pluie tombe » !
+cf638f3d | Tu sais écrire la phrase « La vache mange » !
+cfc0aa3b | Tu sais écrire la phrase « Le bébé dort » !
+ea44ddd5 | Tu sais écrire la phrase « Le chat aime le lait » !
+4713e393 | Tu sais écrire la phrase « Le chat boit du lait » !
+69742491 | Tu sais écrire la phrase « Le chat dort » !
+4f42481c | Tu sais écrire la phrase « Le chat lit un livre » !
+039dd6c3 | Tu sais écrire la phrase « Le chien aboie » !
+78dd2bc4 | Tu sais écrire la phrase « Le chien est gentil » !
+c844b60b | Tu sais écrire la phrase « Le lapin a un nid » !
+0f4c103a | Tu sais écrire la phrase « Le lapin saute » !
+dca12fe9 | Tu sais écrire la phrase « Le lion rugit » !
+8bbdca06 | Tu sais écrire la phrase « Le loup a faim » !
+ec69da35 | Tu sais écrire la phrase « Le petit chat dort » !
+2b337330 | Tu sais écrire la phrase « Le renard a faim » !
+2ab92f87 | Tu sais écrire la phrase « Le renard est malin » !
+cba0b9fa | Tu sais écrire la phrase « Le soleil brille » !
+d7ec5153 | Tu sais écrire la phrase « Le soleil est chaud » !
+4f832fce | Tu sais écrire la phrase « Maman lit » !
 ccbc54ae | Tu sais écrire la phrase « MAMAN LIT » !
-7b09e29b | Tu sais écrire la phrase « mon ami joue » !
-dfe07456 | Tu sais écrire la phrase « papa lit » !
+5ec6ec3b | Tu sais écrire la phrase « Mon ami joue » !
+87f898f6 | Tu sais écrire la phrase « Papa lit » !
 6041d0f6 | Tu sais écrire la phrase « PAPA LIT » !
-8b4f9067 | Tu sais écrire la phrase « papa lit un livre » !
-22d6cd40 | Tu sais écrire la phrase « papa rit » !
+3acec607 | Tu sais écrire la phrase « Papa lit un livre » !
+207a0260 | Tu sais écrire la phrase « Papa rit » !
 35a494a0 | Tu sais écrire la phrase « PAPA RIT » !
 8d68931f | Tu sais écrire la phrase « TU AS FAIM » !
-dc31a70e | Tu sais écrire la phrase « tu as un ami » !
-8074090f | Tu sais écrire la phrase « tu as un joli livre » !
-2f2f5b20 | Tu sais écrire la phrase « tu lis » !
+0d7ec1ae | Tu sais écrire la phrase « Tu as un ami » !
+7d9d232f | Tu sais écrire la phrase « Tu as un joli livre » !
+bba23c40 | Tu sais écrire la phrase « Tu lis » !
 b711c0c0 | Tu sais écrire la phrase « TU LIS » !
-8fa06f42 | Tu sais écrire la phrase « un ours dort » !
+c0ee8de2 | Tu sais écrire la phrase « Un ours dort » !
 cfe863c2 | Tu sais écrire le 0 !
 d262b49d | Tu sais écrire le 1 !
 d17c62ec | Tu sais écrire le 2 !
@@ -1233,7 +1235,7 @@ e8cf8a91 | La prochaine fois, je te dicterai des sons et des petits mots.
 13c75636 | Réussis d’abord quelques exercices.
 67627f8c | Tu es fort !
 
-=== TABLEAU (227) ===
+=== TABLEAU (181) ===
 ea748872 | Écris « ai » : suis la première ligne, puis les pointillés, puis écris tout seul !
 c12279f9 | Écris « aile » : suis la première ligne, puis les pointillés, puis écris tout seul !
 3dfa4029 | Écris « ami » : suis la première ligne, puis les pointillés, puis écris tout seul !
@@ -1241,26 +1243,19 @@ c12279f9 | Écris « aile » : suis la première ligne, puis les pointillés, pu
 c32f24ae | Écris « arbre » : suis la première ligne, puis les pointillés, puis écris tout seul !
 7d486ce6 | Écris « au » : suis la première ligne, puis les pointillés, puis écris tout seul !
 54801ae7 | Écris « avion » : suis la première ligne, puis les pointillés, puis écris tout seul !
-3203f207 | Écris « AVION » : suis la première ligne, puis les pointillés, puis écris tout seul !
 282a92b8 | Écris « balle » : suis la première ligne, puis les pointillés, puis écris tout seul !
-fd017fd8 | Écris « BALLE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 44679ea8 | Écris « ballon » : suis la première ligne, puis les pointillés, puis écris tout seul !
-a29cc8e8 | Écris « BALLON » : suis la première ligne, puis les pointillés, puis écris tout seul !
 0f89eaac | Écris « bateau » : suis la première ligne, puis les pointillés, puis écris tout seul !
-a8bf832c | Écris « BATEAU » : suis la première ligne, puis les pointillés, puis écris tout seul !
 aa54652c | Écris « bébé » : suis la première ligne, puis les pointillés, puis écris tout seul !
 a46bf893 | Écris « biscuit » : suis la première ligne, puis les pointillés, puis écris tout seul !
 36813eaa | Écris « blanc » : suis la première ligne, puis les pointillés, puis écris tout seul !
 ab3e6184 | Écris « bleu » : suis la première ligne, puis les pointillés, puis écris tout seul !
 f453166b | Écris « bois » : suis la première ligne, puis les pointillés, puis écris tout seul !
 14bc5503 | Écris « bonjour » : suis la première ligne, puis les pointillés, puis écris tout seul !
-479c1f23 | Écris « BONJOUR » : suis la première ligne, puis les pointillés, puis écris tout seul !
 18662872 | Écris « bonsoir » : suis la première ligne, puis les pointillés, puis écris tout seul !
 728a92d2 | Écris « bus » : suis la première ligne, puis les pointillés, puis écris tout seul !
-d5d9c1f2 | Écris « BUS » : suis la première ligne, puis les pointillés, puis écris tout seul !
 5904be53 | Écris « canard » : suis la première ligne, puis les pointillés, puis écris tout seul !
 bba53516 | Écris « cartable » : suis la première ligne, puis les pointillés, puis écris tout seul !
-9a3434d6 | Écris « CARTABLE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 7e3c069f | Écris « ch » : suis la première ligne, puis les pointillés, puis écris tout seul !
 5b96fb6a | Écris « chameau » : suis la première ligne, puis les pointillés, puis écris tout seul !
 19290c8e | Écris « champignon » : suis la première ligne, puis les pointillés, puis écris tout seul !
@@ -1272,27 +1267,22 @@ f1a9bbbd | Écris « chien » : suis la première ligne, puis les pointillés, p
 62fca1e7 | Écris « citron » : suis la première ligne, puis les pointillés, puis écris tout seul !
 8a8a2441 | Écris « coccinelle » : suis la première ligne, puis les pointillés, puis écris tout seul !
 f7347c0a | Écris « crayon » : suis la première ligne, puis les pointillés, puis écris tout seul !
-ddfe7e0a | Écris « CRAYON » : suis la première ligne, puis les pointillés, puis écris tout seul !
 9b6db160 | Écris « crocodile » : suis la première ligne, puis les pointillés, puis écris tout seul !
 38fb6f4d | Écris « cube » : suis la première ligne, puis les pointillés, puis écris tout seul !
 102283be | Écris « cuisine » : suis la première ligne, puis les pointillés, puis écris tout seul !
 1d6c5c91 | Écris « dent » : suis la première ligne, puis les pointillés, puis écris tout seul !
-20278ed1 | Écris « DENT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 940dd5a6 | Écris « dinosaure » : suis la première ligne, puis les pointillés, puis écris tout seul !
 6285061d | Écris « eau » : suis la première ligne, puis les pointillés, puis écris tout seul !
 011b9f76 | Écris « école » : suis la première ligne, puis les pointillés, puis écris tout seul !
 95840da5 | Écris « elle rit » : suis la première ligne, puis les pointillés, puis écris tout seul !
-5753f905 | Écris « ELLE RIT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 d87f04cc | Écris « été » : suis la première ligne, puis les pointillés, puis écris tout seul !
 05b4f902 | Écris « eu » : suis la première ligne, puis les pointillés, puis écris tout seul !
 816a8237 | Écris « fête » : suis la première ligne, puis les pointillés, puis écris tout seul !
 953d29fa | Écris « fleur » : suis la première ligne, puis les pointillés, puis écris tout seul !
 79cf5e31 | Écris « forêt » : suis la première ligne, puis les pointillés, puis écris tout seul !
 9389da5e | Écris « fruit » : suis la première ligne, puis les pointillés, puis écris tout seul !
-998f87fe | Écris « FRUIT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 3ddd1a2e | Écris « garçon » : suis la première ligne, puis les pointillés, puis écris tout seul !
 77513955 | Écris « gare » : suis la première ligne, puis les pointillés, puis écris tout seul !
-fe88ed55 | Écris « GARE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 3126d5c8 | Écris « girafe » : suis la première ligne, puis les pointillés, puis écris tout seul !
 445aba11 | Écris « gn » : suis la première ligne, puis les pointillés, puis écris tout seul !
 c18be828 | Écris « grenouille » : suis la première ligne, puis les pointillés, puis écris tout seul !
@@ -1300,41 +1290,30 @@ c18be828 | Écris « grenouille » : suis la première ligne, puis les pointill�
 d02d7ca2 | Écris « herbe » : suis la première ligne, puis les pointillés, puis écris tout seul !
 af8566d4 | Écris « hirondelle » : suis la première ligne, puis les pointillés, puis écris tout seul !
 242643a5 | Écris « il » : suis la première ligne, puis les pointillés, puis écris tout seul !
-6cabaa25 | Écris « IL » : suis la première ligne, puis les pointillés, puis écris tout seul !
-9056ca11 | Écris « IL A FAIM » : suis la première ligne, puis les pointillés, puis écris tout seul !
+5cf813b1 | Écris « il a faim » : suis la première ligne, puis les pointillés, puis écris tout seul !
 19f37d54 | Écris « il a un ami » : suis la première ligne, puis les pointillés, puis écris tout seul !
-56184c14 | Écris « IL A UN AMI » : suis la première ligne, puis les pointillés, puis écris tout seul !
 a2975cd8 | Écris « il a un chien » : suis la première ligne, puis les pointillés, puis écris tout seul !
 0b700e7c | Écris « il dort » : suis la première ligne, puis les pointillés, puis écris tout seul !
-bd1cafbc | Écris « IL DORT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 64f88c9a | Écris « il joue » : suis la première ligne, puis les pointillés, puis écris tout seul !
-985a8d5a | Écris « IL JOUE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 e73d5a35 | Écris « il neige » : suis la première ligne, puis les pointillés, puis écris tout seul !
-ff35eb95 | Écris « IL NEIGE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 56c11467 | Écris « il pleut » : suis la première ligne, puis les pointillés, puis écris tout seul !
-fd64e887 | Écris « IL PLEUT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 dd5c052b | Écris « in » : suis la première ligne, puis les pointillés, puis écris tout seul !
 27bcd840 | Écris « jardin » : suis la première ligne, puis les pointillés, puis écris tout seul !
-4479f1c0 | Écris « JARDIN » : suis la première ligne, puis les pointillés, puis écris tout seul !
 d22f4e3d | Écris « jaune » : suis la première ligne, puis les pointillés, puis écris tout seul !
-a41d81ae | Écris « JE JOUE » : suis la première ligne, puis les pointillés, puis écris tout seul !
-71e85125 | Écris « JE LIS » : suis la première ligne, puis les pointillés, puis écris tout seul !
+ea087a2e | Écris « je joue » : suis la première ligne, puis les pointillés, puis écris tout seul !
+61dfde85 | Écris « je lis » : suis la première ligne, puis les pointillés, puis écris tout seul !
 91898a0d | Écris « je sais écrire » : suis la première ligne, puis les pointillés, puis écris tout seul !
 d32136d7 | Écris « jouet » : suis la première ligne, puis les pointillés, puis écris tout seul !
 7d6432b8 | Écris « jour » : suis la première ligne, puis les pointillés, puis écris tout seul !
-049be6b8 | Écris « JOUR » : suis la première ligne, puis les pointillés, puis écris tout seul !
 44ab520b | Écris « kangourou » : suis la première ligne, puis les pointillés, puis écris tout seul !
 739c13e4 | Écris « kiwi » : suis la première ligne, puis les pointillés, puis écris tout seul !
 81248ecb | Écris « la » : suis la première ligne, puis les pointillés, puis écris tout seul !
-3cda290b | Écris « LA » : suis la première ligne, puis les pointillés, puis écris tout seul !
 a5a674fb | Écris « la lune brille » : suis la première ligne, puis les pointillés, puis écris tout seul !
 606c6ab7 | Écris « la pluie tombe » : suis la première ligne, puis les pointillés, puis écris tout seul !
 ad4bb392 | Écris « la vache mange » : suis la première ligne, puis les pointillés, puis écris tout seul !
 605fd04e | Écris « lait » : suis la première ligne, puis les pointillés, puis écris tout seul !
-d7e8380e | Écris « LAIT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 d823e782 | Écris « lapin » : suis la première ligne, puis les pointillés, puis écris tout seul !
 388e49ef | Écris « le » : suis la première ligne, puis les pointillés, puis écris tout seul !
-424bad2f | Écris « LE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 1a401bbc | Écris « le bébé dort » : suis la première ligne, puis les pointillés, puis écris tout seul !
 d4bb26f6 | Écris « le chat aime le lait » : suis la première ligne, puis les pointillés, puis écris tout seul !
 28e591dc | Écris « le chat boit du lait » : suis la première ligne, puis les pointillés, puis écris tout seul !
@@ -1354,54 +1333,39 @@ d7220a2e | Écris « le soleil est chaud » : suis la première ligne, puis les 
 6a5c9d2d | Écris « leçon » : suis la première ligne, puis les pointillés, puis écris tout seul !
 772e3fe6 | Écris « lion » : suis la première ligne, puis les pointillés, puis écris tout seul !
 7864e111 | Écris « lit » : suis la première ligne, puis les pointillés, puis écris tout seul !
-de9b7bf1 | Écris « LIT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 30a104ce | Écris « livre » : suis la première ligne, puis les pointillés, puis écris tout seul !
 12a01688 | Écris « loi » : suis la première ligne, puis les pointillés, puis écris tout seul !
 4c3d26cc | Écris « loup » : suis la première ligne, puis les pointillés, puis écris tout seul !
 82c27fa0 | Écris « lundi » : suis la première ligne, puis les pointillés, puis écris tout seul !
-765c7900 | Écris « LUNDI » : suis la première ligne, puis les pointillés, puis écris tout seul !
 1867cc6a | Écris « lune » : suis la première ligne, puis les pointillés, puis écris tout seul !
-2d08a62a | Écris « LUNE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 925e47a6 | Écris « ma » : suis la première ligne, puis les pointillés, puis écris tout seul !
 1217b7e5 | Écris « main » : suis la première ligne, puis les pointillés, puis écris tout seul !
-63377fe5 | Écris « MAIN » : suis la première ligne, puis les pointillés, puis écris tout seul !
 9a69c17b | Écris « maison » : suis la première ligne, puis les pointillés, puis écris tout seul !
-8ecdb7fb | Écris « MAISON » : suis la première ligne, puis les pointillés, puis écris tout seul !
 d86bb852 | Écris « maman » : suis la première ligne, puis les pointillés, puis écris tout seul !
-69c41fb2 | Écris « MAMAN » : suis la première ligne, puis les pointillés, puis écris tout seul !
 1d21d463 | Écris « maman lit » : suis la première ligne, puis les pointillés, puis écris tout seul !
-39b8e423 | Écris « MAMAN LIT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 4a774207 | Écris « mamie » : suis la première ligne, puis les pointillés, puis écris tout seul !
 a2b7db64 | Écris « merci » : suis la première ligne, puis les pointillés, puis écris tout seul !
-3074fbc4 | Écris « MERCI » : suis la première ligne, puis les pointillés, puis écris tout seul !
 6fff796b | Écris « mercredi » : suis la première ligne, puis les pointillés, puis écris tout seul !
 c0d3e010 | Écris « mère » : suis la première ligne, puis les pointillés, puis écris tout seul !
 70fb434e | Écris « mon » : suis la première ligne, puis les pointillés, puis écris tout seul !
 e2bb18f0 | Écris « mon ami joue » : suis la première ligne, puis les pointillés, puis écris tout seul !
 efd0b4e1 | Écris « moto » : suis la première ligne, puis les pointillés, puis écris tout seul !
-40f07ce1 | Écris « MOTO » : suis la première ligne, puis les pointillés, puis écris tout seul !
 baf212b4 | Écris « neige » : suis la première ligne, puis les pointillés, puis écris tout seul !
 94c1fff3 | Écris « nid » : suis la première ligne, puis les pointillés, puis écris tout seul !
 0a4a9278 | Écris « noir » : suis la première ligne, puis les pointillés, puis écris tout seul !
 b9d3e748 | Écris « nuit » : suis la première ligne, puis les pointillés, puis écris tout seul !
-f03c6088 | Écris « NUIT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 9e813fa4 | Écris « oi » : suis la première ligne, puis les pointillés, puis écris tout seul !
 a4ca8e1f | Écris « oie » : suis la première ligne, puis les pointillés, puis écris tout seul !
 81300369 | Écris « on » : suis la première ligne, puis les pointillés, puis écris tout seul !
 181b0b26 | Écris « orange » : suis la première ligne, puis les pointillés, puis écris tout seul !
-a051c866 | Écris « ORANGE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 133806c0 | Écris « ou » : suis la première ligne, puis les pointillés, puis écris tout seul !
-efb502e7 | Écris « OUI » : suis la première ligne, puis les pointillés, puis écris tout seul !
+e406df47 | Écris « oui » : suis la première ligne, puis les pointillés, puis écris tout seul !
 7998a9fb | Écris « ours » : suis la première ligne, puis les pointillés, puis écris tout seul !
 6216e840 | Écris « pain » : suis la première ligne, puis les pointillés, puis écris tout seul !
-21ca9900 | Écris « PAIN » : suis la première ligne, puis les pointillés, puis écris tout seul !
 751d2590 | Écris « papa » : suis la première ligne, puis les pointillés, puis écris tout seul !
-c63ced90 | Écris « PAPA » : suis la première ligne, puis les pointillés, puis écris tout seul !
 1c07dc81 | Écris « papa lit » : suis la première ligne, puis les pointillés, puis écris tout seul !
-da2bc621 | Écris « PAPA LIT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 8482e922 | Écris « papa lit un livre » : suis la première ligne, puis les pointillés, puis écris tout seul !
 f3454c57 | Écris « papa rit » : suis la première ligne, puis les pointillés, puis écris tout seul !
-718b9df7 | Écris « PAPA RIT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 90138408 | Écris « papi » : suis la première ligne, puis les pointillés, puis écris tout seul !
 a9b345b1 | Écris « papillon » : suis la première ligne, puis les pointillés, puis écris tout seul !
 3f20ddc7 | Écris « parapluie » : suis la première ligne, puis les pointillés, puis écris tout seul !
@@ -1418,39 +1382,31 @@ d55ee249 | Écris « poussin » : suis la première ligne, puis les pointillés,
 91a29b00 | Écris « pyjama » : suis la première ligne, puis les pointillés, puis écris tout seul !
 c6982ed6 | Écris « qu » : suis la première ligne, puis les pointillés, puis écris tout seul !
 9e98ff5f | Écris « rat » : suis la première ligne, puis les pointillés, puis écris tout seul !
-6badfcff | Écris « RAT » : suis la première ligne, puis les pointillés, puis écris tout seul !
 0620ca4e | Écris « renard » : suis la première ligne, puis les pointillés, puis écris tout seul !
 98efd615 | Écris « riz » : suis la première ligne, puis les pointillés, puis écris tout seul !
 2376b9e6 | Écris « robe » : suis la première ligne, puis les pointillés, puis écris tout seul !
 d8f4adca | Écris « roi » : suis la première ligne, puis les pointillés, puis écris tout seul !
-c365b26a | Écris « ROI » : suis la première ligne, puis les pointillés, puis écris tout seul !
 2a17e37b | Écris « rose » : suis la première ligne, puis les pointillés, puis écris tout seul !
 ab8f56d2 | Écris « rouge » : suis la première ligne, puis les pointillés, puis écris tout seul !
 13114b0d | Écris « route » : suis la première ligne, puis les pointillés, puis écris tout seul !
-3b03b52d | Écris « ROUTE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 11afec2c | Écris « rue » : suis la première ligne, puis les pointillés, puis écris tout seul !
 964e2d81 | Écris « sable » : suis la première ligne, puis les pointillés, puis écris tout seul !
 7f05b049 | Écris « sac » : suis la première ligne, puis les pointillés, puis écris tout seul !
 0bfa8855 | Écris « samedi » : suis la première ligne, puis les pointillés, puis écris tout seul !
 eb3a019a | Écris « singe » : suis la première ligne, puis les pointillés, puis écris tout seul !
-2e697efa | Écris « SINGE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 e4064268 | Écris « soleil » : suis la première ligne, puis les pointillés, puis écris tout seul !
 6722026d | Écris « souris » : suis la première ligne, puis les pointillés, puis écris tout seul !
 5ecc8894 | Écris « table » : suis la première ligne, puis les pointillés, puis écris tout seul !
 9a4cd8f0 | Écris « tata » : suis la première ligne, puis les pointillés, puis écris tout seul !
 24886431 | Écris « tigre » : suis la première ligne, puis les pointillés, puis écris tout seul !
-d22d6551 | Écris « TIGRE » : suis la première ligne, puis les pointillés, puis écris tout seul !
 22f33179 | Écris « tortue » : suis la première ligne, puis les pointillés, puis écris tout seul !
 51b1d87e | Écris « tracteur » : suis la première ligne, puis les pointillés, puis écris tout seul !
 d1e8e0c7 | Écris « tu » : suis la première ligne, puis les pointillés, puis écris tout seul !
-82c2b707 | Écris « TU » : suis la première ligne, puis les pointillés, puis écris tout seul !
-8410cb84 | Écris « TU AS FAIM » : suis la première ligne, puis les pointillés, puis écris tout seul !
+c326cd04 | Écris « tu as faim » : suis la première ligne, puis les pointillés, puis écris tout seul !
 2733732d | Écris « tu as un ami » : suis la première ligne, puis les pointillés, puis écris tout seul !
 056a8b5e | Écris « tu as un joli livre » : suis la première ligne, puis les pointillés, puis écris tout seul !
 734cc6cf | Écris « tu lis » : suis la première ligne, puis les pointillés, puis écris tout seul !
-c777c26f | Écris « TU LIS » : suis la première ligne, puis les pointillés, puis écris tout seul !
 2d7b137f | Écris « un » : suis la première ligne, puis les pointillés, puis écris tout seul !
-7f3507bf | Écris « UN » : suis la première ligne, puis les pointillés, puis écris tout seul !
 cbb8847d | Écris « un ours dort » : suis la première ligne, puis les pointillés, puis écris tout seul !
 01e4953e | Écris « une » : suis la première ligne, puis les pointillés, puis écris tout seul !
 eef6aa92 | Écris « vacances » : suis la première ligne, puis les pointillés, puis écris tout seul !
@@ -1724,56 +1680,56 @@ a4f77d17 | g comme grenouille
 faaaa8da | j comme jardin
 8383433b | k comme koala
 c2ed872f | l comme lanterne
-52f9a88a | La phrase « elle rit »
+405118aa | La phrase « Elle rit »
 c09b71aa | La phrase « ELLE RIT »
 dd6d81f2 | La phrase « IL A FAIM »
-87a2fe4f | La phrase « il a un ami »
+df3978ef | La phrase « Il a un ami »
 4fc6650f | La phrase « IL A UN AMI »
-057cfb03 | La phrase « il a un chien »
-6d80d293 | La phrase « il dort »
+c2cbe523 | La phrase « Il a un chien »
+5b602533 | La phrase « Il dort »
 588e47d3 | La phrase « IL DORT »
-6d7e1bc1 | La phrase « il joue »
+5a1d13e1 | La phrase « Il joue »
 ada5d541 | La phrase « IL JOUE »
-6d83a526 | La phrase « il neige »
+21fffc46 | La phrase « Il neige »
 7c57af46 | La phrase « IL NEIGE »
-14b61058 | La phrase « il pleut »
+aea87df8 | La phrase « Il pleut »
 d375b538 | La phrase « IL PLEUT »
 dd764f51 | La phrase « JE JOUE »
 78e62e86 | La phrase « JE LIS »
-4715aede | La phrase « je sais écrire »
-ff544f20 | La phrase « la lune brille »
-0bcd7aa8 | La phrase « la pluie tombe »
-410014a5 | La phrase « la vache mange »
-97dd6017 | La phrase « le bébé dort »
-05e2910d | La phrase « le chat aime le lait »
-9a6bc113 | La phrase « le chat boit du lait »
-695ce97d | La phrase « le chat dort »
-a31110b8 | La phrase « le chat lit un livre »
-51cebe7f | La phrase « le chien aboie »
-65b5ddb6 | La phrase « le chien est gentil »
-0d264009 | La phrase « le lapin a un nid »
-4779b236 | La phrase « le lapin saute »
-79915913 | La phrase « le lion rugit »
-d09e80ea | La phrase « le loup a faim »
-d53001d9 | La phrase « le petit chat dort »
-ef216da4 | La phrase « le renard a faim »
-1251af01 | La phrase « le renard est malin »
-416b74ce | La phrase « le soleil brille »
-7fb18735 | La phrase « le soleil est chaud »
-34b0a134 | La phrase « maman lit »
+0549a67e | La phrase « Je sais écrire »
+5026ffc0 | La phrase « La lune brille »
+78d296c8 | La phrase « La pluie tombe »
+8aee0345 | La phrase « La vache mange »
+52428d37 | La phrase « Le bébé dort »
+8faed42d | La phrase « Le chat aime le lait »
+0aece233 | La phrase « Le chat boit du lait »
+08c9d69d | La phrase « Le chat dort »
+48b4b558 | La phrase « Le chat lit un livre »
+ed328c1f | La phrase « Le chien aboie »
+d8ce4c56 | La phrase « Le chien est gentil »
+912bb2a9 | La phrase « Le lapin a un nid »
+d7c1c556 | La phrase « Le lapin saute »
+0744fb33 | La phrase « Le lion rugit »
+57115c8a | La phrase « Le loup a faim »
+37e831f9 | La phrase « Le petit chat dort »
+a2035e44 | La phrase « Le renard a faim »
+8f3fb021 | La phrase « Le renard est malin »
+d33db4ee | La phrase « Le soleil brille »
+76326ad5 | La phrase « Le soleil est chaud »
+80d8f3d4 | La phrase « Maman lit »
 ce2c83f4 | La phrase « MAMAN LIT »
-03b902eb | La phrase « mon ami joue »
-300b1b62 | La phrase « papa lit »
+0fee578b | La phrase « Mon ami joue »
+813c9602 | La phrase « Papa lit »
 80eb01c2 | La phrase « PAPA LIT »
-275000ed | La phrase « papa lit un livre »
-c176b9bc | La phrase « papa rit »
+5ce8d68d | La phrase « Papa lit un livre »
+5833fa5c | La phrase « Papa rit »
 ed312c9c | La phrase « PAPA RIT »
 17ba924f | La phrase « TU AS FAIM »
-913dad4e | La phrase « tu as un ami »
-19c2adcd | La phrase « tu as un joli livre »
-17d0114c | La phrase « tu lis »
+f6edc6ee | La phrase « Tu as un ami »
+1fd272ed | La phrase « Tu as un joli livre »
+a3517a6c | La phrase « Tu lis »
 c33f87ec | La phrase « TU LIS »
-883cbe9e | La phrase « un ours dort »
+6d924dbe | La phrase « Un ours dort »
 70c34c62 | La spirale
 b6c325a6 | Le A majuscule
 4e462c17 | Le B majuscule

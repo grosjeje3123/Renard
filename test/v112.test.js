@@ -17,8 +17,8 @@ const tplE = (id) => buildTemplate(SKILLS[id], undefined, { ecran: true });
 const ctxOf = (sk, phase, W = 10) => recognizerContext(sk, phase, { main: 'droite' }, 'touch', W);
 
 test('accents : « bébé » et « écrire » s\'écrivent avec leurs accents, posés juste après leur lettre', () => {
-  assert.ok(SKILLS.phr_le_bebe_dort && SKILLS.phr_le_bebe_dort.glyph === 'le bébé dort');
-  assert.equal(SKILLS.phr_je_sais_ecrire.glyph, 'je sais écrire');
+  assert.ok(SKILLS.phr_le_bebe_dort && SKILLS.phr_le_bebe_dort.glyph === 'Le bébé dort');
+  assert.equal(SKILLS.phr_je_sais_ecrire.glyph, 'Je sais écrire');
   assert.ok(!Object.values(SKILLS).some((s) => /\b(bebe|ecrire|ecole|ete)\b/.test(s.glyph || '')), 'plus aucun mot écrit sans son accent');
   assert.equal(sansAccent('garçon'), 'garcon');
   assert.deepEqual(SKILLS.mot_ecole.needs.sort(), ['c', 'e', 'l', 'o']);
@@ -237,4 +237,26 @@ test('parents : la semaine en bref dit le temps, les acquis, ce qui est à repre
   assert.deepEqual(b.reprendre, [{ id: 'l', pourquoi: 'dictee' }]);
   assert.deepEqual(b.confusions, ['a']);
   assert.deepEqual(P.bilanSemaine(P.newState(), now), { minutes: 0, jours: 0, acquis: [], consolides: [], reprendre: [], confusions: [] });
+});
+
+test('phrases : une majuscule d\'imprimerie au début, un point à la fin ; la majuscule est droite, le reste est en cursive', () => {
+  const phrases = LEVELS[2].skills.filter((id) => SKILLS[id].phrase);
+  assert.equal(phrases.length, 36);
+  for (const id of phrases) {
+    const sk = SKILLS[id], t = buildTemplate(sk), M = sk.glyph[0];
+    assert.ok(/^[A-Z]$/.test(M) && sk.glyph.slice(1) === sk.word.slice(1) && sk.word[0] === M.toLowerCase(), id);
+    assert.ok(sk.title.includes(`« ${sk.glyph} »`) && sk.say.intro.includes('majuscule') && sk.say.how.startsWith('Commence par la majuscule'), id);
+    assert.equal(t.strokes[0].of, M, `${id} : on commence par la majuscule`);
+    const maj = t.strokes.filter((s) => s.of === M), cap = buildTemplate(SKILLS[`maj_${M}`]);
+    assert.equal(maj.length, cap.strokes.length, `${id} : les mêmes traits que la majuscule apprise au niveau 1`);
+    const y0 = Math.min(...maj.map((s) => s.bbox.y0)), y1 = Math.max(...maj.map((s) => s.bbox.y1));
+    assert.ok(Math.abs(y0 - (t.frame.baseline - 3)) < 0.05 && Math.abs(y1 - t.frame.baseline) < 0.05, `${id} : la majuscule va de la ligne d'écriture à la 3e ligne`);
+    assert.ok(!sk.needs.some((l) => l.length !== 1 || !/[a-z]/.test(l)), `${id} : seules les lettres cursives écrites sont demandées`);
+    assert.ok(t.strokes.at(-1).kind === 'dot');
+    assert.ok(rivaux(maj[0]).length === 0, 'une majuscule n\'est pas comparée aux minuscules');
+  }
+  // une barre verticale de majuscule reste verticale dans une phrase penchée (la cursive, elle, penche)
+  const t = buildTemplate(SKILLS.phr_le_chat_dort), barre = t.strokes[0];
+  assert.ok(barre.bbox.w < 0.05 && barre.bbox.h > 2.9, `le L est droit (${barre.bbox.w.toFixed(3)})`);
+  assert.deepEqual(SKILLS.phr_je_sais_ecrire.needs.includes('j'), false, 'le j minuscule n\'est pas demandé pour « Je sais écrire »');
 });

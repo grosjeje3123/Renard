@@ -85,7 +85,7 @@ add('Dessine ce que tu veux sur la feuille !', 'dessin');
 
 // 5. Tableau libre : « Écris … » pour le mot de départ et pour chaque mot ou phrase des exercices (« Mes mots »)
 const mots = new Set(['renard']);
-for (const s of Object.values(SKILLS)) if (s.kind === 'word') mots.add(s.glyph);
+for (const s of Object.values(SKILLS)) if (s.kind === 'word') mots.add(s.glyph.toLowerCase()); // le tableau dit toujours le texte en minuscules (voir askText dans tableau.js)
 for (const m of mots) add(`Écris « ${m} » : suis la première ligne, puis les pointillés, puis écris tout seul !`, 'tableau');
 
 // 6. Accueil (version sans prénom : avec un prénom, la phrase du prénom est lue par la voix du système)
