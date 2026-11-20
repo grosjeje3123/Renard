@@ -150,7 +150,7 @@ export function affichageCard() {
       : h('div', { class: 'stackc' },
           canFullscreen() ? btn : h('p', { class: 'muted' }, 'Ce navigateur ne propose pas de plein écran pour cette page.'),
           status,
-          h('p', { class: 'muted' }, 'Pour l’avoir à chaque ouverture, sans barre de navigateur : sur iPad, touchez Partager puis « Sur l’écran d’accueil ». Sur Android (Chrome), ouvrez le menu ⋮ puis « Installer l’application ».')));
+          h('p', { class: 'muted' }, 'Pour l’avoir à chaque ouverture, sans barre de navigateur : dans Chrome, ouvrez le menu ⋮ puis « Installer l’application ».')));
 }
 
 /** Voix du renard : choix de la voix, vitesse, timbre, écoute d'un exemple. Tout reste sur l'appareil. */
@@ -200,7 +200,6 @@ function voiceCard(app) {
       h('summary', {}, 'Obtenir une voix plus naturelle'),
       h('p', {}, 'La qualité vient du système de la tablette, pas de l’application. Les chemins exacts changent selon la version, mais l’idée est la même :'),
       h('ul', {},
-        h('li', {}, h('strong', {}, 'iPad : '), 'Réglages › Accessibilité › Contenu énoncé › Voix › Français, puis télécharger une voix « Améliorée » ou « Premium » (ou Siri).'),
         h('li', {}, h('strong', {}, 'Android : '), 'Paramètres › Système ou Accessibilité › Synthèse vocale › Moteur préféré › Réglages › Installer les données vocales › Français.')),
       h('p', {}, 'Revenez ensuite ici : la nouvelle voix apparaît dans la liste, et le mode « Automatique » la choisira seul.')));
 }

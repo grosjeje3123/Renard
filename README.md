@@ -14,15 +14,15 @@ node build.mjs --pwa  # produit pwa/ : la version installable en plein écran (v
 
 Ouvrir `dist/index.html` dans un navigateur (tablette, ou ordinateur avec souris). Routes : `#accueil`, `#niveaux`, `#carte-1` à `#carte-3` (ou `#carte-3-<section>`), `#exercice-<id>`, `#tresors`, `#album`, `#pause`, `#fiche-<vignette>`, `#cahier-<exercice>`, `#dessin`, `#galerie`, `#tableau`, `#options`, `#credits`, `#bienvenue` (présentation du premier lancement ; l'adresse sans ancre affiche d'abord l'écran « Touche pour jouer »), `#parents` (maintenir le cadenas 2 s).
 
-## Plein écran sur la tablette (iPad et Android) : version installable
+## Plein écran sur la tablette Android : version installable
 
 `node build.mjs --pwa` produit le dossier `pwa/` : `index.html`, `manifest.webmanifest` (affichage `fullscreen`, repli `standalone`), `sw.js` (service worker : l'application est gardée sur la tablette et démarre sans réseau), les icônes (192, 512, masquable, `apple-touch-icon`), `_headers` (Netlify / Cloudflare Pages : revérification à chaque ouverture) et `LISEZMOI.txt`.
 
 1. Déposer le dossier `pwa/` tel quel sur un hébergement HTTPS statique (Netlify Drop, Cloudflare Pages, GitHub Pages…).
-2. Sur la tablette, ouvrir l'adresse une fois, avec une connexion. **iPad (Safari)** : Partager, « Sur l'écran d'accueil ». **Android (Chrome)** : menu ⋮, « Installer l'application ».
+2. Sur la tablette, ouvrir l'adresse une fois, avec une connexion, dans Chrome : menu ⋮, « Installer l'application ».
 3. L'icône ouvre Renard sans barre de navigateur, hors connexion comprise.
 
-À savoir : la progression est liée à l'adresse (changer d'adresse repart de zéro : utiliser le code de sauvegarde) ; sur iPad, l'icône de l'écran d'accueil a son propre stockage, distinct de celui de Safari ; la page garde `connect-src 'none'` (elle ne peut rien envoyer), seul le service worker relit les fichiers de l'application sur son hébergement ; une mise à jour arrive à la deuxième ouverture suivante avec connexion.
+À savoir : la progression est liée à l'adresse (changer d'adresse repart de zéro : utiliser le code de sauvegarde) ; la page garde `connect-src 'none'` (elle ne peut rien envoyer), seul le service worker relit les fichiers de l'application sur son hébergement ; une mise à jour arrive à la deuxième ouverture suivante avec connexion.
 Dans l'espace parents, la carte « Affichage » propose aussi « Passer en plein écran » quand la page est ouverte dans un navigateur, et sur tablette tactile les PDF et images passent par la feuille de partage du système (Enregistrer dans Fichiers, Imprimer).
 Contrôle : `node build.mjs --pwa && node tools/pwa-check.mjs` (installable selon Chrome, démarrage hors connexion, icônes, aucune requête hors de l'hébergement, plein écran).
 
@@ -62,7 +62,7 @@ Notes :
 - Icône et écran de démarrage : générés par `npm run icons` à partir du renard SVG.
 - Réseau : la page de l'application (`npm run build:app`) porte une politique de sécurité (CSP, `connect-src 'none'`) qui interdit à ses pages toute connexion, tout script et toute image distants. `node tools/csp-check.mjs` le vérifie dans un vrai navigateur. La permission Android `INTERNET` du modèle Capacitor est conservée (la retirer n'a pas pu être testé sur tablette) ; la synthèse vocale du système, elle, reste celle de l'appareil.
 - PDF : les fiches à imprimer passent par la feuille de partage d'Android (plugins `@capacitor/filesystem` et `@capacitor/share`, fichier temporaire dans le cache). Ce chemin n'a pas pu être essayé sur une vraie tablette ; dans un navigateur, le PDF se télécharge.
-- iPad : même code, mais il faut un Mac avec Xcode (`npx cap add ios`, puis ouvrir dans Xcode).
+- iPad : non prévu. Décision de novembre 2026 : Renard est annoncé, essayé et vendu pour la tablette Android seulement.
 
 ## Architecture (de bas en haut)
 

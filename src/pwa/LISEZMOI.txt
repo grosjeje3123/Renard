@@ -6,8 +6,7 @@ RENARD — version installable (plein écran, fonctionne sans connexion)
    Vous obtenez une adresse en https://… : c'est l'adresse de Renard.
 
 2. Sur la tablette, ouvrez cette adresse UNE fois, avec une connexion.
-   - iPad (Safari) : touchez le bouton Partager, puis « Sur l'écran d'accueil », puis « Ajouter ».
-   - Android (Chrome) : menu ⋮, puis « Installer l'application » (ou « Ajouter à l'écran d'accueil »).
+   Dans Chrome : menu ⋮, puis « Installer l'application » (ou « Ajouter à l'écran d'accueil »).
 
 3. Ouvrez Renard depuis son icône : plus de barre de navigateur, et ça marche même sans réseau.
 
