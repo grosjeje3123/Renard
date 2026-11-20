@@ -25,7 +25,7 @@ export const CREDITS = [
     'La petite mélodie de marimba et tous les sons sont fabriqués par l’application elle-même, note après note. Aucun enregistrement, aucun fichier audio.',
   ]],
   ['La voix du renard', {
-    voixIA: ['Les voix du renard sont des voix de synthèse, générées par une intelligence artificielle : ce ne sont pas les voix d’une personne. Quand une phrase n’a pas été préparée (un prénom, par exemple), le renard utilise la voix française de la tablette.', 'Synthèse vocale libre Piper (Rhasspy, licence MIT), voix française « siwis » entraînée sur le corpus SIWIS de l’université d’Édimbourg (licence CC BY 4.0).'],
+    voixIA: ['Les voix du renard sont des voix de synthèse, générées par une intelligence artificielle : ce ne sont pas les voix d’une personne. Quand une phrase n’a pas été préparée (un prénom, par exemple), le renard utilise la voix française de la tablette.', 'Synthèse vocale libre Piper (Rhasspy, licence MIT), voix française « upmc », locutrice « Jessica », entraînée sur le corpus UPMC du projet MaryTTS (licence CC BY-SA 4.0). La voix a été rendue plus aiguë pour le renard.'],
     voixSysteme: ['Le renard parle avec la voix française de la tablette (la synthèse vocale du système). S’il reste muet, un adulte peut installer une voix française : l’espace parents explique comment.'],
   }],
   ['Les polices', [

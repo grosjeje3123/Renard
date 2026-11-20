@@ -1,7 +1,7 @@
 // Tableau libre : une page lignée où l'enfant écrit ce qu'il veut (son prénom, un mot, une phrase), avec un calque à suivre.
-// Fonctions pures, sans interface : testables sans navigateur. Le texte est du « a–z » sans accent, avec des espaces ;
+// Fonctions pures, sans interface : testables sans navigateur. Le texte est du « a–z » (avec les accents du français), des chiffres et des espaces ;
 // la casse (minuscules cursives, MAJUSCULES d'imprimerie ou majuscule au début) ne change que le tracé.
-import { SKILLS, ECRITURE, composeText } from '../content/skills.js';
+import { SKILLS, ECRITURE, ACCENTS, composeText } from '../content/skills.js';
 import { buildTemplate, strokeToSvgPath } from './template.js';
 import { BOARD } from './board.js';
 import { bbox, polyLength } from '../engine/geometry.js';
@@ -23,10 +23,14 @@ export const CASSES = [
   { id: 'debut', label: 'Abc', name: 'Majuscule au début', hint: 'Pour un prénom ou une phrase' },
 ];
 
-/** « Léa-Rose » → « lea rose » : minuscules, sans accent, seulement a–z, 0–9 et espaces simples. */
+/**
+ * « Léa-Rose » → « léa rose » : minuscules, seulement a–z, 0–9, espaces simples et les lettres accentuées qu'on sait écrire
+ * (é è ê ë à â î ï ô ù û ü ç). Les autres signes sont ramenés à leur lettre (« ñ » → « n ») ou à un espace.
+ */
 export function clean(s) {
-  return String(s || '').toLowerCase().replace(/œ/g, 'oe').replace(/æ/g, 'ae').normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, ' ').replace(/^ /, '').slice(0, TABLEAU.maxLen);
+  const t = String(s || '').toLowerCase().normalize('NFC').replace(/œ/g, 'oe').replace(/æ/g, 'ae');
+  const out = [...t].map((c) => (ACCENTS[c] ? c : c.normalize('NFD').replace(/[\u0300-\u036f]/g, ''))).join('');
+  return out.replace(/[^a-z0-9éèêëàâîïôùûüç]+/g, ' ').replace(/^ /, '').slice(0, TABLEAU.maxLen);
 }
 
 /** Le texte tel qu'on l'écrit : « lea » → « LEA » (majuscules) ou « Lea » (majuscule au début). */
@@ -102,6 +106,12 @@ export const expectedStrokes = (text, mode = 'min') => calque(text, TABLEAU.rows
 
 const centroid = (pts) => ({ x: pts.reduce((s, p) => s + p.x, 0) / pts.length, y: pts.reduce((s, p) => s + p.y, 0) / pts.length });
 const isTap = (pts) => polyLength(pts) < 0.5;
+/** Un trait « léger » du modèle : un point (i, j, tréma, point final) ou un accent. L'enfant peut le poser quand il veut, et l'oublier ne bloque pas. */
+const leger = (t) => t.kind === 'dot' || !!t.mark;
+/** Un tout petit trait de l'enfant (un accent, ou la barre d'un t écrit petit) : ni un toucher, ni une lettre. */
+const petit = (pts) => { if (isTap(pts)) return false; const b = bbox(pts); return polyLength(pts) < 1.3 && Math.max(b.w, b.h) < 1; };
+/** Qui peut aller avec qui : un point se pose d'un toucher ; un accent, d'un toucher ou d'un petit trait ; une lettre se trace. */
+const vaAvec = (t, pts) => (t.kind === 'dot' ? isTap(pts) : t.mark ? isTap(pts) || petit(pts) : !isTap(pts));
 
 /** La rangée la plus proche d'un trait (d'après son centre, par rapport au milieu des petites lettres). */
 export function rowOf(rows, pts) {
@@ -122,7 +132,7 @@ export function checkRow({ text, mode = 'min', baseline, strokes, phase = 2, boa
   const T = c.tpl;
   const none = { ok: false, stars: 0, score: 0, expected: T.length, got: strokes.length, matched: 0, tags: ['vide'] };
   if (!T.length || !strokes.length) return none;
-  const tPaths = T.filter((s) => s.kind === 'path'), tDots = T.filter((s) => s.kind === 'dot');
+  const tPaths = T.filter((s) => !leger(s));
   const uPaths = strokes.filter((s) => !isTap(s.pts)), uDots = strokes.filter((s) => isTap(s.pts));
   if (uPaths.length < tPaths.length) return { ...none, tags: ['trait-manquant'], matched: 0 };
   // alignement : le début du mot sur la rangée (translation seulement ; la hauteur reste celle de la ligne)
@@ -139,9 +149,9 @@ export function checkRow({ text, mode = 'min', baseline, strokes, phase = 2, boa
   // appariement glouton : les paires les plus proches d'abord
   const pairs = [];
   T.forEach((t, i) => U.forEach((u, j) => {
-    if ((t.kind === 'dot') !== isTap(u.pts)) return;
+    if (!vaAvec(t, u.pts)) return;
     const cu = centroid(u.pts), ct = centroid(t.pts);
-    const cost = Math.hypot(cu.x - ct.x, cu.y - ct.y) + (t.kind === 'path' ? Math.abs(Math.log((bbox(u.pts).w + 0.3) / (t.bbox.w + 0.3))) : 0);
+    const cost = Math.hypot(cu.x - ct.x, cu.y - ct.y) + (!leger(t) ? Math.abs(Math.log((bbox(u.pts).w + 0.3) / (t.bbox.w + 0.3))) : 0);
     pairs.push({ i, j, cost });
   }));
   pairs.sort((a, b) => a.cost - b.cost);
@@ -158,7 +168,7 @@ export function checkRow({ text, mode = 'min', baseline, strokes, phase = 2, boa
   });
   const matched = T.length - missing.length;
   // il manque un trait de lettre : l'écriture est incomplète (un point oublié ne bloque pas, il pèse seulement sur la note)
-  if (missing.some((i) => T[i].kind === 'path')) return { ok: false, stars: 0, score: 0, expected: T.length, got: strokes.length, matched, tags: ['trait-manquant'] };
+  if (missing.some((i) => !leger(T[i]))) return { ok: false, stars: 0, score: 0, expected: T.length, got: strokes.length, matched, tags: ['trait-manquant'] };
   const done = evals.map((e, i) => e || recognizer.evaluateStroke(T[i], { points: [] }, {}));
   const attempt = recognizer.evaluateAttempt({ strokes: T }, done);
   let score = attempt.score;

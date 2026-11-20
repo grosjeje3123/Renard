@@ -3,6 +3,7 @@
 
 import { SKILLS, LEVELS, ITEMS } from '../content/skills.js';
 import { STICKERS } from '../content/stickers.js';
+import { seDicte } from '../content/dictee.js';
 import { CRITERIA } from '../engine/recognizer.js';
 import { validDrawing, MAX_DESSINS } from './galerie.js';
 
@@ -27,6 +28,7 @@ export function newState() {
       dessinVu: '', // la dernière idée de dessin montrée (les modèles se suivent du plus simple au plus compliqué)
       traitAide: true, // épaissir le trait d'un cran (deux au plus) quand l'enfant a du mal
       reps: 1, // réussites demandées à chaque étape d'un exercice (1 ou 2)
+      rivales: true, // sans le guide plein, vérifier que l'enfant n'a pas écrit une autre lettre (voir core/rivaux.js)
       main: 'droite', // main d'écriture : 'droite' | 'gauche' (miroir de l'écran, tolérance de pente élargie)
       plateau: 0, // inclinaison du cahier à l'écran, en degrés (positif = vers la droite)
       pauseMin: 15, // minutes d'activité continue avant de proposer une pause (0 = jamais)
@@ -211,6 +213,11 @@ export function avisPapier(st, id, avis, now = Date.now()) {
   return true;
 }
 const paperEncore = (s) => s.paper?.avis === 'encore' && (s.paper.avisAt || 0) > (s.last || 0);
+/**
+ * Une dictée ratée (une étoile au plus) est l'information la plus précieuse : l'enfant ne sait pas encore écrire cela sans modèle.
+ * L'exercice revient dans les « à reprendre » jusqu'à ce qu'il soit rejoué. La maîtrise acquise n'est pas retirée.
+ */
+export const dicteeRatee = (st, id) => { const d = st.dictees?.[id]; return !!d && seDicte(SKILLS[id]) && d.last <= 1 && d.t > (st.skills[id]?.last || 0); }; // ce qui ne se dicte plus (un son seul, un mot très court) ne compte plus
 export const paperCount = (st) => Object.values(st.skills).filter((s) => s.paper?.n > 0).length;
 
 const roundCrit = (c) => Object.fromEntries(Object.entries(c).map(([k, v]) => [k, Math.round(v * 100) / 100]));
@@ -250,6 +257,7 @@ export function skillStatus(st, id) {
   const s = st.skills[id];
   if (!s || s.sessions === 0) return 'new';
   if (paperEncore(s)) return 'review'; // un adulte a vu le cahier : « à retravailler » (jusqu'à ce que l'enfant rejoue l'exercice)
+  if (dicteeRatee(st, id)) return 'review'; // raté en dictée : à revoir (jusqu'à ce que l'enfant rejoue l'exercice)
   if (s.mastered) return 'mastered';
   const recent = s.history.slice(-6);
   if (recent.length >= 5 && avg(recent.map((h) => h.sc)) < 0.5) return 'review';
@@ -353,6 +361,7 @@ const known = (st, id) => skillState(st, id).sessions > 0 || levelOf(id).id < de
  */
 export function isSkillOpen(st, id) {
   if (st.settings.demo) return true;
+  if (skillState(st, id).sessions > 0) return true; // déjà joué : jamais refermé (même si des exercices sont ajoutés avant lui par une mise à jour)
   const level = levelOf(id);
   if (level.id < departLevel(st)) return true;
   const sk = SKILLS[id];
@@ -361,6 +370,8 @@ export function isSkillOpen(st, id) {
   const i = list.indexOf(id);
   // Grande section : les formes de départ sont acquises, on commence directement par les majuscules
   if (sk.capital && st.settings.classe === 'gs' && !SKILLS[list[i - 1]]?.capital) return true;
+  // La première majuscule s'ouvre dès que les cinq formes de départ ont été essayées : les « autres formes » (v1.12) ne font pas barrage
+  if (sk.capital && !SKILLS[list[i - 1]]?.capital && level.core) return known(st, level.core.at(-1));
   // Les chiffres forment leur propre file : le 0 s'ouvre dès que les ronds sont essayés (ou d'emblée en grande section)
   if (sk.chiffre && !SKILLS[list[i - 1]]?.chiffre) return st.settings.classe === 'gs' || known(st, 'ronds');
   return i === 0 || skillState(st, list[i - 1]).sessions > 0;
@@ -555,3 +566,23 @@ export function usageDays(st, n = 7, now = Date.now()) {
 }
 
 export const todaySeconds = (st, now = Date.now()) => st.usage[dayKey(now)] || 0;
+
+/**
+ * La semaine en bref, pour les parents (les sept derniers jours) : le temps passé, ce qui vient d'être acquis ou consolidé,
+ * ce qui est à reprendre (et pourquoi), et les lettres écrites à la place d'une autre. Tout vient de l'état enregistré.
+ */
+export function bilanSemaine(st, now = Date.now()) {
+  const depuis = now - 7 * DAY;
+  const jours = usageDays(st, 7, now);
+  const ids = orderedSkills(st);
+  const recent = (t) => !!t && t >= depuis && t <= now;
+  const pourquoi = (id) => (paperEncore(st.skills[id] || {}) ? 'papier' : dicteeRatee(st, id) ? 'dictee' : 'fragile');
+  return {
+    minutes: Math.round(jours.reduce((a, d) => a + d.seconds, 0) / 60),
+    jours: jours.filter((d) => d.seconds >= 60).length,
+    acquis: ids.filter((id) => recent(st.skills[id]?.masteredAt)),
+    consolides: ids.filter((id) => recent(st.skills[id]?.consolidatedAt)),
+    reprendre: ids.filter((id) => skillStatus(st, id) === 'review').map((id) => ({ id, pourquoi: pourquoi(id) })),
+    confusions: ids.filter((id) => (st.skills[id]?.history || []).some((e) => recent(e.t) && (e.tg || []).includes('autre-lettre'))),
+  };
+}

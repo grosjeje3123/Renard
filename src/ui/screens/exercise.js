@@ -1,6 +1,6 @@
 // Écran d'exercice : le renard présente, montre le geste, puis l'enfant trace (guide → pointillés → seul).
 import { h, icon, sleep, pick } from '../dom.js';
-import { forestScene, itemSVG, templateOf, glyphIcon } from '../art.js';
+import { forestScene, itemSVG, templateEcran, glyphIcon } from '../art.js';
 import { Board } from '../board.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { SKILLS, ITEMS, LEVELS, isWriting } from '../../content/skills.js';
@@ -8,6 +8,7 @@ import { Session } from '../../core/session.js';
 import { recognizerContext } from '../../core/tolerance.js';
 import { epaisseur } from '../../core/epaisseur.js';
 import { recognizer } from '../../engine/recognizer.js';
+import { avecRivale } from '../../core/rivaux.js';
 import { buildFeedback } from '../../engine/feedback.js';
 import { surpriseOk } from '../../core/dictee.js';
 import { masteredCount } from '../../core/progress.js';
@@ -34,10 +35,10 @@ export function exercise(root, app, skillId) {
   if (blocked(app.state)) { app.go('pause'); return; } // pause douce ou limite du jour
 
   const st = app.state;
-  const tpl = templateOf(skillId);
+  const tpl = templateEcran(skillId);
   const startPhase = st.settings.demo ? 0 : startPhaseFor(st, skillId); // déjà acquis un autre jour : rappel « tout seul »
   const defi = startPhase === 2 && !skillState(st, skillId).sessions; // enfant très à l'aise : défi « tout seul » sur un exercice nouveau
-  const session = new Session(skillId, { demo: st.settings.demo, startPhase, reps: st.settings.reps, defi });
+  const session = new Session(skillId, { demo: st.settings.demo, startPhase, reps: st.settings.reps, defi, strokes: tpl.strokes.length });
   const level = LEVELS.find((l) => l.skills.includes(skillId));
   const item = skill.item ? ITEMS[skill.item] : null;
   const writing = isWriting(skill);
@@ -77,7 +78,7 @@ export function exercise(root, app, skillId) {
       h('span', {}, cardText)),
     writing ? h('span', { class: 'ec-ear', 'aria-hidden': 'true', html: icon('speaker', 22) }) : null);
   // Modèle à côté du cahier (côté opposé à la main qui écrit) : on le voit même quand la main cache le guide.
-  const modelChip = h('div', { class: 'model-chip', 'aria-label': 'Le modèle', html: glyphIcon(skillId, { stroke: 'var(--text)', width: 0.2, pad: 0.4 }) });
+  const modelChip = h('div', { class: 'model-chip', 'aria-label': 'Le modèle', html: glyphIcon(skillId, { stroke: 'var(--text)', width: 0.2, pad: 0.4, ecran: true }) });
 
   root.append(
     h('div', { class: 'scene-wrap soft', html: forestScene({ density: 0 }) }),
@@ -98,10 +99,10 @@ export function exercise(root, app, skillId) {
   const say = (t, o) => (alive ? speaker.say(t, o) : Promise.resolve());
 
   const board = new Board(boardHost, tpl, {
-    allowTap: () => tpl.strokes[strokeIdx]?.kind === 'dot',
+    allowTap: () => tpl.strokes[strokeIdx]?.kind === 'dot' || !!tpl.strokes[strokeIdx]?.mark, // un point, ou un accent tout petit
     shouldHold: (s) => {
       const ts = tpl.strokes[strokeIdx];
-      return ts.kind === 'path' && polyLength(s.points) > 0.5 && dist(s.points[s.points.length - 1], ts.end) > 1.4;
+      return ts.kind === 'path' && !ts.mark && polyLength(s.points) > 0.5 && dist(s.points[s.points.length - 1], ts.end) > 1.4;
     },
     onStrokeStart: () => sfx('start'),
     onStrokeEnd: (s) => onStrokeEnd(s),
@@ -160,10 +161,13 @@ export function exercise(root, app, skillId) {
   async function onStrokeEnd(stroke) {
     if (!alive || busy) return;
     const ts = tpl.strokes[strokeIdx];
-    if (ts.kind === 'path' && polyLength(stroke.points) < 0.5) { board.removeInk(stroke.el); return; } // simple effleurement
+    if (ts.kind === 'path' && !ts.mark && polyLength(stroke.points) < 0.5) { board.removeInk(stroke.el); return; } // simple effleurement
     busy = true; board.enable(false);
     const ctx = recognizerContext(skill, session.phase, st.settings, stroke.pointerType, tpl.board?.W);
-    const ev = recognizer.evaluateStroke(ts, { points: stroke.points, lifts: stroke.lifts }, ctx);
+    const trace = { points: stroke.points, lifts: stroke.lifts };
+    // Sans le guide plein, on vérifie aussi que ce n'est pas une autre lettre (un « o » à la place d'un « a »…) : voir core/rivaux.js
+    const brut = recognizer.evaluateStroke(ts, trace, ctx);
+    const ev = st.settings.rivales === false ? brut : avecRivale(ts, trace, ctx, brut);
     board.markInk(stroke.el, ev.stars);
 
     if (tpl.strokes.length > 1 && ev.stars === 0 && retries < 1) {

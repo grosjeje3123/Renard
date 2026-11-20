@@ -13,7 +13,8 @@ export function levels(root, app) {
   const b = bubble();
   root.classList.add('levels');
 
-  const cards = LEVELS.map((lv) => {
+  // Un niveau encore vide n'est pas montré : pas de promesse « Bientôt » tant qu'il n'y a rien à y faire.
+  const cards = LEVELS.filter((lv) => lv.available && lv.skills.length).map((lv) => {
     const p = levelProgress(st, lv);
     const series = seriesDuNiveau(st, lv);
     // beaucoup d'exercices : une feuille par étape (« Les lettres rondes »…) plutôt qu'une par exercice

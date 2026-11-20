@@ -11,6 +11,7 @@ import { DICTEE_INVITE, DICTEE_FIN, DICTEE_MONTE, dicteeDit } from '../../conten
 import { recognizerContext } from '../../core/tolerance.js';
 import { epaisseur } from '../../core/epaisseur.js';
 import { recognizer } from '../../engine/recognizer.js';
+import { avecRivale } from '../../core/rivaux.js';
 import { buildFeedback } from '../../engine/feedback.js';
 import { dicteeItems, dicteePossible, recordDictee, DICTEE_N, SURPRISE_N, bilanDictee } from '../../core/dictee.js';
 import { blocked, breakDue } from '../../core/progress.js';
@@ -77,10 +78,10 @@ export function dictee(root, app, arg) {
   function buildBoard() {
     board?.destroy();
     board = new Board(boardHost, tpl, {
-      allowTap: () => tpl.strokes[strokeIdx]?.kind === 'dot',
+      allowTap: () => tpl.strokes[strokeIdx]?.kind === 'dot' || !!tpl.strokes[strokeIdx]?.mark,
       shouldHold: (s) => {
         const ts = tpl.strokes[strokeIdx];
-        return ts.kind === 'path' && polyLength(s.points) > 0.5 && dist(s.points[s.points.length - 1], ts.end) > 1.4;
+        return ts.kind === 'path' && !ts.mark && polyLength(s.points) > 0.5 && dist(s.points[s.points.length - 1], ts.end) > 1.4;
       },
       onStrokeStart: () => sfx('start'),
       onStrokeEnd: (s) => onStrokeEnd(s),
@@ -112,10 +113,12 @@ export function dictee(root, app, arg) {
   async function onStrokeEnd(stroke) {
     if (!alive || busy) return;
     const ts = tpl.strokes[strokeIdx];
-    if (ts.kind === 'path' && polyLength(stroke.points) < 0.5) { board.removeInk(stroke.el); return; } // simple effleurement
+    if (ts.kind === 'path' && !ts.mark && polyLength(stroke.points) < 0.5) { board.removeInk(stroke.el); return; } // simple effleurement
     busy = true; board.enable(false); skipBtn.disabled = replayBtn.disabled = true;
     const ctx = recognizerContext(skill, 2, st.settings, stroke.pointerType, tpl.board?.W);
-    const ev = recognizer.evaluateStroke(ts, { points: stroke.points, lifts: stroke.lifts }, ctx);
+    const trace = { points: stroke.points, lifts: stroke.lifts };
+    const brut = recognizer.evaluateStroke(ts, trace, ctx);
+    const ev = st.settings.rivales === false ? brut : avecRivale(ts, trace, ctx, brut); // une dictée vérifie que c'est la bonne lettre
     board.markInk(stroke.el, ev.stars);
     if (tpl.strokes.length > 1 && ev.stars === 0 && retries < 1) {
       retries++; sfx('oops');

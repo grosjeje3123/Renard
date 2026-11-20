@@ -32,6 +32,26 @@ const boucles = () => {
   return [{ d: new P().fn(Math.PI, 5 * Math.PI, 160, g).toString() }];
 };
 
+// ---- D'autres formes (v1.12) : les gestes qui manquaient avant les lettres. Traits couchés, obliques, créneaux, coupes (le creux du u),
+// spirale (tourner sans s'arrêter, vers la gauche comme le o) et boucles vers le bas (la boucle du j, du g et du y).
+const couches = () => [2.5, 1.5, 0.5].map((y) => ({ d: new P().M(0, y).L(5.6, y).toString() }));
+const montagnes = () => [{ d: new P().M(0, 0).L(1.2, 2).L(2.4, 0).L(3.6, 2).L(4.8, 0).L(6, 2).L(7.2, 0).toString() }];
+const creneaux = () => [{ d: new P().M(0, 0).L(0, 2).L(1.3, 2).L(1.3, 0).L(2.6, 0).L(2.6, 2).L(3.9, 2).L(3.9, 0).L(5.2, 0).L(5.2, 2).L(6.5, 2).L(6.5, 0).toString() }];
+const coupes = () => {
+  const w = 2.4, h = 8 / 3; // comme les ponts, à l'envers : on part d'en haut, on touche la ligne d'écriture, on remonte
+  const p = new P().M(0, 2);
+  for (let i = 0; i < 3; i++) p.C(i * w, 2 - h, i * w + w, 2 - h, i * w + w, 2);
+  return [{ d: p.toString() }];
+};
+const spirale = () => {
+  const a = 1.5 / (4.5 * Math.PI); // du centre vers l'extérieur, en tournant vers la gauche : 3 interlignes de haut à la fin
+  return [{ d: new P().fn(0.6, 4.5 * Math.PI, 150, (t) => [1.6 + a * t * Math.cos(t), 1.5 + a * t * Math.sin(t)]).toString() }];
+};
+const lianes = () => {
+  const a = 0.62, b = 1.5; // les rubans, tête en bas : les boucles pendent de la ligne du haut jusqu'à la ligne d'écriture
+  return [{ d: new P().fn(Math.PI, 5 * Math.PI, 160, (t) => [a * t - b * Math.sin(t), 3 - (b * Math.cos(t) + b)]).toString() }];
+};
+
 export const SKILLS = {
   lignes: {
     id: 'lignes', kind: 'graphisme', level: 1, title: 'La pluie', short: 'Traits droits',
@@ -87,6 +107,73 @@ export const SKILLS = {
       bubble: 'Fais la boucle',
     },
     item: 'medaille',
+  },
+
+  couches: {
+    id: 'couches', kind: 'graphisme', level: 1, title: 'Le vent', short: 'Traits couchés',
+    skillLabel: 'Tracer des traits de gauche à droite',
+    strokes: couches(),
+    say: {
+      intro: 'Le vent souffle ! Je trace des traits couchés, de la gauche vers la droite.',
+      how: 'Pars du point vert et va tout droit vers la droite.',
+      bubble: 'De gauche à droite',
+    },
+    item: null,
+  },
+  montagnes: {
+    id: 'montagnes', kind: 'graphisme', level: 1, title: 'Les montagnes', short: 'Traits en biais',
+    skillLabel: 'Tracer des traits en biais',
+    strokes: montagnes(),
+    say: {
+      intro: 'Des montagnes pointues ! Je monte en biais, je redescends en biais, sans lever le crayon.',
+      how: 'Monte en biais jusqu’à la ligne du haut, redescends en biais, et recommence.',
+      bubble: 'Monte, descends, en biais',
+    },
+    item: null,
+  },
+  creneaux: {
+    id: 'creneaux', kind: 'graphisme', level: 1, title: 'Le château', short: 'Les créneaux',
+    skillLabel: 'Tracer des créneaux',
+    strokes: creneaux(),
+    say: {
+      intro: 'Le mur du château ! Je monte tout droit, je vais à droite, je descends, je vais à droite.',
+      how: 'Monte, tourne à droite, descends, tourne à droite. Les coins sont bien carrés.',
+      bubble: 'Monte, à droite, descends',
+    },
+    item: null,
+  },
+  coupes: {
+    id: 'coupes', kind: 'graphisme', level: 1, title: 'Les guirlandes', short: 'Les creux',
+    skillLabel: 'Tracer des creux',
+    strokes: coupes(),
+    say: {
+      intro: 'Une guirlande pour la fête ! Je descends, je touche la ligne du bas et je remonte.',
+      how: 'Descends en rond jusqu’à la ligne du bas, puis remonte. Recommence sans lever le crayon.',
+      bubble: 'Descends, touche, remonte',
+    },
+    item: null,
+  },
+  spirale: {
+    id: 'spirale', kind: 'graphisme', level: 1, title: 'L’escargot', short: 'La spirale',
+    skillLabel: 'Tracer une spirale',
+    strokes: spirale(),
+    say: {
+      intro: 'La coquille de l’escargot ! Je pars du milieu et je tourne vers la gauche, de plus en plus grand.',
+      how: 'Pars du point vert, au milieu, et tourne vers la gauche sans t’arrêter.',
+      bubble: 'Tourne, de plus en plus grand',
+    },
+    item: null,
+  },
+  lianes: {
+    id: 'lianes', kind: 'graphisme', level: 1, title: 'Les lianes', short: 'Boucles vers le bas',
+    skillLabel: 'Tracer des boucles vers le bas',
+    strokes: lianes(),
+    say: {
+      intro: 'Des lianes qui pendent ! Je descends, je fais une boucle en bas et je remonte.',
+      how: 'Descends, tourne en bas, remonte en croisant ton trait, et avance.',
+      bubble: 'Descends, boucle, remonte',
+    },
+    item: null,
   },
 
   // ---- Niveau 2 : lettres cursives (tracés écrits droits, l'inclinaison est appliquée au chargement)
@@ -191,27 +278,100 @@ const shiftD = (d, dx) => {
 };
 const WORD_GAP = 0.6; // entre deux lettres d'un mot
 const SPACE_GAP = 1.5; // entre deux mots d'une phrase
+export const LINE_PITCH = 5; // entre deux lignes d'écriture d'un même exercice (3 interlignes de hampe + 1,75 de jambage + un peu d'air)
+
+// ---- Accents. Une lettre accentuée = la lettre, puis son accent posé juste après (comme le point du i) : un petit trait à part.
+// L'accent aigu descend vers la gauche, le grave vers la droite, le circonflexe fait un petit toit, le tréma deux points,
+// la cédille un petit crochet sous le c. Les majuscules d'imprimerie gardent leurs accents (« Élodie »).
+const ACCENTS_MIN = { 'é': ['e', 'aigu'], 'è': ['e', 'grave'], 'ê': ['e', 'circ'], 'ë': ['e', 'trema'], 'à': ['a', 'grave'], 'â': ['a', 'circ'], 'î': ['i', 'circ'], 'ï': ['i', 'trema'], 'ô': ['o', 'circ'], 'ù': ['u', 'grave'], 'û': ['u', 'circ'], 'ü': ['u', 'trema'], 'ç': ['c', 'cedille'] };
+export const ACCENTS = { ...ACCENTS_MIN, ...Object.fromEntries(Object.entries(ACCENTS_MIN).map(([c, [b, m]]) => [c.toUpperCase(), [b.toUpperCase(), m]])) };
+/** « bébé » → « bebe » : le même texte, sans ses accents (identifiants, lettres à connaître, difficulté). */
+export const sansAccent = (t) => [...String(t)].map((c) => ACCENTS[c]?.[0] ?? c).join('');
+/** Le milieu du corps des minuscules qui portent un accent (pas le milieu de la lettre avec sa queue de sortie). */
+const AXE = { e: 0.8, a: 0.78, u: 1.32, o: 0.78, i: 0.9, c: 0.78 };
+/** Les traits d'un accent posé sur une lettre d'axe `cx` et de hauteur `top` (y vers le haut) : des lignes brisées `pts`, ou des points. */
+function accentStrokes(mark, cx, top) {
+  switch (mark) {
+    case 'aigu': return [{ pts: [[cx + 0.3, top + 0.95], [cx - 0.15, top + 0.4]], mark }];
+    case 'grave': return [{ pts: [[cx - 0.3, top + 0.95], [cx + 0.15, top + 0.4]], mark }];
+    case 'circ': return [{ pts: [[cx - 0.42, top + 0.4], [cx, top + 0.92], [cx + 0.42, top + 0.4]], mark }];
+    case 'trema': return [{ dot: [cx - 0.32, top + 1] }, { dot: [cx + 0.32, top + 1] }];
+    case 'cedille': return [{ pts: parsePath(new P().M(cx + 0.05, 0).C(cx + 0.5, -0.25, cx + 0.4, -0.8, cx - 0.2, -0.72).toString()).filter((_, i) => i % 2 === 0).map((q) => [q.x, q.y]), mark }];
+    default: return [];
+  }
+}
 /**
- * Écrit un texte (lettres a–z, espaces) avec les tracés des lettres : lettres détachées, points des i et des j à la fin de chaque mot,
- * point final de la phrase si `period`.
+ * Une ligne de texte : lettres détachées posées côte à côte, point du i et accent juste après leur lettre.
+ * Chaque trait dit à quelle lettre il appartient (`of`), ce qui permet de reconnaître une lettre écrite à la place d'une autre.
+ * Retourne { strokes, width } (la largeur va du bord gauche de la première lettre au bord droit de la dernière).
  */
-export function composeText(text, { period = false, skills = SKILLS, gap = WORD_GAP, space = SPACE_GAP } = {}) {
+function composeLine(text, { skills = SKILLS, gap = WORD_GAP, space = SPACE_GAP } = {}) {
   const out = [];
   let cursor = 0;
   text.split(' ').forEach((word, wi) => {
     if (wi) cursor += space - gap;
-    for (const id of word) {
-      const strokes = skills[id].strokes;
+    for (const ch of word) {
+      const [id, mark] = ACCENTS[ch] || [ch, null];
       const sk = skills[id];
+      if (!sk) continue;
+      const strokes = sk.strokes;
       const xs = strokes.filter((st) => st.d).flatMap((st) => parsePath(st.d)).map((q) => (sk.upright ? q.x + BOARD.slant * q.y : q.x));
-      const dx = cursor - Math.min(...xs);
+      const x0 = Math.min(...xs), x1 = Math.max(...xs);
+      const dx = cursor - x0;
       // Le point du i se pose juste après le i, pendant l'écriture du mot (et non à la fin) : l'ordre des traits, donc la numérotation, suit l'écriture.
-      for (const st of strokes) out.push(st.d ? { d: shiftD(st.d, dx) } : { dot: [st.dot[0] + dx, st.dot[1]] });
-      cursor += Math.max(...xs) - Math.min(...xs) + gap;
+      // Un i qui porte un accent (î, ï) perd son point : l'accent le remplace.
+      for (const st of strokes) {
+        if (st.d) out.push({ d: shiftD(st.d, dx), of: id });
+        else if (!(mark && id === 'i')) out.push({ dot: [st.dot[0] + dx, st.dot[1]], of: id });
+      }
+      if (mark) {
+        const cx = sk.upright ? (x0 + x1) / 2 : AXE[id] ?? (x0 + x1) / 2;
+        // les capitales sont « pré-redressées » (voir majuscules.js) : leur accent aussi, pour rester droit au-dessus d'elles
+        const place = (x, y) => (sk.upright ? x - BOARD.slant * y : x) + dx;
+        for (const a of accentStrokes(mark, cx, sk.upright ? 3 : 2)) {
+          if (a.pts) out.push({ d: a.pts.map(([x, y], i) => `${i ? 'L' : 'M'} ${fx(place(x, y))} ${fx(y)}`).join(' '), mark: a.mark, of: id });
+          else out.push({ dot: [place(a.dot[0], a.dot[1]), a.dot[1]], of: id });
+        }
+      }
+      cursor += x1 - x0 + gap;
     }
   });
-  if (period) out.push({ dot: [cursor - gap + 0.55, 0] });
-  return out;
+  return { strokes: out, width: Math.max(0, cursor - gap) };
+}
+/** Descend d'une ligne d'écriture (dy vers le bas) : les abscisses ne bougent pas. */
+const lower = (st, dy, row) => (st.d ? { ...st, d: mapY(st.d, (y) => y - dy), row } : { ...st, dot: [st.dot[0], st.dot[1] - dy], row });
+/**
+ * Écrit un texte (lettres a–z avec ou sans accent, espaces) avec les tracés des lettres, sur une seule ligne :
+ * lettres détachées, points et accents juste après leur lettre, point final de la phrase si `period`.
+ */
+export function composeText(text, { period = false, skills = SKILLS, gap = WORD_GAP, space = SPACE_GAP } = {}) {
+  const { strokes, width } = composeLine(text, { skills, gap, space });
+  if (period) strokes.push({ dot: [width + 0.55, 0] });
+  return strokes;
+}
+/**
+ * Le même texte, pour l'écran : une phrase trop longue pour une seule ligne revient à la ligne entre deux mots, comme dans un cahier
+ * (jusqu'à trois lignes). On retient le découpage qui donne les lettres les plus grandes à l'écran (rapport 10:7 de la page) ; à moins de
+ * 12 % de gain, on garde moins de lignes. Retourne { strokes, lignes } : `lignes` = décalage de chaque ligne d'écriture (0, −5, −10…).
+ */
+export function composeLines(text, { period = false, skills = SKILLS, gap = WORD_GAP, space = SPACE_GAP, pitch = LINE_PITCH, maxLines = 3 } = {}) {
+  const words = text.split(' ');
+  const wide = (n, w) => Math.max(w + 1.6 + (period ? 0.55 : 0), (3.5 + (n - 1) * pitch + 2.25) / 0.7); // largeur de page nécessaire (voir ui/board.js)
+  let best = null;
+  const essayer = (groups) => {
+    const lines = groups.map((g) => composeLine(g.join(' '), { skills, gap, space }));
+    const need = wide(lines.length, Math.max(...lines.map((l) => l.width)));
+    if (!best || need < best.need * (lines.length > best.lines.length ? 0.88 : 1)) best = { need, lines };
+  };
+  essayer([words]);
+  for (let i = 1; i < words.length && maxLines >= 2; i++) essayer([words.slice(0, i), words.slice(i)]);
+  const deux = best;
+  best = null;
+  for (let i = 1; i < words.length && maxLines >= 3; i++) for (let j = i + 1; j < words.length; j++) essayer([words.slice(0, i), words.slice(i, j), words.slice(j)]);
+  if (!best || best.need >= deux.need * 0.88) best = deux;
+  const strokes = best.lines.flatMap((l, k) => l.strokes.map((st) => (k ? lower(st, k * pitch, k) : st)));
+  if (period) { const last = best.lines.at(-1); strokes.push({ dot: [last.width + 0.55, -(best.lines.length - 1) * pitch], ...(best.lines.length > 1 ? { row: best.lines.length - 1 } : {}) }); }
+  return { strokes, lignes: best.lines.map((_, k) => -k * pitch) };
 }
 // ---- Niveau 1 (suite) : les 26 majuscules d'imprimerie, la grande étape de la grande section avant le CP.
 // Mêmes tracés que le tableau libre (majuscules.js), mais droits dès le départ (`slant: 0`) : on les pose tels quels sur le cahier.
@@ -304,14 +464,19 @@ export const composeWord = (letters, skills = SKILLS) => composeText(letters.joi
 
 // ---- Niveau 3 : les sons, les mots, les phrases. Tout est composé avec les lettres : on n'écrit ici que du texte.
 const GROUPES = ['ou', 'on', 'an', 'in', 'ch', 'oi', 'au', 'eau', 'ai', 'eu', 'gn', 'qu'];
+/**
+ * Le mot repère de chaque groupe de lettres, comme sur les affiches de la classe. Plusieurs écritures donnent le même son
+ * (« o », « au », « eau » ; « an », « en »…) : c'est le mot repère qui dit laquelle écrire, à l'écran comme en dictée.
+ */
+export const SON_REPERE = { ou: 'loup', on: 'mouton', an: 'maman', in: 'lapin', ch: 'chat', oi: 'roi', au: 'jaune', eau: 'bateau', ai: 'lait', eu: 'bleu', gn: 'montagne', qu: 'quille' };
 // L'échelle de la fin du niveau 3 : des mots, puis des phrases, du plus simple au plus difficile.
 // La difficulté d'un texte, c'est d'abord sa longueur (nombre de lettres), puis la difficulté de ses lettres : celles qu'on apprend
 // d'abord comptent 1 (i, o, a, l, e), puis 2 (u, t, n, m, r), 3 (c, d, s, g, q), 4 (b, h, k, f, p) et 5 (j, y, v, w, x, z), comme dans l'ordre du niveau 2.
 const POIDS_LETTRE = Object.fromEntries(['ioale', 'utnmr', 'cdsgq', 'bhkfp', 'jyvwxz'].flatMap((g, i) => [...g].map((l) => [l, i + 1])));
 /** Nombre de lettres d'un mot ou d'une phrase (sans les espaces). */
-export const nbLettres = (t) => t.replace(/ /g, '').length;
+export const nbLettres = (t) => [...t.replace(/ /g, '')].length;
 /** Poids total des lettres : à longueur égale, c'est ce qui départage le plus simple du plus difficile. */
-export const difficulte = (t, poids = POIDS_LETTRE) => [...t.replace(/ /g, '')].reduce((a, l) => a + (poids[l] || 0), 0);
+export const difficulte = (t, poids = POIDS_LETTRE) => [...sansAccent(t).replace(/ /g, '')].reduce((a, l) => a + (poids[l] || 0), 0) + [...t].filter((c) => ACCENTS[c]).length;
 const parDifficulte = (liste) => [...liste].sort((a, b) => nbLettres(a) - nbLettres(b) || difficulte(a) - difficulte(b) || a.localeCompare(b, 'fr'));
 
 const PALIERS_MOTS = [
@@ -325,8 +490,8 @@ const PALIERS_MOTS = [
 ];
 const PHRASES_ECHELLE = [
   'tu lis', 'il dort', 'il joue', 'elle rit', 'il pleut', 'il neige', 'papa lit', 'papa rit', 'il a un ami', 'maman lit',
-  'tu as un ami', 'mon ami joue', 'il a un chien', 'le chat dort', 'un ours dort', 'le bebe dort', 'le lion rugit', 'le loup a faim',
-  'la lune brille', 'le lapin saute', 'le chien aboie', 'la pluie tombe', 'la vache mange', 'je sais ecrire', 'le soleil brille', 'papa lit un livre',
+  'tu as un ami', 'mon ami joue', 'il a un chien', 'le chat dort', 'un ours dort', 'le bébé dort', 'le lion rugit', 'le loup a faim',
+  'la lune brille', 'le lapin saute', 'le chien aboie', 'la pluie tombe', 'la vache mange', 'je sais écrire', 'le soleil brille', 'papa lit un livre',
   'le renard a faim', 'le lapin a un nid',
   'le petit chat dort', 'tu as un joli livre', 'le chat aime le lait', 'le renard est malin', 'le chien est gentil', 'le soleil est chaud',
   'le chat lit un livre', 'le chat boit du lait',
@@ -349,28 +514,46 @@ const MOT_SECTIONS = [
   { id: 'nature', title: 'La nature', mots: ['lune', 'soleil', 'fleur', 'arbre', 'pluie', 'neige', 'vent', 'sable'] },
   { id: 'maison', title: 'À la maison', mots: ['table', 'livre', 'porte', 'lit', 'sac', 'robe', 'pomme', 'poire', 'pain', 'lait'] },
   { id: 'couleurs', title: 'Les couleurs', mots: ['rouge', 'vert', 'bleu', 'jaune', 'noir', 'blanc', 'gris', 'rose'] },
+  // Les accents : aigu, grave, circonflexe, cédille. Des mots courts et familiers, pour que le geste nouveau (l'accent) soit la seule difficulté.
+  { id: 'accents', title: 'Les mots à accent', mots: ['été', 'vélo', 'bébé', 'école', 'père', 'mère', 'fête', 'forêt', 'leçon', 'garçon'] },
   ...ECHELLE_MOTS,
   ...ECHELLE_PHRASES,
 ];
-const needsOf = (text) => [...new Set(text.replace(/ /g, ''))];
+const needsOf = (text) => [...new Set(sansAccent(text).replace(/ /g, ''))];
+/** Ce que le renard dit de l'accent d'un mot (le premier accent du mot ; un seul geste nouveau à la fois). */
+const ACCENT_DIT = {
+  aigu: 'L’accent aigu se pose après la lettre : un petit trait qui descend vers la gauche.',
+  grave: 'L’accent grave se pose après la lettre : un petit trait qui descend vers la droite.',
+  circ: 'L’accent circonflexe se pose après la lettre : un petit chapeau pointu.',
+  trema: 'Le tréma se pose après la lettre : deux petits points.',
+  cedille: 'La cédille se pose après le c : un petit crochet sous la ligne.',
+};
 const mkText = (sec, text, kind) => {
-  const id = `${kind === 'phrase' ? 'phr' : kind === 'groupe' ? 'son' : 'mot'}_${text.replace(/ /g, '_')}`;
+  const id = `${kind === 'phrase' ? 'phr' : kind === 'groupe' ? 'son' : 'mot'}_${sansAccent(text).replace(/ /g, '_')}`; // identifiant sans accent : il sert d'adresse d'écran et de clé de progression
   const dots = /[ij]/.test(text);
+  const accent = [...text].map((c) => ACCENTS[c]?.[1]).find(Boolean);
   const n = needsOf(text).length;
   const L = n === 1 ? 'la lettre' : 'les lettres';
+  const apres = `${dots ? ', et pose le point du i juste après le i' : ''}`;
+  // Une phrase commence par une majuscule et finit par un point. Tant que les majuscules cursives ne sont pas apprises (elles viennent
+  // au CE1), la majuscule est celle d'imprimerie, droite, que l'enfant connaît depuis le niveau 1 : c'est l'usage du début du CP.
+  const affiche = kind === 'phrase' ? text[0].toUpperCase() + text.slice(1) : text;
+  const ecran = kind === 'phrase' ? composeLines(affiche, { period: true, skills: ECRITURE }) : null;
   SKILLS[id] = {
-    id, kind: 'word', level: 3, glyph: text, word: text, section: sec.id,
+    id, kind: 'word', level: 3, glyph: affiche, word: text, section: sec.id,
     groupe: kind === 'groupe', phrase: kind === 'phrase',
-    title: kind === 'groupe' ? `Le son « ${text} »` : kind === 'phrase' ? `La phrase « ${text} »` : `Le mot « ${text} »`,
-    label: text, short: kind === 'groupe' ? `Le son « ${text} »` : kind === 'phrase' ? `La phrase « ${text} »` : `Le mot « ${text} »`,
-    skillLabel: kind === 'groupe' ? `Écrire le son « ${text} »` : kind === 'phrase' ? `Écrire la phrase « ${text} »` : `Écrire le mot « ${text} »`,
-    needs: needsOf(text),
-    strokes: composeText(text, { period: kind === 'phrase' }),
+    title: kind === 'groupe' ? `Le son « ${text} »` : kind === 'phrase' ? `La phrase « ${affiche} »` : `Le mot « ${text} »`,
+    label: affiche, short: kind === 'groupe' ? `Le son « ${text} »` : kind === 'phrase' ? `La phrase « ${affiche} »` : `Le mot « ${text} »`,
+    skillLabel: kind === 'groupe' ? `Écrire le son « ${text} »` : kind === 'phrase' ? `Écrire la phrase « ${affiche} »` : `Écrire le mot « ${text} »`,
+    needs: needsOf(kind === 'phrase' ? text.slice(1) : text), // les lettres cursives réellement écrites (la première d'une phrase est une majuscule)
+    strokes: kind === 'phrase' ? composeText(affiche, { period: true, skills: ECRITURE }) : composeText(text),
+    // à l'écran, une longue phrase revient à la ligne (les fiches à imprimer et le tableau gardent la ligne unique `strokes`)
+    ...(ecran && ecran.lignes.length > 1 ? { ecran } : {}),
     say: kind === 'groupe'
-      ? { intro: `Le son « ${text} » s’écrit avec ${text.length} lettres : ${[...text].join(', ')}. Je les écris l’une après l’autre.`, how: `Écris les lettres l’une après l’autre, de gauche à droite${dots ? ', et pose le point juste après le i' : ''}.`, bubble: 'Lettre après lettre' }
+      ? { intro: `Le son « ${text} », comme dans « ${SON_REPERE[text]} », s’écrit avec ${text.length} lettres : ${[...text].join(', ')}. Je les écris l’une après l’autre.`, how: `Écris les lettres l’une après l’autre, de gauche à droite${dots ? ', et pose le point juste après le i' : ''}.`, bubble: 'Lettre après lettre' }
       : kind === 'phrase'
-        ? { intro: `La phrase « ${text} ». J’écris les mots l’un après l’autre, et je pose un point à la fin.`, how: 'Écris chaque mot lettre par lettre, puis pose le point final sur la ligne.', bubble: 'Mot après mot, puis le point' }
-        : { intro: `Le mot « ${text} ». J’écris ${L} une par une, et je lève le crayon entre les lettres.`, how: `Écris les lettres une par une, de gauche à droite${dots ? ', et pose le point du i juste après le i' : ''}.`, bubble: 'Lettre par lettre' },
+        ? { intro: `La phrase « ${affiche} ». Elle commence par une majuscule, et je pose un point à la fin.`, how: `Commence par la majuscule, bien droite. Écris chaque mot lettre par lettre${ecran && ecran.lignes.length > 1 ? ', reviens à la ligne comme dans ton cahier' : ''}, puis pose le point final sur la ligne.${accent ? ` ${ACCENT_DIT[accent]}` : ''}`, bubble: 'La majuscule, les mots, le point' }
+        : { intro: `Le mot « ${text} ». J’écris ${L} une par une, de gauche à droite.${accent ? ` ${ACCENT_DIT[accent]}` : ''}`, how: `Écris les lettres une par une, de gauche à droite${apres}.${accent ? ' N’oublie pas l’accent !' : ''}`, bubble: accent ? 'Lettre par lettre, et l’accent' : 'Lettre par lettre' },
     item: null,
   };
   return id;
@@ -408,6 +591,7 @@ const SECTIONS_MAJ_TEXTES = [
 const mkTexteMaj = (sec, text, phrase) => {
   const id = `${phrase ? 'mp' : 'mm'}_${text.replace(/ /g, '_')}`;
   const n = needsOf(text).length;
+  const ecran = phrase ? composeLines(text, { period: true, skills: CAPITALES, gap: ECART_MAJ, space: ESPACE_MAJ }) : null;
   SKILLS[id] = {
     id, kind: 'word', level: 1, glyph: text, word: text, section: sec.id, phrase, groupe: false, majMot: true,
     title: phrase ? `La phrase « ${text} »` : `Le mot « ${text} »`,
@@ -415,8 +599,9 @@ const mkTexteMaj = (sec, text, phrase) => {
     skillLabel: phrase ? `Écrire la phrase « ${text} » en capitales` : `Écrire le mot « ${text} » en capitales`,
     needs: needsOf(text).map((L) => `maj_${L}`),
     strokes: composeText(text, { period: phrase, skills: CAPITALES, gap: ECART_MAJ, space: ESPACE_MAJ }),
+    ...(ecran && ecran.lignes.length > 1 ? { ecran } : {}),
     say: phrase
-      ? { intro: `La phrase « ${text} », en majuscules. J’écris les mots l’un après l’autre, et je pose un point à la fin.`, how: 'Écris chaque mot lettre par lettre, bien droit, puis pose le point final sur la ligne.', bubble: 'Ma phrase en capitales' }
+      ? { intro: `La phrase « ${text} », en majuscules. J’écris les mots l’un après l’autre, et je pose un point à la fin.`, how: `Écris chaque mot lettre par lettre, bien droit${ecran && ecran.lignes.length > 1 ? ', reviens à la ligne comme dans ton cahier' : ''}, puis pose le point final sur la ligne.`, bubble: 'Ma phrase en capitales' }
       : { intro: `Le mot « ${text} », en majuscules. J’écris ${n === 1 ? 'la lettre' : 'les lettres'} une par une, de gauche à droite.`, how: 'Écris les lettres une par une, de gauche à droite, bien droites, en levant le crayon entre les lettres.', bubble: 'Lettre par lettre' },
     item: null,
   };
@@ -432,13 +617,14 @@ const SEC2 = [
   { id: 'voyage', title: 'Les lettres qui voyagent', skills: ['j', 'y', 'v', 'w', 'x', 'z'] },
 ];
 
+const FORMES2 = ['couches', 'montagnes', 'creneaux', 'coupes', 'spirale', 'lianes'];
 export const LEVELS = [
   {
     id: 1, name: 'Les petits explorateurs', classe: 'Avant le CP', ages: 'MS · GS', env: 'foret', available: true,
     // `core` : les formes de départ (récompenses, vignette du hibou) ; les majuscules viennent ensuite, par familles
     core: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'],
-    sections: [{ id: 'formes', title: 'Les formes', skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'] }, ...MAJ_SECTIONS, CHIFFRES_SECTION, ...SECTIONS_MAJ_TEXTES],
-    skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles', ...MAJ_SECTIONS.flatMap((x) => x.skills), ...CHIFFRES_SECTION.skills, ...SECTIONS_MAJ_TEXTES.flatMap((x) => x.skills)],
+    sections: [{ id: 'formes', title: 'Les formes', skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles'] }, { id: 'formes2', title: 'D’autres formes', skills: FORMES2 }, ...MAJ_SECTIONS, CHIFFRES_SECTION, ...SECTIONS_MAJ_TEXTES],
+    skills: ['lignes', 'ronds', 'ponts', 'vagues', 'boucles', ...FORMES2, ...MAJ_SECTIONS.flatMap((x) => x.skills), ...CHIFFRES_SECTION.skills, ...SECTIONS_MAJ_TEXTES.flatMap((x) => x.skills)],
     blurb: 'Les formes, les majuscules, les chiffres, puis des mots et des phrases',
   },
   {

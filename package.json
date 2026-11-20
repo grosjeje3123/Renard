@@ -1,12 +1,12 @@
 {
   "name": "renard",
-  "version": "1.11.1",
+  "version": "1.12.0",
   "description": "Renard, mon compagnon pour apprendre à écrire (prototype jouable)",
   "main": "index.js",
   "scripts": {
     "build": "node build.mjs",
     "build:app": "node build.mjs --app",
-    "test": "node --test test/engine.test.js test/core.test.js test/features.test.js test/tableau.test.js test/voix.test.js",
+    "test": "node --test test/engine.test.js test/core.test.js test/features.test.js test/tableau.test.js test/voix.test.js test/v112.test.js",
     "apk": "node tools/apk.mjs",
     "icons": "node tools/make-icons.mjs",
     "shots": "node tools/shots.mjs",

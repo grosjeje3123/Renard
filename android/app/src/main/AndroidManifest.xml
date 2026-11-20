@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- allowBackup="false" : la progression de l'enfant (prénom, exercices, dessins) n'est pas copiée dans la sauvegarde
+         Google du compte : rien ne quitte la tablette. Les parents gardent le code de sauvegarde de l'espace parents. -->
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"

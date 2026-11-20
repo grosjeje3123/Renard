@@ -55,6 +55,7 @@ export class Board {
 
   build() {
     const { W, H, baseline } = this.bd;
+    const rows = this.bd.rows || [baseline]; // une phrase qui revient à la ligne a plusieurs lignes d'écriture
     // Cadrage : on zoome sur la zone utile (lettres plus grandes = plus faciles à tracer pour de petites mains).
     // Le repère reste celui du cahier ; seul le viewBox change, la conversion des points passe par getScreenCTM.
     const bb = this.tpl.strokes.reduce((a, s) => ({ x0: Math.min(a.x0, s.bbox.x0), x1: Math.max(a.x1, s.bbox.x1), y0: Math.min(a.y0, s.bbox.y0), y1: Math.max(a.y1, s.bbox.y1) }), { x0: 1e9, x1: -1e9, y0: 1e9, y1: -1e9 });
@@ -69,8 +70,7 @@ export class Board {
     el('rect', { class: 'paper', x: 0, y: 0, width: W, height: H, rx: 0.32 }, svg);
     const rules = el('g', { class: 'rules' }, svg);
     for (let y = 1; y < H; y++) {
-      const k = baseline - y;
-      el('line', { class: k === 0 ? 'r-base' : k === 2 || k === 3 ? 'r-main' : 'r-thin', x1: 0.25, x2: W - 0.25, y1: y, y2: y }, rules);
+      el('line', { class: rows.some((b) => b === y) ? 'r-base' : rows.some((b) => b - y === 2 || b - y === 3) ? 'r-main' : 'r-thin', x1: 0.25, x2: W - 0.25, y1: y, y2: y }, rules);
     }
     for (let x = 2; x < W; x += 2) el('line', { class: 'r-vert', x1: x, x2: x, y1: 0.3, y2: H - 0.3 }, rules);
 

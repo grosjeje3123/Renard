@@ -27,7 +27,7 @@ const SIZES = [['fin', 0.12, 0.1], ['moyen', 0.2, 0.22], ['gros', 0.34, 0.45]];
 const DRAW = { W: 10, H: 7, rows: [] }; // la hauteur du dessin suit la place libre (ui/sheet.js), 7 au minimum
 const CALQUES = [['plein', 'Plein'], ['pointille', 'Pointillés'], ['aucun', 'Caché']];
 const PNG_W = 1600;
-const ABC = 'abcdefghijklmnopqrstuvwxyz'.split('');
+const ABC = [...'abcdefghijklmnopqrstuvwxyz', ...'éèêàçôîùë']; // les lettres, puis les accents les plus courants du français
 const THUMB_VIEW = '1.4 0.4 7.2 6.4';
 
 const svgEl = (tag, attrs = {}, parent) => {
@@ -189,7 +189,7 @@ export function tableau(root, app) {
     syncCasse();
     if (view === 'ecrire') { buildPage(); fit?.set(pg.H / pg.W); }
   }
-  const askText = () => speaker.say(`Écris « ${shown()} » : suis la première ligne, puis les pointillés, puis écris tout seul !`, { icon: 'pencil', dit: `Écris « ${shown().toLowerCase()} » : suis la première ligne, puis les pointillés, puis écris tout seul !` });
+  const askText = () => speaker.say(`Écris « ${shown()} » : suis la première ligne, puis les pointillés, puis écris tout seul !`, { icon: 'pencil', dit: `Écris « ${shown().toLowerCase()} » : suis la première ligne, puis les pointillés, puis écris tout seul !`, repli: ['À toi d’écrire !', 'Suis la première ligne, puis les pointillés, puis écris tout seul !'] });
 
   function setCasse(id) {
     if (id === casse) return;
@@ -447,7 +447,7 @@ export function tableau(root, app) {
       if (!t || !fits(t, pc)) return;
       close();
       if (t !== text && view === 'ecrire' && strokes().length) clearAll(); // un autre texte : la page repart à blanc (changer seulement la casse garde l'écriture)
-      if (t !== text || pc !== casse) { text = t; casse = pc; app.tableauCasse = pc; applyText(); speaker.say(`On écrit « ${shown()} » ! Suis la première ligne.`, { icon: 'pencil' }); }
+      if (t !== text || pc !== casse) { text = t; casse = pc; app.tableauCasse = pc; applyText(); speaker.say(`On écrit « ${shown()} » ! Suis la première ligne.`, { icon: 'pencil', repli: ['C’est parti !', 'Suis la première ligne.'] }); }
     });
     const cancel = h('button', { class: 'btn-sec sm', type: 'button', onClick: () => { sfx('tap'); close(); } }, 'Annuler');
     picker = h('div', { class: 'result tpick', role: 'dialog', 'aria-label': 'Choisir ce qu’on écrit' },

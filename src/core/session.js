@@ -5,17 +5,23 @@
 // Trois échecs de suite : le renard remontre le geste et on revient à une phase plus simple.
 
 export const MAX_TRIES = 10;
+/**
+ * Un essai d'une phrase de vingt traits est bien plus long qu'un essai d'une lettre : la séance s'arrête plus tôt quand l'exercice est long,
+ * pour ne pas épuiser l'enfant (dix essais d'une phrase, ce serait plus de deux cents traits). On reprendra une autre fois, sans rien perdre.
+ */
+export const maxTriesFor = (strokes = 1) => (strokes <= 4 ? MAX_TRIES : strokes <= 8 ? 8 : strokes <= 12 ? 6 : 5);
 
 export class Session {
   /**
    * startPhase : un exercice déjà acquis un autre jour recommence directement « tout seul » (rappel express).
    * reps : réussites demandées à chaque étape (1 par défaut, 2 pour s'entraîner davantage).
    */
-  constructor(skillId, { demo = false, startPhase = 0, reps = 1, defi = false } = {}) {
+  constructor(skillId, { demo = false, startPhase = 0, reps = 1, defi = false, strokes = 1 } = {}) {
     this.defi = defi && startPhase === 2; // défi « tout seul » d'emblée : au premier raté, on passe aux pointillés
     this.skillId = skillId;
     const n = demo ? 1 : reps === 2 ? 2 : 1;
     this.need = [n, n, n];
+    this.maxTries = Math.max(maxTriesFor(strokes), 3 * n + 2); // toujours la place de réussir, avec deux ratés
     this.phase = startPhase;
     this.wins = this.need.map((n, i) => (i < startPhase ? n : 0));
     this.fails = 0;
@@ -70,7 +76,7 @@ export class Session {
   }
 
   #maybeTired(res) {
-    if (this.tries >= MAX_TRIES && !this.done) { this.done = true; this.ended = 'tired'; return { action: 'done', rewatch: false }; }
+    if (this.tries >= this.maxTries && !this.done) { this.done = true; this.ended = 'tired'; return { action: 'done', rewatch: false }; }
     return res;
   }
 

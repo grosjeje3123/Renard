@@ -33,6 +33,7 @@ export class GeometricRecognizer {
     const raw = dedupe(user.points || []);
     if (raw.length === 0) return emptyEval(['vide']);
     if (tStroke.kind === 'dot') return this.#evaluateDot(tStroke, raw, ts);
+    if (tStroke.mark) return this.#evaluateMark(tStroke, raw, ts); // un accent : un petit trait, jugé sur sa place et sa pente
 
     const clean = smooth(resample(raw, 0.07), 1);
     if (clean.length < 3 || polyLength(clean) < 0.3) return emptyEval(['trop-court']);
@@ -54,17 +55,21 @@ export class GeometricRecognizer {
       }
       // Recalage : on essaie deux points de départ, « pas de décalage » et « point à point le long du tracé ».
       // Le second évite qu'un n, un m ou un u écrit à demi-pas de sa place s'accroche à la mauvaise jambe.
+      // Pour estimer le décalage et la pente, un point sur deux du tracé et un sur trois du gabarit suffisent (0,18 interligne entre
+      // deux points) : le recalage est environ six fois plus rapide, ce qui compte sur une tablette modeste. La note, elle, est
+      // calculée ensuite sur tous les points.
+      const tplA = allege(tStroke.pts, 3), usrA = allege(usr, 2);
       const fit = (tx, ty) => {
         for (let it = 0; it < 8; it++) {
-          const off = meanOffsetToPolyline(translate(usr, tx, ty), tStroke.pts);
+          const off = meanOffsetToPolyline(translate(usrA, tx, ty), tplA);
           tx += off.x; ty += off.y;
           const m = Math.hypot(tx, ty);
           if (m > 1.6) { tx *= 1.6 / m; ty *= 1.6 / m; }
           if (Math.hypot(off.x, off.y) < 0.01) break;
         }
-        const moved = translate(usr, tx, ty);
+        const moved = translate(usrA, tx, ty);
         let r = 0;
-        for (const p of moved) r += distToPolyline(p, tStroke.pts);
+        for (const p of moved) r += distToPolyline(p, tplA);
         return { tx, ty, r: r / moved.length };
       };
       const ua = resampleN(usr, 40), ta = resampleN(tStroke.pts, 40);
@@ -74,7 +79,7 @@ export class GeometricRecognizer {
       const f0 = fit(0, 0), f1 = Math.hypot(init.x, init.y) < 2.5 ? fit(init.x, init.y) : f0;
       const { tx, ty } = f1.r < f0.r ? f1 : f0;
       usr = translate(usr, tx, ty);
-      if (o.slant) usr = fitShear(usr, tStroke.pts, o.slant);
+      if (o.slant) usr = fitShear(usr, tplA, o.slant);
     }
 
     const tpl = tStroke.pts;
@@ -139,15 +144,18 @@ export class GeometricRecognizer {
     const tags = [];
     if (direction < 0.4) tags.push('sens-inverse');
     if (start < 0.6) tags.push('depart-loin');
-    if (!complete) tags.push('incomplet');
-    if (size < 0.7 && (complete || o.align)) tags.push(gmean < 1 ? 'trop-petit' : 'trop-grand');
+    // « Incomplet » veut dire deux choses bien différentes pour l'enfant : il s'est arrêté en route (« continue jusqu'au bout »),
+    // ou il est allé au bout mais trop petit ou à côté du chemin. Le conseil doit dire laquelle.
+    const alleAuBout = fwd.reach >= 0.85 && !endFar;
+    if (!complete) tags.push(!alleAuBout ? 'incomplet' : gmean < 0.8 ? 'trop-petit' : gmean > 1.25 ? 'trop-grand' : 'hors-chemin');
+    if (size < 0.7 && (complete || o.align) && !tags.includes('trop-petit') && !tags.includes('trop-grand')) tags.push(gmean < 1 ? 'trop-petit' : 'trop-grand');
     if (complete && lines < 0.7) {
       if (eb < -0.4) tags.push('flotte');
       else if (eb > 0.4) tags.push('descend-trop');
       if (et > 0.4) tags.push('haut-court');
       else if (et < -0.4) tags.push('haut-depasse');
     }
-    if (precScore < 0.55 && complete) tags.push('hors-chemin');
+    if (precScore < 0.55 && complete && !tags.includes('hors-chemin')) tags.push('hors-chemin');
     if (flow < 0.6) tags.push(wobble > 0.2 ? 'tremble' : lifts ? 'leve' : 'pause');
 
     return { score, stars: starsFor(score), criteria, tags, metrics: { coverage, rawCov: covered / samples.length, reach: fwd.reach, dEnd, precMean, outFrac, d0, costF, costR, ratio, wobble, sizeErr, eb, et, userLen } };
@@ -169,9 +177,32 @@ export class GeometricRecognizer {
     return { score, stars: starsFor(score), criteria, tags, metrics: { d, spread } };
   }
 
+  /**
+   * Un accent (aigu, grave, circonflexe, cédille) : on regarde s'il est posé sur sa lettre, s'il reste petit, et — pour l'aigu et
+   * le grave — s'il penche du bon côté (c'est ce qui distingue « é » de « è »). Le sens du geste n'est pas jugé.
+   */
+  #evaluateMark(tStroke, raw, ts) {
+    const centre = (pts) => ({ x: pts.reduce((a, p) => a + p.x, 0) / pts.length, y: pts.reduce((a, p) => a + p.y, 0) / pts.length });
+    const d = dist(centre(raw), centre(tStroke.pts));
+    const bb = bbox(raw);
+    const spread = Math.hypot(bb.w, bb.h);
+    const start = sc(d, 0.5 * ts, 1.5 * ts);
+    const shape = sc(spread, 1.3, 2.6);
+    let score = 0.6 * start + 0.4 * shape;
+    const tags = [];
+    if (start < 0.5) tags.push('accent-loin');
+    if (tStroke.mark === 'aigu' || tStroke.mark === 'grave') {
+      const a = raw[0], b = raw[raw.length - 1];
+      const pente = (b.x - a.x) * (b.y - a.y), attendue = (tStroke.end.x - tStroke.start.x) * (tStroke.end.y - tStroke.start.y);
+      if (Math.abs(b.x - a.x) > 0.12 && Math.abs(b.y - a.y) > 0.12 && pente * attendue < 0) { score = Math.min(score, 0.4); tags.push('accent-pente'); }
+    }
+    const criteria = { start, direction: 1, shape, size: 1, lines: 1, flow: 1 };
+    return { score, stars: starsFor(score), criteria, tags, metrics: { d, spread } };
+  }
+
   evaluateAttempt(template, evals) {
     if (!evals.length) return emptyEval(['vide']);
-    const w = evals.map((e, i) => (template.strokes[i]?.kind === 'dot' ? 0.5 : 1));
+    const w = evals.map((e, i) => (template.strokes[i]?.kind === 'dot' || template.strokes[i]?.mark ? 0.5 : 1));
     const W = w.reduce((a, b) => a + b, 0);
     const avg = (f) => evals.reduce((s, e, i) => s + f(e) * w[i], 0) / W;
     const criteria = {};
@@ -207,6 +238,14 @@ function fitShear(usr, tpl, { min, max }) {
   const sheared = usr.map((p) => ({ ...p, x: p.x - bestK * (p.y - cy) }));
   const off = meanOffsetToPolyline(sheared, tpl);
   return translate(sheared, off.x, off.y);
+}
+
+/** Un point sur `pas` (le premier et le dernier sont gardés). */
+function allege(pts, pas) {
+  if (pts.length <= 12) return pts;
+  const out = pts.filter((_, i) => i % pas === 0);
+  if ((pts.length - 1) % pas !== 0) out.push(pts[pts.length - 1]);
+  return out;
 }
 
 function emptyEval(tags) {

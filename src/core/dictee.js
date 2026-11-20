@@ -1,27 +1,23 @@
 // Dictée : choix des exercices à dicter et suivi. Une dictée vérifie ce que l'enfant sait déjà écrire sans modèle :
 // elle ne change jamais la maîtrise d'un exercice (voir progress.js) et ne donne ni vignette ni accessoire.
-import { SKILLS, skillOrder, isWriting, nbLettres } from '../content/skills.js';
+import { SKILLS, skillOrder, nbLettres } from '../content/skills.js';
+import { seDicte } from '../content/dictee.js';
 import { skillState, isSkillOpen } from './progress.js';
 
 export const DICTEE_N = 5;
 /** La dictée surprise, proposée en cours de route (tous les 5 exercices acquis, ou après une série fêtée) : courte. */
 export const SURPRISE_N = 3;
 export const surpriseOk = (st) => st.settings.dicteeSurprise !== false && !st.settings.demo && !!st.settings.voix && dicteePossible(st);
-const MAX_LETTRES_MOT = 8, MAX_LETTRES_PHRASE = 12; // au-delà, le cahier d'une dictée deviendrait trop serré
 
 /**
- * La dictée se complique avec l'enfant : 1 = lettres et chiffres ; 2 = sons et petits mots (3 lettres au plus) ; 3 = mots ;
- * 4 = petites phrases. Toujours parmi ce qu'il a déjà acquis : on ne dicte jamais ce qui n'a pas été appris.
+ * La dictée se complique avec l'enfant : 1 = lettres et chiffres ; 2 = petits mots (4 ou 5 lettres) ; 3 = mots plus longs
+ * (6 à 8 lettres) ; 4 = petites phrases. Toujours parmi ce qu'il a déjà acquis : on ne dicte jamais ce qui n'a pas été appris.
+ * Ni son seul ni mot de moins de quatre lettres : voir seDicte (content/dictee.js).
  */
-export const DICTEE_PALIERS = { 1: 'des lettres', 2: 'des sons et des petits mots', 3: 'des mots', 4: 'de petites phrases' };
-export const palier = (s) => (s.kind === 'letter' ? 1 : s.phrase ? 4 : s.groupe || nbLettres(s.word) <= 3 ? 2 : 3);
+export const DICTEE_PALIERS = { 1: 'des lettres', 2: 'de petits mots', 3: 'des mots plus longs', 4: 'de petites phrases' };
+export const palier = (s) => (s.kind === 'letter' ? 1 : s.phrase ? 4 : nbLettres(s.word) <= 5 ? 2 : 3);
 
-const dictable = (id) => {
-  const s = SKILLS[id];
-  if (!s || !isWriting(s)) return false;
-  if (s.kind === 'letter') return true;
-  return nbLettres(s.word) <= (s.phrase ? MAX_LETTRES_PHRASE : MAX_LETTRES_MOT);
-};
+const dictable = (id) => seDicte(SKILLS[id]);
 
 /** Exercices que l'enfant sait déjà : les acquis ; à défaut, ceux qu'il a essayés ; en démonstration, tous ceux qui sont ouverts. */
 export function dicteePool(st) {

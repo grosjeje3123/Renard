@@ -49,7 +49,7 @@ export function cahier(root, app, id) {
 
   const fox = app.makeFox(foxHost);
   const speaker = makeSpeaker(fox, b);
-  speaker.say(`Prends ton cahier et ton crayon. ${verb(sk)} ${todo(sk)}, comme tu l’as fait avec moi !`, { icon: 'pencil' });
+  speaker.say(`Prends ton cahier et ton crayon. ${verb(sk)} ${todo(sk)}, comme tu l’as fait avec moi !`, { icon: 'pencil', repli: ['Prends ton cahier et ton crayon.', 'Écris-le comme tu l’as fait avec moi !'] });
 
   go.addEventListener('click', () => {
     markPaper(st, id);

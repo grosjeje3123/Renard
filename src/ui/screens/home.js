@@ -1,4 +1,5 @@
 import { h, icon, pick } from '../dom.js';
+import { decouper } from '../../core/voixId.js';
 import { forestScene } from '../art.js';
 import { bubble, makeSpeaker } from '../say.js';
 import { recommend, foxStage, breakDue, blocked, takeBreak } from '../../core/progress.js';
@@ -72,19 +73,44 @@ export function home(root, app) {
   else if (rec.reason === 'continue') line = `Content de te revoir${name} ! On continue : ${skill.title.toLowerCase()} ?`;
   else if (rec.reason === 'next') line = `Bravo pour tes progrès${name} ! Prêt pour ${skill.title.toLowerCase()} ?`;
   else line = `Salut${name} ! On refait un exercice que tu aimes ?`;
-  speaker.say(line, { silent: true, icon: resting ? 'moon' : undefined });
+  // Le prénom et le nom de l'exercice n'ont pas d'enregistrement : sans voix du système (application Android), le renard dit
+  // la même chose avec des phrases enregistrées (voir tools/paroles.mjs, « accueil »).
+  const SUITE = { review: 'On s’entraîne encore ?', revise: 'Tu t’en souviens ? On vérifie ensemble !', continue: 'On continue ?', next: 'Prêt pour la suite ?' };
+  const repli = block === 'limit' ? ['On se retrouve demain !', 'Aujourd’hui, on a bien travaillé.']
+    : block === 'sleep' ? ['Je fais une petite sieste… On se retrouve tout à l’heure !']
+      : due ? ['J’ai bien travaillé avec toi !', 'Et si on faisait une pause ?']
+        : first ? ['Bonjour !', 'Je m’appelle Renard.', 'Tu veux apprendre à écrire avec moi ?']
+          : SUITE[rec.reason] ? [rec.reason === 'next' ? 'Bravo pour tes progrès !' : 'Content de te revoir !', ...decouper(SUITE[rec.reason]), skill.short]
+            : ['Salut !', 'On refait un exercice que tu aimes ?'];
+  speaker.say(line, { silent: true, icon: resting ? 'moon' : undefined, repli });
   if (block) fox.setMood('sleep');
   else fox.setMood('wave', 2800); // le renard salue à l’arrivée
 
   // La toute première fois, on montre d'abord les trois étapes (guide, pointillés, tout seul), puis on enchaîne sur l'exercice.
   playBtn.addEventListener('click', () => { sfx('pop'); app.go(resting ? 'pause' : !st.settings.methodeVue && !st.settings.demo ? `methode-${rec.skillId}` : `exercice-${rec.skillId}`); });
   stayBtn?.addEventListener('click', () => { sfx('tap'); takeBreak(st); app.save(); app.go(`exercice-${rec.skillId}`); }); // pause refusée : on repart pour un tour
+  // La voix est ce qui permet à un enfant qui ne lit pas de jouer seul : un toucher la remet tout de suite, mais pour la couper
+  // il faut maintenir le bouton une seconde et demie (un toucher par mégarde fait seulement répéter le renard).
+  const paintVoice = () => {
+    voiceBtn.innerHTML = `<span class="ring"></span>${icon(st.settings.voix ? 'speaker' : 'mute', 26)}`;
+    voiceBtn.setAttribute('aria-label', st.settings.voix ? 'Écouter le renard (maintenir appuyé pour couper la voix)' : 'Remettre la voix');
+  };
+  const setVoice = (on) => { st.settings.voix = on; app.applySettings(); paintVoice(); if (on) speaker.repeat(); };
+  paintVoice();
+  let vRaf = 0, vT0 = 0, vCoupee = false;
+  const vStop = () => { cancelAnimationFrame(vRaf); voiceBtn.querySelector('.ring')?.style.setProperty('--p', '0'); };
+  const vTick = (now) => {
+    const k = Math.min(1, (now - vT0) / 1500);
+    voiceBtn.querySelector('.ring')?.style.setProperty('--p', String(k));
+    if (k >= 1) { vStop(); vCoupee = true; sfx('tap'); setVoice(false); return; }
+    vRaf = requestAnimationFrame(vTick);
+  };
+  voiceBtn.addEventListener('pointerdown', () => { vCoupee = false; if (st.settings.voix) { vT0 = performance.now(); vRaf = requestAnimationFrame(vTick); } });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => voiceBtn.addEventListener(ev, vStop));
+  voiceBtn.addEventListener('contextmenu', (e) => e.preventDefault());
   voiceBtn.addEventListener('click', () => {
-    st.settings.voix = !st.settings.voix;
-    app.applySettings();
-    voiceBtn.innerHTML = icon(st.settings.voix ? 'speaker' : 'mute', 26);
-    voiceBtn.setAttribute('aria-label', st.settings.voix ? 'Couper la voix' : 'Remettre la voix');
-    if (st.settings.voix) speaker.repeat();
+    if (vCoupee) { vCoupee = false; return; } // l'appui long vient de couper la voix
+    if (!st.settings.voix) setVoice(true); else speaker.repeat();
   });
   const pet = () => {
     sfx('giggle');
@@ -109,5 +135,5 @@ export function home(root, app) {
   lockBtn.addEventListener('contextmenu', (e) => e.preventDefault());
   lockBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter') { app.parentOk = Date.now(); app.go('parents'); } }); // clavier : accès direct pour les adultes
 
-  return () => { stop(); fox.destroy(); };
+  return () => { stop(); vStop(); fox.destroy(); };
 }
